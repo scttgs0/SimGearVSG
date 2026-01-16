@@ -1,0 +1,172 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// SPDX-FileCopyrightText: 2012 Thomas Geymayer <tomgey@gmail.com>
+
+/**
+ * @file
+ * @brief An image on the Canvas
+ */
+
+#ifndef CANVAS_IMAGE_HXX_
+#define CANVAS_IMAGE_HXX_
+
+#include "CanvasElement.hxx"
+
+#include <simgear/canvas/canvas_fwd.hxx>
+#include <simgear/io/HTTPClient.hxx>
+#include <simgear/misc/CSSBorder.hxx>
+#include <simgear/misc/SVGpreserveAspectRatio.hxx>
+#include <simgear/scene/util/SGProgram.hxx>
+#include <osg/Texture2D>
+
+namespace simgear
+{
+namespace HTTP { class Request; }
+namespace canvas
+{
+
+  class Image:
+    public Element
+  {
+    public:
+      static const std::string TYPE_NAME;
+      static void staticInit();
+
+      /**
+       * @param node    Property node containing settings for this image:
+       *                  rect/[left/right/top/bottom]  Dimensions of source
+       *                                                rect
+       *                  size[0-1]                     Dimensions of rectangle
+       *                  [x,y]                         Position of rectangle
+       */
+      Image( const CanvasWeakPtr& canvas,
+             const SGPropertyNode_ptr& node,
+             const Style& parent_style = Style(),
+             ElementWeakPtr parent = 0 );
+      virtual ~Image();
+
+      void valueChanged(SGPropertyNode* child) override;
+
+      void setSrcCanvas(CanvasPtr canvas);
+      CanvasWeakPtr getSrcCanvas() const;
+
+      void setImage(osg::ref_ptr<osg::Image> img);
+      void setOpacity(float opacity);
+      void setFill(const std::string& fill);
+      void setFill(const osg::Vec4& color);
+
+      void setSize(const SGVec2f& sz);
+
+      /**
+       * @see http://www.w3.org/TR/css3-background/#border-image-outset
+       */
+      void setOutset(const std::string& outset);
+
+      /**
+       * @see
+       *   http://www.w3.org/TR/SVG11/coords.html#PreserveAspectRatioAttribute
+       */
+      void setPreserveAspectRatio(const std::string& scale);
+
+      /**
+       * Set image slice (aka. 9-scale)
+       *
+       * @see http://www.w3.org/TR/css3-background/#border-image-slice
+       */
+      void setSlice(const std::string& slice);
+
+      /**
+       * Set image slice width.
+       *
+       * By default the size of the 9-scale grid is the same as specified
+       * with setSlice/"slice". Using this method allows setting values
+       * different to the size in the source image.
+       *
+       * @see http://www.w3.org/TR/css3-background/#border-image-width
+       */
+      void setSliceWidth(const std::string& width);
+
+      const SGRect<float>& getRegion() const;
+
+      bool handleEvent(const EventPtr& event) override;
+
+      /**
+       *
+       */
+      void setSourceRect(const SGRect<float>& sourceRect);
+
+      /**
+       * fill the specified rectangle of the image, with an RGB value
+       */
+      void fillRect(const SGRect<int>& rect, const std::string& color);
+
+      /**
+       * fill the specified rectangle of the image, with an RGB value
+       */
+      void fillRect(const SGRect<int>& rect, const osg::Vec4& color);
+
+      void setPixel(int x, int y, const std::string& color);
+
+      void setPixel(int x, int y, const osg::Vec4& color);
+
+      /**
+        * mark the image pixels as modified, so the canvas is re-painted
+       */
+      void dirtyPixels();
+
+      osg::ref_ptr<osg::Image> getImage() const;
+
+    //  void setRow(int row, int offset, )
+    protected:
+      enum ImageAttributes
+      {
+        SRC_RECT       = LAST_ATTRIBUTE << 1, // Source image rectangle
+        DEST_SIZE      = SRC_RECT << 1,       // Element size
+        SRC_CANVAS     = DEST_SIZE << 1
+      };
+
+      void updateImpl(double dt) override;
+
+      void childChanged(SGPropertyNode * child) override;
+
+      void setupDefaultDimensions();
+      SGRect<int> getTextureDimensions() const;
+
+      void setQuad(size_t index, const SGVec2f& tl, const SGVec2f& br);
+      void setQuadUV(size_t index, const SGVec2f& tl, const SGVec2f& br);
+
+      void handleImageLoadDone(HTTP::Request*);
+      bool loadImage( osgDB::ReaderWriter& reader,
+                      const std::string& data,
+                      HTTP::Request& request,
+                      const std::string& type );
+
+      void allocateImage();
+
+      static osg::ref_ptr<SGProgram> _program;
+
+      osg::ref_ptr<osg::Texture2D> _texture;
+      // TODO optionally forward events to canvas
+      CanvasWeakPtr _src_canvas;
+      HTTP::Request_ptr _http_request;
+
+      osg::ref_ptr<osg::Geometry>  _geom;
+      osg::ref_ptr<osg::DrawArrays>_prim;
+      osg::ref_ptr<osg::Vec3Array> _vertices;
+      osg::ref_ptr<osg::Vec2Array> _texCoords;
+      osg::ref_ptr<osg::Vec4Array> _colors;
+
+      SGPropertyNode *_node_src_rect = nullptr;
+      SGRect<float>   _src_rect {0, 0},
+                      _region   {0, 0};
+
+      SVGpreserveAspectRatio _preserve_aspect_ratio;
+
+      CSSBorder       _outset,
+                      _slice,
+                      _slice_width;
+  };
+
+} // namespace canvas
+} // namespace canvas
+
+#endif /* CANVAS_IMAGE_HXX_ */

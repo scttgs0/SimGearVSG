@@ -1,0 +1,81 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
+
+#pragma once
+
+#include <optional>
+
+class SGGeodesy {
+public:
+  // Hard numbers from the WGS84 standard.
+  static const double EQURAD;
+  static const double iFLATTENING;
+  static const double SQUASH;
+  static const double STRETCH;
+  static const double POLRAD;
+
+  /// Takes a cartesian coordinate data and returns the geodetic
+  /// coordinates.
+  static void SGCartToGeod(const SGVec3<double>& cart, SGGeod& geod);
+
+  /// Takes a geodetic coordinate data and returns the cartesian
+  /// coordinates.
+  static void SGGeodToCart(const SGGeod& geod, SGVec3<double>& cart);
+
+  /// Takes a geodetic coordinate data and returns the sea level radius.
+  static double SGGeodToSeaLevelRadius(const SGGeod& geod);
+
+  /// Takes a cartesian coordinate data and returns the geocentric
+  /// coordinates.
+  static void SGCartToGeoc(const SGVec3<double>& cart, SGGeoc& geoc);
+
+  /// Takes a geocentric coordinate data and returns the cartesian
+  /// coordinates.
+  static void SGGeocToCart(const SGGeoc& geoc, SGVec3<double>& cart);
+
+  // Geodetic course/distance computation
+  static bool direct(const SGGeod& p1, double course1,
+                     double distance, SGGeod& p2, double& course2);
+
+  /// overloaded version of above, returns new value directly, throws
+  /// an sg_exception on failure.
+  static SGGeod direct(const SGGeod& p1, double course1,
+                     double distance);
+
+  static bool inverse(const SGGeod& p1, const SGGeod& p2, double& course1,
+                      double& course2, double& distance);
+
+  static double courseDeg(const SGGeod& from, const SGGeod& to);
+  static double distanceM(const SGGeod& from, const SGGeod& to);
+  static double distanceNm(const SGGeod& from, const SGGeod& to);
+
+  // Geocentric course/distance computation
+  static void advanceRadM(const SGGeoc& geoc, double course, double distance,
+                          SGGeoc& result);
+
+  static SGGeoc advanceDegM(const SGGeoc &geoc, double course, double distance);
+
+  static double courseRad(const SGGeoc& from, const SGGeoc& to);
+  static double distanceRad(const SGGeoc& from, const SGGeoc& to);
+  static double distanceM(const SGGeoc& from, const SGGeoc& to);
+
+  static bool cross(const SGGeod& e1, const SGGeod& e2, SGVec3d& result);
+  static bool largeAngleDiff(const SGGeod& p1, const SGGeod& p2);
+  /**
+   * compute the intersection of two great circle segments, or return false
+   * if no intersection could be computed.
+   */
+  static std::optional<SGGeod> intersection(const SGGeod& e1, const SGGeod& e2,
+      const SGGeod& e3, const SGGeod& e4);
+
+  /**
+   * compute the intersection of two (true) radials (in degrees), or return false
+   * if no intersection could be computed.
+   */
+  static bool radialIntersection(const SGGeoc& a, double aRadial,
+    const SGGeoc& b, double bRadial, SGGeoc& result);
+
+  static bool radialIntersection(const SGGeod& a, double aRadial,
+    const SGGeod& b, double bRadial, SGGeod& result);
+
+};

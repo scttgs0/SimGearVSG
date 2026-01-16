@@ -1,0 +1,85 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+# SPDX-FileCopyrightText: James Turner <james@flightgear.org>
+
+# required by configure_package_config_file()
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(ZLIB)
+find_dependency(LibLZMA)
+find_dependency(Threads)
+find_dependency(CURL)
+
+set(SIMGEAR_HEADLESS @SIMGEAR_HEADLESS@)
+
+# OSG
+if (NOT SIMGEAR_HEADLESS)
+  # this does a find_package on OpenSceneGraph,
+  # then creates imported targets for OSG
+  include(${CMAKE_CURRENT_LIST_DIR}/CreateOSGImportedTargets.cmake)
+endif()
+
+set(SIMGEAR_SOUND @ENABLE_SOUND@)
+set(USE_AEONWAVE @USE_AEONWAVE@)
+set(SG_SOUND_USES_OPENALSOFT @SG_SOUND_USES_OPENALSOFT@)
+
+set(ENABLE_ASAN @ENABLE_ASAN@)
+set(SIMGEAR_SHARED @SIMGEAR_SHARED@)
+set(SIMGEAR_USE_FFMPEG @SIMGEAR_USE_FFMPEG@)
+
+# SSE/SSE2 support
+
+set(ENABLE_SIMD @ENABLE_SIMD@)
+
+# CycloneDDS support
+set(SG_HAVE_DDS @SG_HAVE_DDS@)
+if(SG_HAVE_DDS)
+    find_dependency(CycloneDDS)
+endif()
+
+# if we're a static build, we still need to link against this, even though
+# it's a PRIVATE dependency
+if (NOT SIMGEAR_SHARED AND @SIMGEAR_USING_CARES_DNS@)
+  find_dependency(c-ares 1.17)
+endif()
+
+
+if (SIMGEAR_SOUND)
+  # find the sound dependency
+  if (USE_AEONWAVE)
+    find_dependency(AAX)
+  elseif(SG_SOUND_USES_OPENALSOFT)
+    # must force CONFIG mode when using OpenAL soft, to avoid picking
+    # the CMake supplied FindOpenAL and hence defaults to the system
+    # framework on macOS
+    find_dependency(OpenAL CONFIG)
+  else()
+    find_dependency(OpenAL)
+  endif()
+endif()
+
+if (SIMGEAR_USE_FFMPEG)
+  find_dependency(FFmpeg COMPONENTS AVCODEC AVFORMAT AVUTIL SWSCALE)
+  include(${CMAKE_CURRENT_LIST_DIR}/CreateFFmpegImportedTargets.cmake)
+endif()
+
+# OpenRTI support
+set(ENABLE_RTI @ENABLE_RTI@)
+if(ENABLE_RTI)
+    find_dependency(PkgConfig)
+    if(PKG_CONFIG_FOUND)
+      pkg_check_modules(RTI IMPORTED_TARGET hla-rti13)
+    endif(PKG_CONFIG_FOUND)
+endif(ENABLE_RTI)
+
+# Alternative terrain engine based on pagedLOD
+
+set(ENABLE_GDAL @ENABLE_GDAL@)
+if (ENABLE_GDAL)
+  find_dependency(GDAL)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/SimGearTargets.cmake")
+
+check_required_components(SimGear)

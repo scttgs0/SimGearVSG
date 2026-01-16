@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// SPDX-FileCopyrightText: 2000 Curtis L. Olson - http://www.flightgear.org/~curt/
+
+#pragma once
+
+#define SIMGEAR_VERSION       @SIMGEAR_VERSION@
+#define SIMGEAR_MAJOR_VERSION @SIMGEAR_MAJOR_VERSION@
+#define SIMGEAR_MINOR_VERSION @SIMGEAR_MINOR_VERSION@
+#define SIMGEAR_PATCH_VERSION @SIMGEAR_PATCH_VERSION@

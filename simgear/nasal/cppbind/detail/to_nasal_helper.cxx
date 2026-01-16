@@ -1,0 +1,146 @@
+///@brief Conversion functions to convert C++ types to Nasal types
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// SPDX-FileCopyrightText: 2012 Thomas Geymayer <tomgey@gmail.com>
+
+#include "to_nasal_helper.hxx"
+#include "simgear/nasal/nasal.h"
+
+#include <any>
+#include <memory>
+
+#include <simgear/nasal/cppbind/NasalHash.hxx>
+#include <simgear/nasal/cppbind/Ghost.hxx>
+
+#include <simgear/structure/exception.hxx>
+#include <simgear/math/SGMath.hxx>
+#include <simgear/misc/sg_path.hxx>
+
+namespace nasal
+{
+
+
+  //----------------------------------------------------------------------------
+  naRef to_nasal_helper(naContext c, const std::string& str)
+  {
+    naRef ret = naNewString(c);
+    naStr_fromdata(ret, str.c_str(), static_cast<int>(str.size()));
+    return ret;
+  }
+
+  //----------------------------------------------------------------------------
+  naRef to_nasal_helper(naContext c, const char* str)
+  {
+    return to_nasal_helper(c, std::string(str));
+  }
+
+  //----------------------------------------------------------------------------
+  naRef to_nasal_helper(naContext c, const Hash& hash)
+  {
+    return hash.get_naRef();
+  }
+
+  //----------------------------------------------------------------------------
+  naRef to_nasal_helper(naContext c, const naRef& ref)
+  {
+    return ref;
+  }
+
+  //------------------------------------------------------------------------------
+  naRef to_nasal_helper(naContext c, const SGGeod& pos)
+  {
+    nasal::Hash hash(c);
+    hash.set("lat", pos.getLatitudeDeg());
+    hash.set("lon", pos.getLongitudeDeg());
+    hash.set("elevation", pos.getElevationM());
+    return hash.get_naRef();
+  }
+
+  //----------------------------------------------------------------------------
+  naRef to_nasal_helper(naContext c, const SGPath& path)
+  {
+    return to_nasal_helper(c, path.utf8Str());
+  }
+
+  //----------------------------------------------------------------------------
+  naRef to_nasal_helper(naContext c, naCFunction func)
+  {
+    return naNewFunc(c, naNewCCode(c, func));
+  }
+
+  //----------------------------------------------------------------------------
+  static naRef free_function_invoker( naContext c,
+                                      naRef me,
+                                      int argc,
+                                      naRef* args,
+                                      void* user_data )
+  {
+    free_function_t* func = static_cast<free_function_t*>(user_data);
+    assert(func);
+
+    try
+    {
+      return (*func)(nasal::CallContext(c, me, argc, args));
+    }
+    // CppUnit::Exception inherits std::exception, so restrict ourselves to
+    // sg_exception
+    catch (const sg_exception& e)
+    {
+       naRuntimeError(c, "Fatal error in Nasal call: %s", e.what());
+    }
+
+    return naNil();
+  }
+
+  //----------------------------------------------------------------------------
+  static void free_function_destroy(void* func)
+  {
+    delete static_cast<free_function_t*>(func);
+  }
+
+
+  naRef to_nasal_helper(naContext c, const free_function_t& func)
+  {
+    return naNewFunc
+    (
+      c,
+      naNewCCodeUD
+      (
+        c,
+        &free_function_invoker,
+        new free_function_t(func),
+        &free_function_destroy
+      )
+    );
+  }
+
+  template <>
+  naRef to_nasal(naContext c, const std::any& arg)
+  {
+      return any_to_nasal_helper(c, arg);
+  }
+
+  //----------------------------------------------------------------------------
+  naRef any_to_nasal_helper(naContext c, const std::any& a)
+  {
+      if (a.type() == typeid(int)) {
+          return naNum(std::any_cast<int>(a));
+      }
+      if (a.type() == typeid(float)) {
+          return naNum(std::any_cast<float>(a));
+      }
+      if (a.type() == typeid(double)) {
+          return naNum(std::any_cast<double>(a));
+      }
+      if (a.type() == typeid(bool)) {
+          const auto b = std::any_cast<bool>(a);
+          return naNum(b ? 1.0 : 0.0);
+      }
+      if (a.type() == typeid(std::string)) {
+          return to_nasal_helper(c, std::any_cast<std::string>(a));
+      }
+
+      return naNil();
+  }
+
+
+} // namespace nasal

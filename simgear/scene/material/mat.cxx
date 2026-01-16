@@ -1,0 +1,699 @@
+// mat.cxx -- class to handle material properties
+//
+// Written by Curtis Olson, started May 1998.
+//
+// SPDX-FileCopyrightText: 1998 - 2000 Curtis L. Olson
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
+#include <simgear_config.h>
+
+#include <simgear/compiler.h>
+
+#include <string.h>
+#include <map>
+#include <vector>
+#include <string>
+#include <mutex>
+
+#include "mat.hxx"
+
+#include <osg/CullFace>
+#include <osg/Material>
+#include <osg/ShadeModel>
+#include <osg/StateSet>
+#include <osg/TexEnv>
+#include <osg/Texture>
+#include <osg/Texture2D>
+#include <osgDB/ReaderWriter>
+#include <osgDB/ReadFile>
+#include <osgDB/Registry>
+#include <osgDB/FileUtils>
+
+#include <simgear/debug/logstream.hxx>
+#include <simgear/debug/ErrorReportingCallback.hxx>
+#include <simgear/misc/sg_path.hxx>
+#include <simgear/io/iostreams/sgstream.hxx>
+
+#include <simgear/scene/util/SGReaderWriterOptions.hxx>
+#include <simgear/props/props_io.hxx>
+#include <simgear/props/vectorPropTemplates.hxx>
+#include <simgear/scene/model/model.hxx>
+#include <simgear/scene/material/matmodel.hxx>
+#include <simgear/scene/util/RenderConstants.hxx>
+#include <simgear/scene/util/StateAttributeFactory.hxx>
+#include <simgear/props/condition.hxx>
+#include <simgear/scene/util/SGSceneFeatures.hxx>
+#include <simgear/scene/tgdb/SGTexturedTriangleBin.hxx>
+
+#include "Effect.hxx"
+#include "Technique.hxx"
+#include "Pass.hxx"
+
+using std::map;
+using namespace simgear;
+using namespace std::string_literals;
+
+////////////////////////////////////////////////////////////////////////
+// Constructors and destructor.
+////////////////////////////////////////////////////////////////////////
+
+SGMaterial::_internal_state::_internal_state(Effect *e, bool l,
+                                             const SGReaderWriterOptions* o)
+    : effect(e), effect_realized(l), options(o)
+{
+}
+
+SGMaterial::_internal_state::_internal_state( Effect *e,
+                                              const std::string &t,
+                                              bool l,
+                                              const SGReaderWriterOptions* o )
+    : effect(e), effect_realized(l), options(o)
+{
+    texture_paths.push_back(std::make_pair(t,0));
+}
+
+void SGMaterial::_internal_state::add_texture(const std::string &t, int i)
+{
+    texture_paths.push_back(std::make_pair(t,i));
+}
+
+SGMaterial::SGMaterial( const SGReaderWriterOptions* options,
+                        const SGPropertyNode *props,
+                        SGPropertyNode *prop_root,
+                        std::shared_ptr<AreaList> a,
+			SGSharedPtr<const SGCondition> c,
+                        const std::string& n)
+{
+    init();
+    areas = a;
+    condition = c;
+    region = n;
+    read_properties( options, props, prop_root );
+    buildEffectProperties(options);
+}
+
+SGMaterial::SGMaterial( const osgDB::Options* options,
+                        const SGPropertyNode *props,
+                        SGPropertyNode *prop_root,
+                        std::shared_ptr<AreaList> a,
+                        SGSharedPtr<const SGCondition> c,
+                        const std::string& n)
+{
+    osg::ref_ptr<SGReaderWriterOptions> opt;
+    opt = SGReaderWriterOptions::copyOrCreate(options);
+    areas = a;
+    condition = c;
+    region = n;
+    init();
+    read_properties(opt.get(), props, prop_root);
+    buildEffectProperties(opt.get());
+}
+
+SGMaterial::~SGMaterial (void)
+{
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// Public methods.
+////////////////////////////////////////////////////////////////////////
+
+void
+SGMaterial::read_properties(const SGReaderWriterOptions* options,
+                            const SGPropertyNode *props,
+                            SGPropertyNode *prop_root)
+{
+    float default_object_range = prop_root->getFloatValue("/sim/rendering/static-lod/rough", SG_OBJECT_RANGE_ROUGH);
+    std::vector<bool> dds;
+    std::vector<SGPropertyNode_ptr> textures = props->getChildren("texture");
+    for (unsigned int i = 0; i < textures.size(); i++)
+    {
+        std::string tname = textures[i]->getStringValue();
+
+        if (tname.empty()) {
+            tname = "unknown.rgb";
+        }
+
+        SGPath tpath("Textures"s);
+        tpath.append(tname);
+        std::string fullTexPath = SGModelLib::findDataFile(tpath, options);
+        if (fullTexPath.empty()) {
+            SG_LOG(SG_GENERAL, SG_ALERT, "Cannot find texture \""
+                    << tname << "\" in Textures folders.");
+        }
+
+        if (tpath.lower_extension() == "dds") {
+            dds.push_back(true);
+        } else {
+            dds.push_back(false);
+        }
+
+        if (!fullTexPath.empty() ) {
+            _internal_state st( NULL, fullTexPath, false, options );
+            _status.push_back( st );
+        }
+    }
+
+    std::vector<SGPropertyNode_ptr> texturesets = props->getChildren("texture-set");
+    for (unsigned int i = 0; i < texturesets.size(); i++)
+    {
+        _internal_state st( NULL, false, options );
+        std::vector<SGPropertyNode_ptr> textures = texturesets[i]->getChildren("texture");
+        for (unsigned int j = 0; j < textures.size(); j++)
+        {
+            std::string tname = textures[j]->getStringValue();
+            if (tname.empty()) {
+                tname = "unknown.rgb";
+            }
+
+            SGPath tpath("Textures"s);
+            tpath.append(tname);
+            std::string fullTexPath = SGModelLib::findDataFile(tpath, options);
+            if (fullTexPath.empty()) {
+                SG_LOG(SG_GENERAL, SG_ALERT, "Cannot find texture \""
+                        << tname << "\" in Textures folders.");
+            }
+
+            if (j == 0) {
+                if (tpath.lower_extension() == "dds") {
+                    dds.push_back(true);
+                } else {
+                    dds.push_back(false);
+                }
+            }
+
+            st.add_texture(fullTexPath, textures[j]->getIndex());
+        }
+
+        if (!st.texture_paths.empty() ) {
+            _status.push_back( st );
+        }
+    }
+
+    if (textures.empty() && texturesets.empty()) {
+        SGPath tpath("Textures"s);
+        tpath.append("Terrain");
+        tpath.append("unknown.rgb");
+        _internal_state st( NULL, tpath.utf8Str(), true, options );
+        _status.push_back( st );
+    }
+
+    std::vector<SGPropertyNode_ptr> masks = props->getChildren("object-mask");
+    for (unsigned int i = 0; i < masks.size(); i++)
+    {
+        std::string omname = masks[i]->getStringValue();
+
+        if (! omname.empty()) {
+            SGPath ompath("Textures"s);
+            ompath.append(omname);
+            std::string fullMaskPath = SGModelLib::findDataFile(ompath, options);
+
+            if (fullMaskPath.empty()) {
+                SG_LOG(SG_GENERAL, SG_ALERT, "Cannot find texture \""
+                        << omname << "\" in Textures folders.");
+            }
+            else
+            {
+                osg::Image* image = osgDB::readRefImageFile(fullMaskPath, options);
+                if (image && image->valid())
+                {
+                    Texture2DRef object_mask = new osg::Texture2D;
+
+                    bool dds_mask = (ompath.lower_extension() == "dds");
+
+                    if (i < dds.size() && dds[i] != dds_mask) {
+                        // Texture format does not match mask format. This is relevant for
+                        // the object mask, as DDS textures have an origin at the bottom
+                        // left rather than top left. Therefore we flip a copy of the image
+                        // (otherwise a second reference to the object mask would flip it
+                        // back!).
+                        SG_LOG(SG_GENERAL, SG_DEBUG, "Flipping object mask" << omname);
+                        image = (osg::Image* ) image->clone(osg::CopyOp::SHALLOW_COPY);
+                        image->flipVertical();
+                    }
+
+                    object_mask->setImage(image);
+
+                    // We force the filtering to be nearest, as the red channel (rotation)
+                    // in particular, doesn't make sense to be interpolated between pixels.
+                    object_mask->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+                    object_mask->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+
+                    object_mask->setDataVariance(osg::Object::STATIC);
+                    object_mask->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+                    object_mask->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+                    _masks.push_back(object_mask);
+                }
+            }
+        }
+    }
+
+    xsize = props->getDoubleValue("xsize", 0.0);
+    ysize = props->getDoubleValue("ysize", 0.0);
+    wrapu = props->getBoolValue("wrapu", true);
+    wrapv = props->getBoolValue("wrapv", true);
+    mipmap = props->getBoolValue("mipmap", true);
+    light_coverage = props->getDoubleValue("light-coverage", 0.0);
+
+    light_edge_spacing_m = props->getDoubleValue("light-edge-spacing-m", 0.0);
+    light_edge_size_cm = props->getDoubleValue("light-edge-size-cm", 40.0);
+    light_edge_height_m = props->getDoubleValue("light-edge-height-m", 5.0);
+    light_edge_intensity_cd = props->getDoubleValue("light-edge-intensity-cd", 50.0);
+    light_edge_angle_horizontal_deg = props->getDoubleValue("light-edge-angle-horizontal-deg", 360.0);
+    light_edge_angle_vertical_deg = props->getDoubleValue("light-edge-angle-vertical-deg", 360.0);
+    light_edge_offset = props->getBoolValue("light-edge-offset", true);
+    light_edge_left = props->getBoolValue("light-edge-left", true);
+    light_edge_right = props->getBoolValue("light-edge-right", true);
+    light_model = props->getStringValue("light-model", "");
+
+    light_edge_colour[0] = props->getDoubleValue("light-edge-color/r", 1.0);
+    light_edge_colour[1] = props->getDoubleValue("light-edge-color/g", 1.0);
+    light_edge_colour[2] = props->getDoubleValue("light-edge-color/b", 1.0);
+    light_edge_colour[3] = props->getDoubleValue("light-edge-color/a", 1.0);
+
+    // Line feature texture coordinates
+    line_feature_tex_x0 = props->getDoubleValue("line-feature-tex-x0", 0.0);
+    line_feature_tex_x1 = props->getDoubleValue("line-feature-tex-x1", 0.0);
+    line_feature_offset_m = props->getDoubleValue("line-feature-offset-m", 1.0);
+
+    // Building properties
+    building_coverage = props->getDoubleValue("building-coverage", 0.0);
+    building_spacing = props->getDoubleValue("building-spacing-m", 5.0);
+
+    SGPath bt(props->getStringValue("building-texture", "Textures/Buildings/global.png"));
+    building_texture = SGModelLib::findDataFile(bt, options);
+
+    if (building_texture.empty()) {
+        SG_LOG(SG_GENERAL, SG_ALERT, "Cannot find texture " << bt);
+    }
+
+    const std::string bt_base = bt.base();
+
+    bt = SGPath(props->getStringValue("building-normalmap", bt_base + "-normalmap.png"));
+    building_normalmap = SGModelLib::findDataFile(bt, options);
+
+    if (building_normalmap.empty()) {
+        simgear::reportFailure(simgear::LoadFailure::NotFound, simgear::ErrorCode::LoadingTexture,
+                               "Missing building normal-map:" + bt.utf8Str(), sg_location{props});
+    }
+
+    bt = SGPath(props->getStringValue("building-orm-texture", bt_base + "-orm.png"));
+    building_orm_texture = SGModelLib::findDataFile(bt, options);
+
+    if (building_orm_texture.empty()) {
+        simgear::reportFailure(simgear::LoadFailure::NotFound, simgear::ErrorCode::LoadingTexture,
+                               "Missing building ORM texture:" + bt.utf8Str(), sg_location{props});
+    }
+
+    bt = SGPath(props->getStringValue("building-emissive-texture", bt_base + "-emissive.png"));
+    building_emissive_texture = SGModelLib::findDataFile(bt, options);
+
+    if (building_emissive_texture.empty()) {
+        simgear::reportFailure(simgear::LoadFailure::NotFound, simgear::ErrorCode::LoadingTexture,
+                               "Missing building emmissive texture:" + bt.utf8Str(), sg_location{props});
+    }
+
+    building_small_ratio = props->getDoubleValue("building-small-ratio", 0.8);
+    building_medium_ratio = props->getDoubleValue("building-medium-ratio", 0.15);
+    building_large_ratio =  props->getDoubleValue("building-large-ratio", 0.05);
+
+    building_small_pitch =  props->getDoubleValue("building-small-pitch", 0.8);
+    building_medium_pitch =  props->getDoubleValue("building-medium-pitch", 0.2);
+    building_large_pitch =  props->getDoubleValue("building-large-pitch", 0.1);
+
+    building_small_min_floors = props->getIntValue("building-small-min-floors", 1);
+    building_small_max_floors = props->getIntValue("building-small-max-floors", 3);
+    building_medium_min_floors = props->getIntValue("building-medium-min-floors", 3);
+    building_medium_max_floors = props->getIntValue("building-medium-max-floors", 8);
+    building_large_min_floors = props->getIntValue("building-large-min-floors", 5);
+    building_large_max_floors = props->getIntValue("building-large-max-floors", 20);
+
+    building_small_min_width = props->getFloatValue("building-small-min-width-m", 15.0);
+    building_small_max_width = props->getFloatValue("building-small-max-width-m", 60.0);
+    building_small_min_depth = props->getFloatValue("building-small-min-depth-m", 10.0);
+    building_small_max_depth = props->getFloatValue("building-small-max-depth-m", 20.0);
+
+    building_medium_min_width = props->getFloatValue("building-medium-min-width-m", 25.0);
+    building_medium_max_width = props->getFloatValue("building-medium-max-width-m", 50.0);
+    building_medium_min_depth = props->getFloatValue("building-medium-min-depth-m", 20.0);
+    building_medium_max_depth = props->getFloatValue("building-medium-max-depth-m", 50.0);
+
+    building_large_min_width = props->getFloatValue("building-large-min-width-m", 50.0);
+    building_large_max_width = props->getFloatValue("building-large-max-width-m", 75.0);
+    building_large_min_depth = props->getFloatValue("building-large-min-depth-m", 50.0);
+    building_large_max_depth = props->getFloatValue("building-large-max-depth-m", 75.0);
+
+    building_range = props->getDoubleValue("building-range-m", default_object_range);
+
+    // There are some constraints on the maximum building size that we can sensibly render.
+    // Using values outside these ranges will result in the texture being stretched to fit,
+    // which may not be desirable.  We will allow it, but display warnings.
+    // We do not display warnings for large buildings as we assume the textures are sufficiently
+    // generic to be stretched without problems.
+    if (building_small_max_floors  >    3) SG_LOG(SG_GENERAL, SG_ALERT, "building-small-max-floors exceeds maximum (3). Texture will be stretched to fit.");
+    if (building_medium_max_floors >    8) SG_LOG(SG_GENERAL, SG_ALERT, "building-medium-max-floors exceeds maximum (8). Texture will be stretched to fit.");
+    if (building_large_max_floors  >   22) SG_LOG(SG_GENERAL, SG_ALERT, "building-large-max-floors exceeds maximum (22). Texture will be stretched to fit.");
+    if (building_small_max_width   > 192.0) SG_LOG(SG_GENERAL, SG_ALERT, "building-small-max-width-m exceeds maximum (192). Texture will be stretched to fit.");
+    if (building_small_max_depth   > 192.0) SG_LOG(SG_GENERAL, SG_ALERT, "building-small-max-depth-m exceeds maximum (192). Texture will be stretched to fit.");
+    if (building_medium_max_width  > 80.0) SG_LOG(SG_GENERAL, SG_ALERT, "building-medium-max-width-m exceeds maximum (80). Texture will be stretched to fit.");
+    if (building_medium_max_depth  > 80.0) SG_LOG(SG_GENERAL, SG_ALERT, "building-medium-max-depth-m exceeds maximum (80). Texture will be stretched to fit.");
+
+    cos_object_max_density_slope_angle  = cos(props->getFloatValue("object-max-density-angle-deg", 20.0) * osg::PI/180.0);
+    cos_object_zero_density_slope_angle = cos(props->getFloatValue("object-zero-density-angle-deg", 30.0) * osg::PI/180.0);
+
+    // Random vegetation properties
+    wood_coverage = props->getDoubleValue("wood-coverage", 0.0);
+    is_plantation = props->getBoolValue("plantation",false);
+    tree_effect = props->getStringValue("tree-effect", "Effects/tree");
+    tree_varieties = props->getIntValue("tree-varieties", 1);
+    tree_range = props->getDoubleValue("tree-range-m", default_object_range);
+
+    tree_height = props->getDoubleValue("tree-height-m", 0.0);
+    // This defaults to a simple mapping of the texture without squashing as there are 4 trees vertically on the atlas
+    tree_width = props->getDoubleValue("tree-width-m", tree_height*4/tree_varieties);
+    cos_tree_max_density_slope_angle  = cos(props->getFloatValue("tree-max-density-angle-deg", 30.0) * osg::PI/180.0);
+    cos_tree_zero_density_slope_angle = cos(props->getFloatValue("tree-zero-density-angle-deg", 45.0) * osg::PI/180.0);
+
+    std::string treeTexPath = props->getStringValue("tree-texture");
+
+    if (! treeTexPath.empty()) {
+        tree_texture = SGModelLib::findDataFile(SGPath::fromUtf8("Textures") / treeTexPath, options);
+        if (tree_texture.empty()) {
+            simgear::reportFailure(simgear::LoadFailure::IOError, simgear::ErrorCode::LoadingTexture,
+                                   "Cannot find texture \"" + treeTexPath + "\" in Textures folders.",
+                                   SGPath::fromUtf8("Textures") / treeTexPath);
+        }
+    }
+
+    std::string treeNormalMapPath = props->getStringValue("tree-normal-map");
+
+    if (! treeNormalMapPath.empty()) {
+        tree_normal_map = SGModelLib::findDataFile(SGPath::fromUtf8("Textures") / treeNormalMapPath, options);
+        if (tree_normal_map.empty()) {
+            simgear::reportFailure(simgear::LoadFailure::IOError, simgear::ErrorCode::LoadingTexture,
+                                   "Cannot find texture \"" + treeNormalMapPath + "\" in Textures folders.",
+                                   SGPath::fromUtf8("Textures") / treeNormalMapPath);
+        }
+    } else if (! treeTexPath.empty()) {
+        SGPath texPath = SGPath::fromUtf8("Textures") / treeTexPath;
+        SGPath normalPath = texPath.dirPath() / texPath.file_base().append("-normal.png");
+        tree_normal_map = SGModelLib::findDataFile(normalPath, options);
+        if (tree_normal_map.empty()) {
+            simgear::reportFailure(simgear::LoadFailure::IOError, simgear::ErrorCode::LoadingTexture,
+                                   "Cannot find texture \"" + normalPath.utf8Str() + "\" in Textures folders.",
+                                   normalPath);
+        }
+    }
+
+    // surface values for use with ground reactions
+    auto propval = props->getStringValue("solid/property", "");
+    if (propval != "") {
+        _solid_property = prop_root->getNode(propval, true);
+        _solid_is_prop  =true;
+    } else {
+        _solid = props->getBoolValue("solid", _solid);
+    }
+    _friction_factor = props->getDoubleValue("friction-factor", _friction_factor);
+    _rolling_friction = props->getDoubleValue("rolling-friction", _rolling_friction);
+    _bumpiness = props->getDoubleValue("bumpiness", _bumpiness);
+    _load_resistance = props->getDoubleValue("load-resistance", _load_resistance);
+
+    // PBR Materials
+    const SGPropertyNode* pbrNode = props->getChild("pbr");
+    if (pbrNode) {
+        metallic = pbrNode->getDoubleValue("metallic", 0.0);
+        roughness = pbrNode->getDoubleValue("roughness", 0.95);
+        occlusion = pbrNode->getDoubleValue("occlusion", 1.0);
+        emission[0] = pbrNode->getDoubleValue("emissive/r", 0.0);
+        emission[1] = pbrNode->getDoubleValue("emissive/g", 0.0);
+        emission[2] = pbrNode->getDoubleValue("emissive/b", 0.0);
+    }
+
+    // Noise amplitudes for heightmap
+    const SGPropertyNode* heightNode = props->getChild("height-amplitude");
+    if (heightNode) {
+        height_amplitude = heightNode->getValue<SGVec4d>();
+    }
+
+    // Noise amplitudes for bumpmap
+    const SGPropertyNode* bumpmapNode = props->getChild("bumpmap-amplitude");
+    if (bumpmapNode) {
+        bumpmap_amplitude = bumpmapNode->getValue<SGVec4d>();
+    }
+
+    if (props->hasChild("effect"))
+        effect = props->getStringValue("effect");
+
+    std::vector<SGPropertyNode_ptr> object_group_nodes =
+            ((SGPropertyNode *)props)->getChildren("object-group");
+    for (unsigned int i = 0; i < object_group_nodes.size(); i++)
+        object_groups.push_back(new SGMatModelGroup(object_group_nodes[i], default_object_range));
+
+    // read glyph table for taxi-/runway-signs
+    std::vector<SGPropertyNode_ptr> glyph_nodes = props->getChildren("glyph");
+    for (unsigned int i = 0; i < glyph_nodes.size(); i++) {
+        std::string name = glyph_nodes[i]->getStringValue("name");
+        glyphs[name] = new SGMaterialGlyph(glyph_nodes[i]);
+    }
+
+    // Read parameters entry, which is passed into the effect
+    if (props->hasChild("parameters")) {
+        parameters = props->getChild("parameters");
+    } else {
+        parameters = new SGPropertyNode();
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// Private methods.
+////////////////////////////////////////////////////////////////////////
+
+void
+SGMaterial::init ()
+{
+    _status.clear();
+    xsize = 0;
+    ysize = 0;
+    wrapu = true;
+    wrapv = true;
+
+    mipmap = true;
+    light_coverage = 0.0;
+
+    light_edge_spacing_m = 0.0;
+    light_edge_size_cm = 50.0;
+    light_edge_height_m = 5.0;
+    light_edge_intensity_cd = 100.0;
+    light_edge_angle_horizontal_deg = 360.0;
+    light_edge_angle_vertical_deg = 360.0;
+    light_edge_colour = SGVec4f(1.0, 1.0, 1.0, 1.0);
+    light_edge_offset = true;
+
+    building_coverage = 0.0;
+
+    for (int i = 0; i < 4; i++) {
+        emission[i] = (i < 3) ? 0.0 : 1.0;
+        height_amplitude[i] = 0.0;
+        bumpmap_amplitude[i] = 0.0;
+    }
+
+    roughness = 0.98;
+    metallic = 0.0;
+    occlusion = 1.0;
+
+    effect = "Effects/terrain-default";
+}
+
+Effect* SGMaterial::get_effect(int i)
+{
+    if(!_status[i].effect_realized) {
+        if (!_status[i].effect.valid())
+            return 0;
+        _status[i].effect->realizeTechniques(_status[i].options.get());
+        _status[i].effect_realized = true;
+    }
+    return _status[i].effect.get();
+}
+
+Effect* SGMaterial::get_one_effect(int texIndex)
+{
+    std::lock_guard<std::mutex> g(_lock);
+    if (_status.empty()) {
+        SG_LOG( SG_GENERAL, SG_WARN, "No effect available.");
+        return 0;
+    }
+
+    int i = texIndex % _status.size();
+    return get_effect(i);
+}
+
+Effect* SGMaterial::get_effect()
+{
+    std::lock_guard<std::mutex> g(_lock);
+    return get_effect(0);
+}
+
+
+osg::Texture2D* SGMaterial::get_one_object_mask(int texIndex)
+{
+    if (_status.empty()) {
+        SG_LOG( SG_GENERAL, SG_WARN, "No mask available.");
+        return 0;
+    }
+
+    // Note that the object mask is closely linked to the texture/effect
+    // so we index based on the texture index,
+    unsigned int i = texIndex % _status.size();
+    if (i < _masks.size()) {
+        return _masks[i].get();
+    } else {
+        return 0;
+    }
+}
+
+std::string SGMaterial::get_one_texture(int setIndex, int texIndex)
+{
+    if (_status.empty()) {
+        SG_LOG( SG_GENERAL, SG_WARN, "No material available.");
+        return 0;
+    }
+
+    unsigned int i = setIndex % _status.size();
+
+    SGMaterial::_internal_state st = _status[i];
+    //if (st == NULL) return 0;
+
+    std::string texturePath = "";
+
+    auto iter = st.texture_paths.begin();
+    for (; iter != st.texture_paths.end(); ++iter) {
+        if (iter->second == texIndex) texturePath = iter->first;
+    }
+
+    return texturePath;
+}
+
+std::size_t SGMaterial::get_num_textures(int setIndex)
+{
+    if (_status.empty()) {
+        SG_LOG( SG_GENERAL, SG_WARN, "No material available.");
+        return 0;
+    }
+
+    SGMaterial::_internal_state st = _status[setIndex % _status.size()];
+    return st.texture_paths.size();
+}
+
+void SGMaterial::buildEffectProperties(const SGReaderWriterOptions* options)
+{
+    using namespace osg;
+    ref_ptr<SGMaterialUserData> user = new SGMaterialUserData(this);
+    SGPropertyNode_ptr propRoot = new SGPropertyNode();
+    makeChild(propRoot, "inherits-from")->setStringValue(effect);
+
+    SGPropertyNode* paramProp = makeChild(propRoot, "parameters");
+    copyProperties(parameters, paramProp);
+
+    SGPropertyNode* materialProp = makeChild(paramProp, "material");
+    makeChild(materialProp, "emissive")->setValue(SGVec4d(emission));
+    if (emission[3] < 1) {
+        makeChild(paramProp, "transparent")->setBoolValue(true);
+        SGPropertyNode* binProp = makeChild(paramProp, "render-bin");
+        makeChild(binProp, "bin-number")->setIntValue(TRANSPARENT_BIN);
+        makeChild(binProp, "bin-name")->setStringValue("DepthSortedBin");
+    }
+    for (auto& matState : _status) {
+        SGPropertyNode_ptr effectProp = new SGPropertyNode();
+        copyProperties(propRoot, effectProp);
+        SGPropertyNode* effectParamProp = effectProp->getChild("parameters", 0);
+        for (unsigned int i = 0; i < matState.texture_paths.size(); i++) {
+            SGPropertyNode* texProp = makeChild(effectParamProp, "texture", matState.texture_paths[i].second);
+            makeChild(texProp, "type")->setStringValue("2d");
+            makeChild(texProp, "image")->setStringValue(matState.texture_paths[i].first);
+            makeChild(texProp, "filter")
+                ->setStringValue(mipmap ? "linear-mipmap-linear" : "nearest");
+            makeChild(texProp, "wrap-s")
+                ->setStringValue(wrapu ? "repeat" : "clamp-to-edge");
+            makeChild(texProp, "wrap-t")
+                ->setStringValue(wrapv ? "repeat" : "clamp-to-edge");
+        }
+        makeChild(effectParamProp, "xsize")->setDoubleValue(xsize);
+        makeChild(effectParamProp, "ysize")->setDoubleValue(ysize);
+        makeChild(effectParamProp, "scale")->setValue(SGVec3d(xsize,ysize,0.0));
+        makeChild(effectParamProp, "light-coverage")->setDoubleValue(light_coverage);
+
+        matState.effect = makeEffect(effectProp, false, options);
+        if (matState.effect.valid())
+            matState.effect->setUserData(user.get());
+    }
+}
+
+SGMaterialGlyph* SGMaterial::get_glyph (const std::string& name) const
+{
+    map<std::string, SGSharedPtr<SGMaterialGlyph> >::const_iterator it;
+    it = glyphs.find(name);
+    if (it == glyphs.end())
+        return 0;
+
+    return it->second;
+}
+
+bool SGMaterial::valid(SGVec2f loc) const
+{
+	SG_LOG( SG_TERRAIN, SG_BULK, "Checking materials for location ("
+			<< loc.x() << ","
+			<< loc.y() << ")");
+
+	// Check location first again the areas the material is valid for
+	AreaList::const_iterator i = areas->begin();
+
+	if (i == areas->end()) {
+		// No areas defined, so simply check against condition
+		if (condition) {
+			return condition->test();
+		} else {
+			return true;
+		}
+	}
+
+	for (; i != areas->end(); i++) {
+
+		SG_LOG( SG_TERRAIN, SG_BULK, "Checking area ("
+				<< i->x() << ","
+				<< i->y() << ") width:"
+				<< i->width() << " height:"
+				<< i->height());
+		// Areas defined, so check that the tile location falls within it
+		// before checking against condition
+		if (i->contains(loc.x(), loc.y())) {
+			if (condition) {
+				return condition->test();
+			} else {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////
+// SGMaterialGlyph.
+////////////////////////////////////////////////////////////////////////
+
+SGMaterialGlyph::SGMaterialGlyph(SGPropertyNode *p) :
+    _left(p->getDoubleValue("left", 0.0)),
+    _right(p->getDoubleValue("right", 1.0))
+{
+}
+
+void
+SGSetTextureFilter( int max) {
+    SGSceneFeatures::instance()->setTextureFilter( max);
+}
+
+int
+SGGetTextureFilter() {
+    return SGSceneFeatures::instance()->getTextureFilter();
+}

@@ -149,6 +149,7 @@ if(NOT SIMGEAR_HEADLESS)
         OSG::osgTerrain
         OSG::osgParticle
         OSG::osgViewer
+        vsg::vsg
     )
 
     target_precompile_headers(SimGearScene PRIVATE

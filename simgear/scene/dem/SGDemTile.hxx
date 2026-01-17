@@ -1,5 +1,4 @@
-#ifndef __SG_DEM_TILE_HXX__
-#define __SG_DEM_TILE_HXX__
+#pragma once
 
 #include <gdal.h>
 #include <gdal_priv.h>
@@ -61,5 +60,3 @@ private:
 
 typedef SGSharedPtr<SGDemTile> SGDemTileRef;
 typedef std::map<unsigned long, SGDemTileRef> SGDemCache;
-
-#endif /* #define __SG_DEM_TILE_HXX__ */

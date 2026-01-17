@@ -6,8 +6,7 @@
  * @brief Declarations for the SimGear XML parser.
  */
 
-#ifndef __EASYXML_HXX
-#define __EASYXML_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 #include <simgear/structure/exception.hxx>
@@ -516,6 +515,3 @@ extern void readXML (const SGPath &path, XMLVisitor &visitor);
  * @see XMLVisitor
  */
 extern void readXML (const char *buf, const int size, XMLVisitor &visitor);
-
-
-#endif // __EASYXML_HXX

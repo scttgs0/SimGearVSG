@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2016 Erik Hofman <erik@ehofman.com>
 
-#ifndef __SIMD4X4_H__
-#define __SIMD4X4_H__	1
+#pragma once
 
 #include <cstring>
 
@@ -271,6 +270,3 @@ inline simd4x4_t<T,N> operator*(const simd4x4_t<T,N>& m1, const simd4x4_t<T,N>& 
     m *= m2;
     return m;
 }
-
-#endif /* __SIMD4X4_H__ */
-

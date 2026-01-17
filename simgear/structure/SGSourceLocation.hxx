@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2023 James Hogan
 
-#ifndef _SG_SOURCE_LOCATION_HXX
-#define _SG_SOURCE_LOCATION_HXX 1
+#pragma once
 
 #include <map>
 #include <memory>
@@ -72,5 +71,3 @@ private:
     int _line;
     int _column;
 };
-
-#endif // _SG_SOURCE_LOCATION_HXX

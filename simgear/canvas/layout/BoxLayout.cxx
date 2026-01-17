@@ -12,9 +12,7 @@
 #include "SpacerItem.hxx"
 #include <simgear/canvas/Canvas.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
 //----------------------------------------------------------------------------
@@ -793,5 +791,4 @@ int BoxLayout::ItemData::mhfw(int w) const
 
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

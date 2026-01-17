@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SIMGEAR_RENDER_CONSTANTS_HXX
-#define SIMGEAR_RENDER_CONSTANTS_HXX
+#pragma once
+
 // Constants used in the scene graph, both node masks and render bins.
 namespace simgear {
 
@@ -77,4 +77,3 @@ enum RenderBin {
     TRANSPARENT_BIN = 10        // assigned by OSG
 };
 }
-#endif

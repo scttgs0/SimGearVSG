@@ -16,8 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
 
-#ifndef PARSE_COLOR_HXX_
-#define PARSE_COLOR_HXX_
+#pragma once
 
 #include <osg/Vec4>
 #include <string>
@@ -36,5 +35,3 @@ namespace simgear
   bool parseColor(std::string str, osg::Vec4& result);
 
 } // namespace simgear
-
-#endif /* PARSE_COLOR_HXX_ */

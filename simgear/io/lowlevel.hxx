@@ -7,8 +7,7 @@
  * @brief Routines to handle lowlevel compressed binary IO of various datatypes
  */
 
-#ifndef _SG_LOWLEVEL_HXX
-#define _SG_LOWLEVEL_HXX
+#pragma once
 
 #include <stdio.h>
 #include <zlib.h>
@@ -108,9 +107,7 @@ inline void sgWriteGeod ( gzFile fd, const SGGeod& var ) {
 }
 
 /**
-    @ error aid: allow calling code to specify which file path we're reading from, so that erros we
+    @ error aid: allow calling code to specify which file path we're reading from, so that errors we
  throw from sgReadXXXX can have a valid location set.
  */
 void setThreadLocalSimgearReadPath(const SGPath& path);
-
-#endif // _SG_LOWLEVEL_HXX

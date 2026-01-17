@@ -12,8 +12,7 @@
 
 #include <simgear/scene/model/SGLight.hxx>
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 class ClusteredShading final : public osg::Referenced {
 public:
@@ -111,5 +110,4 @@ protected:
     std::atomic<int>                _global_light_count;
 };
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

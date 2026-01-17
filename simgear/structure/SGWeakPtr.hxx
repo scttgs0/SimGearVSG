@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2004-2009 Mathias Froehlich
 
-#ifndef SGWeakPtr_HXX
-#define SGWeakPtr_HXX
+#pragma once
 
 #include "SGWeakReferenced.hxx"
 
@@ -81,5 +80,3 @@ private:
   // The indirect reference itself.
   SGSharedPtr<SGWeakReferenced::WeakData> mWeakData;
 };
-
-#endif

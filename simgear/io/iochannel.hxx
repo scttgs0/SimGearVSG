@@ -6,9 +6,7 @@
  * @brief High level IO channel class
  */
 
-#ifndef _IOCHANNEL_HXX
-#define _IOCHANNEL_HXX
-
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -142,8 +140,3 @@ public:
     inline bool isvalid() const { return valid; }
     inline void set_valid( const bool v ) { valid = v; }
 };
-
-
-#endif // _IOCHANNEL_HXX
-
-

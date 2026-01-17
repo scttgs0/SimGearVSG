@@ -17,8 +17,8 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_UPDATEONCECALLBACK_HXX
-#define SIMGEAR_UPDATEONCECALLBACK_HXX 1
+#pragma once
+
 #include <osg/NodeCallback>
 
 namespace simgear
@@ -41,4 +41,3 @@ public:
     virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
 };
 }
-#endif

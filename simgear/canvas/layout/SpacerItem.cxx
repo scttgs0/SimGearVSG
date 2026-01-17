@@ -9,9 +9,7 @@
 #include <simgear_config.h>
 #include "SpacerItem.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -23,5 +21,4 @@ namespace canvas
     _max_size  = max_size;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

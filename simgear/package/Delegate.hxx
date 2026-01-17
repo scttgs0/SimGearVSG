@@ -1,18 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: Copyright (C) 2013  James Turner - james@flightgear.org
 
-
-#ifndef SG_PACKAGE_DELEGATE_HXX
-#define SG_PACKAGE_DELEGATE_HXX
+#pragma once
 
 #include <string>
 #include <simgear/misc/stdint.hxx>
 #include <simgear/structure/SGSharedPtr.hxx>
 
-namespace simgear
-{
-
-namespace pkg
+namespace simgear::pkg
 {
 
 class Install;
@@ -79,8 +74,4 @@ public:
 		size_t length, const uint8_t* bytes);
 };
 
-} // of namespace pkg
-
-} // of namespace simgear
-
-#endif // of SG_PACKAGE_DELEGATE_HXX
+} // of namespace simgear::pkg

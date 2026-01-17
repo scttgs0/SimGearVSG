@@ -1,5 +1,4 @@
-#ifndef __SG_DEM_ROOT_HXX__
-#define __SG_DEM_ROOT_HXX__
+#pragma once
 
 #include <simgear/scene/dem/SGDemLevel.hxx>
 #include <simgear/scene/dem/SGDemTile.hxx>
@@ -98,5 +97,3 @@ private:
     std::vector<SGDemLevel> levels;
     std::vector<SGDemCache> caches;
 };
-
-#endif /* __SG_DEM_ROOT_HXX__ */

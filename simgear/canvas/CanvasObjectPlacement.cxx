@@ -17,9 +17,7 @@
 
 #include <osgGA/GUIEventAdapter>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -231,5 +229,4 @@ namespace canvas
     return true;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

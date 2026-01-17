@@ -6,8 +6,7 @@
  * @brief Base class for elements of property controlled subsystems
  */
 
-#ifndef SG_PROPERTY_BASED_ELEMENT_HXX_
-#define SG_PROPERTY_BASED_ELEMENT_HXX_
+#pragma once
 
 #include <simgear/props/props.hxx>
 #include <simgear/std/type_traits.hxx>
@@ -169,5 +168,3 @@ namespace simgear
   typedef SGWeakPtr<PropertyBasedElement> PropertyBasedElementWeakPtr;
 
 } // namespace simgear
-
-#endif /* SG_PROPERTY_BASED_ELEMENT_HXX_ */

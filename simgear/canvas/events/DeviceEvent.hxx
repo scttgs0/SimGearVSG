@@ -6,16 +6,13 @@
  * @brief Input device event
  */
 
-#ifndef CANVAS_DEVICE_EVENT_HXX_
-#define CANVAS_DEVICE_EVENT_HXX_
+#pragma once
 
 #include <simgear/canvas/CanvasEvent.hxx>
 
 namespace osgGA { class GUIEventAdapter; }
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -50,7 +47,4 @@ namespace canvas
       int modifiers;  //!< Keyboard modifier state
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_DEVICE_EVENT_HXX_ */
+} // namespace simgear::canvas

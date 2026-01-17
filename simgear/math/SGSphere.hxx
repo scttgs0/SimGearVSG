@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGSphere_H
-#define SGSphere_H
-
+#pragma once
 
 template<typename T>
 class SGSphere {
@@ -162,5 +160,3 @@ operator<<(std::basic_ostream<char_type, traits_type>& s,
   return s << "center = " << sphere.getCenter()
            << ", radius = " << sphere.getRadius();
 }
-
-#endif

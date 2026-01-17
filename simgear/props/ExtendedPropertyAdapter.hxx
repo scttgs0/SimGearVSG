@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef SIMGEAR_EXTENDEDPROPERTYADAPTER_HXX
-#define SIMGEAR_EXTENDEDPROPERTYADAPTER_HXX 1
+#pragma once
 
 #include <algorithm>
 #include <functional>
@@ -71,4 +70,3 @@ inline void makeChildList(SGPropertyNode* prop, InIterator inBegin,
 }
 
 }
-#endif

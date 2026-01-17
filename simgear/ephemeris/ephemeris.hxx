@@ -6,8 +6,7 @@
  * @brief Top level class for calculating current positions of astronomical objects
  */
 
-#ifndef _EPHEMERIS_HXX
-#define _EPHEMERIS_HXX
+#pragma once
 
 #include "simgear/debug/debug_types.h"
 #include <string>
@@ -156,8 +155,3 @@ public:
     inline SGStarData::Star *getStars() { return stars->getStars(); }
     inline const SGStarData::Star *getStars() const { return stars->getStars(); }
 };
-
-
-#endif // _EPHEMERIS_HXX
-
-

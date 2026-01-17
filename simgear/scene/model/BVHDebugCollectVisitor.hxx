@@ -15,8 +15,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef BVHDebugCollectVisitor_hxx
-#define BVHDebugCollectVisitor_hxx
+#pragma once
 
 #include <osg/ref_ptr>
 #include <osg/Geode>
@@ -218,5 +217,3 @@ private:
 };
 
 }
-
-#endif

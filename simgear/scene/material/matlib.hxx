@@ -20,10 +20,7 @@
 //
 // $Id$
 
-
-#ifndef _MATLIB_HXX
-#define _MATLIB_HXX
-
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -168,5 +165,3 @@ public:
 };
 
 typedef SGSharedPtr<SGMaterialLib> SGMaterialLibPtr;
-
-#endif // _MATLIB_HXX 

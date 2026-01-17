@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_SCALE_TRANSFORM_HXX
-#define SG_SCALE_TRANSFORM_HXX
+#pragma once
 
 #include <osg/Transform>
 #include <simgear/math/SGMath.hxx>
@@ -73,5 +72,3 @@ private:
   SGVec3d _scaleFactor;
   mutable double _boundScale;
 };
-
-#endif

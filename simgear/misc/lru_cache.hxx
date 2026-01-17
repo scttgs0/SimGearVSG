@@ -36,8 +36,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
 
-#ifndef LRU_CACHE_HXX_
-#define LRU_CACHE_HXX_
+#pragma once
 
 #include <map>
 #include <list>
@@ -175,5 +174,3 @@ namespace simgear
         size_t m_capacity;
     };
 } // namespace simgear
-
-#endif /* SG_LISTDIFF_HXX_ */

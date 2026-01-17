@@ -108,8 +108,3 @@ PassAttributeBuilder::~PassAttributeBuilder()
 }
   
 } // of namespace simgear
-
-
-
-
-

@@ -6,17 +6,14 @@
  * @brief Text on the Canvas
  */
 
-#ifndef CANVAS_TEXT_HXX_
-#define CANVAS_TEXT_HXX_
+#pragma once
 
 #include "CanvasElement.hxx"
 #include <osgText/Text>
 #include <map>
 #include <vector>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   class TextLine;
@@ -74,7 +71,4 @@ namespace canvas
 
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_TEXT_HXX_ */
+} // namespace simgear::canvas

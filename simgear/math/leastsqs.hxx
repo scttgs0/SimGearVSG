@@ -6,9 +6,7 @@
  * @brief Implements a simple linear least squares best fit routine
  */
 
-#ifndef _LEASTSQS_H
-#define _LEASTSQS_H
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -58,8 +56,3 @@ double least_squares_error(double *x, double *y, int n, double m, double b);
 \f]
 */
 double least_squares_max_error(double *x, double *y, int n, double m, double b);
-
-
-#endif // _LEASTSQS_H
-
-

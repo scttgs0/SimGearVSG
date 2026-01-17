@@ -6,10 +6,7 @@
  * @brief Data structures and routines for managing time related stuff.
  */
 
-#ifndef _SG_TIME_HXX
-#define _SG_TIME_HXX
-
-
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -245,6 +242,3 @@ double sgTimeCalcGST( double mjd );
  * @return pointer to character array containt the result
  */
 std::string sgTimeFormatTime( const struct tm* p);
-
-
-#endif // _SG_TIME_HXX

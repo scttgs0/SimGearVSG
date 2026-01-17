@@ -12,9 +12,7 @@
 #include <simgear/debug/logstream.hxx>
 #include <simgear/misc/sg_path.hxx>
 
-namespace simgear
-{
-namespace HTTP
+namespace simgear::HTTP
 {
   //----------------------------------------------------------------------------
   FileRequest::FileRequest(const std::string& url, const std::string& path, bool append):
@@ -120,5 +118,4 @@ namespace HTTP
     }
   }
 
-} // namespace HTTP
-} // namespace simgear
+} // namespace simgear::HTTP

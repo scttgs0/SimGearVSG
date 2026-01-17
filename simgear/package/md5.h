@@ -12,8 +12,7 @@
  * with every copy.
  */
 
-#ifndef _MD5_H_
-#define _MD5_H_
+#pragma once
 
 #ifdef __cplusplus
  extern "C" {
@@ -46,9 +45,3 @@ void	 SG_MD5Transform(u_int32_t [4], const u_int8_t [MD5_BLOCK_LENGTH]);
 #ifdef __cplusplus
 } // of extern C
 #endif
-
-#endif /* _MD5_H_ */
-
-     
-
- 

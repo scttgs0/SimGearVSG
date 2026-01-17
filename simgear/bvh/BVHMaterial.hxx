@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2008-2021 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef BVHMaterial_hxx
-#define BVHMaterial_hxx
+#pragma once
 
 #include <simgear/structure/SGReferenced.hxx>
 #include <simgear/props/props.hxx>
@@ -75,5 +74,3 @@ protected:
 
 
 }
-
-#endif

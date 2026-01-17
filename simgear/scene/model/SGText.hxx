@@ -16,8 +16,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef _SGTEXT_HXX
-#define _SGTEXT_HXX 1
+#pragma once
 
 #include <osgDB/ReaderWriter>
 #include <osg/Group>
@@ -31,6 +30,3 @@ public:
 private:
   class UpdateCallback;
 };
-
-#endif
-

@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_SCENE_USERDATA_HXX
-#define SG_SCENE_USERDATA_HXX
+#pragma once
 
 #include <vector>
 #include <osg/Node>
@@ -99,5 +98,3 @@ private:
   /// Original source location describing this node
   SGSourceLocation _location;
 };
-
-#endif

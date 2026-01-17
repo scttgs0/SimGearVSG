@@ -6,8 +6,7 @@
  * @brief Unified access to real files or embedded resources
  */
 
-#ifndef FG_EMBEDDEDRESOURCEPROXY_HXX
-#define FG_EMBEDDEDRESOURCEPROXY_HXX
+#pragma once
 
 #include <istream>
 #include <memory>
@@ -138,5 +137,3 @@ private:
 };
 
 } // of namespace simgear
-
-#endif  // of FG_EMBEDDEDRESOURCEPROXY_HXX

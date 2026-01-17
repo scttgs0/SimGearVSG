@@ -8,8 +8,7 @@
  * See props.html for documentation [replace with URL when available].
  */
 
-#ifndef __PROPS_HXX
-#define __PROPS_HXX
+#pragma once
 
 #ifdef SG_PROPS_UNTHREADSAFE
     #include "props-unsafe.hxx"
@@ -1692,5 +1691,3 @@ void SGPropertyLockControl(
         SGPropertyNode* timing,
         SGPropertyNode* parent_listeners
         );
-
-#endif // __PROPS_HXX

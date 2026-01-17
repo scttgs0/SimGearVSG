@@ -6,8 +6,7 @@
  * @brief Basic element used in layouts of Canvas elements.
  */
 
-#ifndef SG_CANVAS_LAYOUT_ITEM_HXX_
-#define SG_CANVAS_LAYOUT_ITEM_HXX_
+#pragma once
 
 #include <simgear/canvas/canvas_fwd.hxx>
 #include <simgear/math/SGMath.hxx>
@@ -16,9 +15,7 @@
 #include <simgear/structure/SGWeakReferenced.hxx>
 #include <simgear/structure/SGSharedPtr.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   class LayoutItem;
   typedef SGSharedPtr<LayoutItem> LayoutItemRef;
@@ -378,7 +375,4 @@ namespace canvas
 
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* SG_CANVAS_LAYOUT_ITEM_HXX_ */
+} // namespace simgear::canvas

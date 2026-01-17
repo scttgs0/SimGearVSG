@@ -15,8 +15,7 @@
 
 class SGPropertyNode;
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 /**
  * A Compositor manages the rendering pipeline of a single physical camera,
@@ -169,5 +168,4 @@ protected:
     static int                   _order_offset;
 };
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

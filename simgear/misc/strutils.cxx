@@ -36,8 +36,7 @@ using std::string;
 using std::vector;
 using std::stringstream;
 
-namespace simgear {
-    namespace strutils {
+namespace simgear::strutils {
 
 	/*
 	 * utf8ToLatin1() convert utf8 to latin, useful for accent character (i.e éâàîè...)
@@ -1690,6 +1689,4 @@ PrintfFormatType validatePrintfFormat(const char* f)
     return type;
 }
 
-} // end namespace strutils
-
-} // end namespace simgear
+} // end namespace simgear::strutils

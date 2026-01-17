@@ -3,8 +3,7 @@
 
 /// @brief Conversion functions to convert C++ types to Nasal types
 
-#ifndef SG_TO_NASAL_HXX_
-#define SG_TO_NASAL_HXX_
+#pragma once
 
 #include <simgear/nasal/cppbind/detail/to_nasal_helper.hxx>
 
@@ -59,5 +58,3 @@ namespace nasal
     }
   };
 } // namespace nasal
-
-#endif /* SG_TO_NASAL_HXX_ */

@@ -5,9 +5,7 @@
 // SPDX-FileCopyrightText: 2001 Curtis L. Olson - http://www.flightgear.org/~curt
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-
-#ifndef _SG_APT_SIGNS_HXX
-#define _SG_APT_SIGNS_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -40,5 +38,3 @@ private:
 };
 
 } // of namespace simgear
-
-#endif // _SG_APT_SIGNS_HXX

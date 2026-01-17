@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2013 Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_MAP_HXX_
-#define SG_MAP_HXX_
+#pragma once
 
 #include <map>
 #include <string>
@@ -53,5 +52,3 @@ namespace simgear
   typedef Map<std::string, std::string> StringMap;
 
 } // namespace simgear
-
-#endif /* SG_MAP_HXX_ */

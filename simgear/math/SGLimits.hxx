@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGLimits_H
-#define SGLimits_H
+#pragma once
 
 #include <limits>
 
@@ -11,5 +10,3 @@
 /// providing numeric_limits ...
 template<typename T>
 class SGLimits : public std::numeric_limits<T> {};
-
-#endif

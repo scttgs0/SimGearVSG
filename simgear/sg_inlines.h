@@ -9,8 +9,7 @@
 #include <type_traits>
 #include <utility>
 
-#ifndef _SG_INLINES_H
-#define _SG_INLINES_H
+#pragma once
 
 // return the sign of a value
 template <class T>
@@ -119,5 +118,3 @@ constexpr typename std::underlying_type<T>::type enumValue(T e) {
 }
 
 } // of namespace simgear
-
-#endif // _SG_INLINES_H

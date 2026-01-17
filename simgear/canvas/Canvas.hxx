@@ -6,8 +6,7 @@
  * @brief The Canvas 2D API
  */
 
-#ifndef CANVAS_HXX_
-#define CANVAS_HXX_
+#pragma once
 
 #include "canvas_fwd.hxx"
 #include "ODGauge.hxx"
@@ -25,10 +24,8 @@
 #include <memory>
 #include <string>
 
-namespace simgear
-{
 /// Canvas 2D drawing API
-namespace canvas
+namespace simgear::canvas
 {
   class CanvasMgr;
   class MouseEvent;
@@ -263,7 +260,4 @@ namespace canvas
       Canvas& operator=(const Canvas&) = delete;
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_HXX_ */
+} // namespace simgear::canvas

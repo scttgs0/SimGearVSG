@@ -6,9 +6,7 @@
  * @brief routine(s) to handle texture coordinate generation
  */
 
-#ifndef _TEXCOORD_HXX
-#define _TEXCOORD_HXX
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -37,6 +35,3 @@ std::vector<SGVec2f> sgCalcTexCoords( const SGBucket& b, const std::vector<SGGeo
 
 std::vector<SGVec2f> sgCalcTexCoords( double centerLat, const std::vector<SGGeod>& geod_nodes,
 			    const std::vector<int>& fan, double scale = 1.0 );
-
-
-#endif // _TEXCOORD_HXX

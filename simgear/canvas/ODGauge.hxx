@@ -11,8 +11,7 @@
  * placing the texture in the scene by certain filter criteria.
  */
 
-#ifndef _SG_OD_GAUGE_HXX
-#define _SG_OD_GAUGE_HXX
+#pragma once
 
 #include "canvas_fwd.hxx"
 
@@ -25,9 +24,7 @@ namespace osg
   class Texture2D;
 }
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -154,7 +151,4 @@ namespace canvas
 
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif // _SG_OD_GAUGE_HXX
+} // namespace simgear::canvas

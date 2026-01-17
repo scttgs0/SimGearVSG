@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_SCENE_DEBUGDRAWCALLBACK_HXX
-#define SG_SCENE_DEBUGDRAWCALLBACK_HXX
+#pragma once
 
 #include <iostream>
 #include <GL/gl.h>
@@ -124,5 +123,3 @@ do {                                  \
     stream << "\n";
   }
 };
-  
-#endif

@@ -8,8 +8,7 @@
  * @brief Simple pthread class wrappers
  */
 
-#ifndef SGTHREAD_HXX_INCLUDED
-#define SGTHREAD_HXX_INCLUDED 1
+#pragma once
 
 #include <thread>
 #include <mutex>
@@ -178,5 +177,3 @@ public:
     void ensure_running();
     bool is_running();
 };
-
-#endif /* SGTHREAD_HXX_INCLUDED */

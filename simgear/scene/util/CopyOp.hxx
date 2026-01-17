@@ -17,8 +17,8 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_COPYOP_HXX
-#define SIMGEAR_COPYOP_HXX 1
+#pragma once
+
 #include <osg/CopyOp>
 
 namespace simgear
@@ -34,4 +34,3 @@ public:
     virtual osg::Object* operator()(const osg::Object* obj) const;
 };
 }
-#endif

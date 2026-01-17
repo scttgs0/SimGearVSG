@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2008-2009 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef BVHLineSegmentVisitor_hxx
-#define BVHLineSegmentVisitor_hxx
+#pragma once
 
 #include <simgear/math/SGGeometry.hxx>
 #include <simgear/structure/SGSharedPtr.hxx>
@@ -87,5 +86,3 @@ private:
 };
 
 }
-
-#endif

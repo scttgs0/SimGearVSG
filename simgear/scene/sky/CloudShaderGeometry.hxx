@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef CLOUD_SHADER_GEOMETRY_HXX
-#define CLOUD_SHADER_GEOMETRY_HXX 1
+#pragma once
 
 #include <vector>
 
@@ -148,4 +147,3 @@ protected:
 };
 
 }
-#endif

@@ -11,9 +11,7 @@
 #include "DeviceEvent.hxx"
 #include <osgGA/GUIEventAdapter>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -54,5 +52,4 @@ namespace canvas
     return (modifiers & osgGA::GUIEventAdapter::MODKEY_META) != 0;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

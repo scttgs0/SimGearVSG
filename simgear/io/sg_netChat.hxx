@@ -26,8 +26,7 @@
  * returned to you - by calling your found_terminator()
 */
 
-#ifndef SG_NET_CHAT_H
-#define SG_NET_CHAT_H
+#pragma once
 
 #include <simgear/io/sg_netBuffer.hxx>
 
@@ -64,5 +63,3 @@ public:
 };
 
 } // of namespace simgear
-
-#endif // SG_NET_CHAT_H

@@ -16,8 +16,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef _SG_PARTICLES_HXX
-#define _SG_PARTICLES_HXX 1
+#pragma once
 
 #include <osg/ref_ptr>
 #include <osgParticle/SmokeTrailEffect>
@@ -197,5 +196,3 @@ private:
 };
 
 } // namespace simgear
-
-#endif

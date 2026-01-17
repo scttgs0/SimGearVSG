@@ -18,8 +18,8 @@
  * MA 02110-1301, USA.
  *
  */
-#ifndef SIMGEAR_NODEANDDRAWABLEVISITOR_HXX
-#define SIMGEAR_NODEANDDRAWABLEVISITOR_HXX 1
+
+ #pragma once
 
 #include <osg/Drawable>
 #include <osg/NodeVisitor>
@@ -48,4 +48,3 @@ public:
 };
 
 }
-#endif

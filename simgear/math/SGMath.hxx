@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGMath_H
-#define SGMath_H
+#pragma once
 
 /// Just include them all
 
@@ -22,5 +21,3 @@
 #include "SGQuat.hxx"
 #include "SGLocation.hxx"
 #include "SGMatrix.hxx"
-
-#endif

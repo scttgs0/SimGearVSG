@@ -5,8 +5,7 @@
  * @brief This header file contains color-related functions
  */
 
-#ifndef _SG_COLORS_HXX
-#define _SG_COLORS_HXX 1
+#pragma once
 
 #include <math.h>
 
@@ -59,7 +58,3 @@ inline void gamma_restore_c(float *color,
 
    *color = pow(*color, system/reff);
 }
-
-
-#endif // _SG_COLORS_HXX
-

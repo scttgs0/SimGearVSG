@@ -6,15 +6,12 @@
  * @brief Basic class for canvas layouts
  */
 
-#ifndef SG_CANVAS_LAYOUT_HXX_
-#define SG_CANVAS_LAYOUT_HXX_
+#pragma once
 
 #include "LayoutItem.hxx"
 #include <vector>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -91,8 +88,4 @@ namespace canvas
 
   typedef SGSharedPtr<Layout> LayoutRef;
 
-} // namespace canvas
-} // namespace simgear
-
-
-#endif /* SG_CANVAS_LAYOUT_HXX_ */
+} // namespace simgear::canvas

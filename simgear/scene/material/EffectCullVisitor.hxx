@@ -14,8 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_EFFECT_CULL_VISITOR_HXX
-#define SIMGEAR_EFFECT_CULL_VISITOR_HXX 1
+#pragma once
 
 #include <osgUtil/CullVisitor>
 
@@ -59,4 +58,3 @@ void installEffectCullVisitor(osg::Camera *camera,
                               bool collect_lights = false,
                               const std::string &effect_scheme = "");
 }
-#endif

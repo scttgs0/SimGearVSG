@@ -2,8 +2,7 @@
 // SPDX-FileCopyrightText: 2011 James Turner <zakalawe@mac.com>
 // SPDX-FileCopyrightText: 2013 Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_HTTP_REQUEST_HXX
-#define SG_HTTP_REQUEST_HXX
+#pragma once
 
 #include <map>
 
@@ -15,9 +14,7 @@
 
 class SGPropertyNode;
 
-namespace simgear
-{
-namespace HTTP
+namespace simgear::HTTP
 {
 
 class Client;
@@ -312,7 +309,4 @@ protected:
 
 typedef SGSharedPtr<Request> Request_ptr;
 
-} // of namespace HTTP
-} // of namespace simgear
-
-#endif // of SG_HTTP_REQUEST_HXX
+} // of namespace simgear::HTTP

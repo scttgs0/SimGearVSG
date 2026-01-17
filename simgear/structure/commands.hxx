@@ -6,9 +6,7 @@
  * @brief Interface definition for encapsulated commands
  */
 
-#ifndef __COMMANDS_HXX
-#define __COMMANDS_HXX
-
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -185,7 +183,3 @@ private:
     class Private;
     std::unique_ptr<Private> d;
 };
-
-#endif // __COMMANDS_HXX
-
-// end of commands.hxx

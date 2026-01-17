@@ -6,15 +6,12 @@
  * @brief HTTP request keeping response in memory.
  */
 
-#ifndef SG_HTTP_MEMORYREQUEST_HXX_
-#define SG_HTTP_MEMORYREQUEST_HXX_
+#pragma once
 
 #include "HTTPRequest.hxx"
 #include <fstream>
 
-namespace simgear
-{
-namespace HTTP
+namespace simgear::HTTP
 {
 
   /**
@@ -45,7 +42,4 @@ namespace HTTP
 
   typedef SGSharedPtr<MemoryRequest> MemoryRequestRef;
 
-} // namespace HTTP
-} // namespace simgear
-
-#endif /* SG_HTTP_MEMORYREQUEST_HXX_ */
+} // namespace simgear::HTTP

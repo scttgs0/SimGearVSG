@@ -20,9 +20,7 @@
 //
 // $Id$
 
-
-#ifndef _SG_MAT_MODEL_HXX
-#define _SG_MAT_MODEL_HXX
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -204,5 +202,3 @@ private:
     double _range_m;
     std::vector<SGSharedPtr<SGMatModel> > _objects;
 };
-
-#endif // _SG_MAT_MODEL_HXX 

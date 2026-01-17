@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006-2009 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGVec4_H
-#define SGVec4_H
+#pragma once
 
 #include <iosfwd>
 
@@ -420,5 +419,3 @@ inline
 SGVec4d
 toVec4d(const SGVec4f& v)
 { SGVec4d d(v); return d; }
-
-#endif

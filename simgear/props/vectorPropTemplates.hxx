@@ -8,8 +8,7 @@
  * Separate header file for any templates requiring SGVecXX vector types.
  */
 
-#ifndef __VECTORPROPTEMPLATES_HXX
-#define __VECTORPROPTEMPLATES_HXX
+#pragma once
 
 #include "props.hxx"
 
@@ -49,7 +48,3 @@ template<>
 std::ostream& SGRawBase<SGVec3d>::printOn(std::ostream& stream) const;
 template<>
 std::ostream& SGRawBase<SGVec4d>::printOn(std::ostream& stream) const;
-
-#endif // __VECTORPROPTEMPLATES_HXX
-
-// end of vectorPropTemplates.hxx

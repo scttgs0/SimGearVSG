@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGMisc_H
-#define SGMisc_H
+#pragma once
 
 #include <cmath>
 
@@ -150,5 +149,3 @@ public:
   static bool neq(const T& a, const T& b, const T& epsilon = SGLimits<T>::epsilon())
   { return !eq(a, b, epsilon); }
 };
-
-#endif

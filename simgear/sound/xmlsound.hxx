@@ -9,10 +9,7 @@
  * @note   Reuses some code from  fg_fx.cxx created by David Megginson
  */
 
-
-#ifndef _SG_SOUND_HXX
-#define _SG_SOUND_HXX 1
-
+#pragma once
 
 #include <map>
 #include <vector>
@@ -175,5 +172,3 @@ private:
     std::vector<_snd_prop> _volume;
     std::vector<_snd_prop> _pitch;
 };
-
-#endif // _SG_SOUND_HXX

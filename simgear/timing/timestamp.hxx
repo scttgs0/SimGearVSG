@@ -6,9 +6,7 @@
  * @brief Provides a class for managing a timestamp (seconds & milliseconds.)
  */
 
-#ifndef _TIMESTAMP_HXX
-#define _TIMESTAMP_HXX
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -285,7 +283,3 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const SGTimeStamp& c)
 
   return os << stream.str();
 }
-
-#endif // _TIMESTAMP_HXX
-
-

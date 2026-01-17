@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef ROAD_BIN_HXX
-#define ROAD_BIN_HXX
+#pragma once
 
 #include <vector>
 #include <string>
@@ -76,5 +75,3 @@ private:
 typedef std::list<osg::ref_ptr<LineFeatureBin>> LineFeatureBinList;
 
 }
-
-#endif

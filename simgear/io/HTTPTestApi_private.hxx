@@ -6,8 +6,7 @@
 
 #include "HTTPRequest.hxx"
 
-namespace simgear {
-namespace HTTP {
+namespace simgear::HTTP {
 
 class Client;
 
@@ -29,5 +28,4 @@ public:
                                   const std::string &message);
 };
 
-} // namespace HTTP
-} // namespace simgear
+} // namespace simgear::HTTP

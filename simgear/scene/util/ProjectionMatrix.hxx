@@ -1,12 +1,6 @@
 // Copyright (C) 2023 Fernando García Liñán
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#pragma once
-
-#include <osg/Matrixd>
-
-namespace simgear {
-
 /**
  * @brief Utility functions for manipulating projection matrices.
  *
@@ -18,7 +12,12 @@ namespace simgear {
  * Based on osgEarth's handling of projection matrices and some math borrowed
  * from GLM (OpenGL Mathematics).
  */
-namespace ProjectionMatrix {
+
+#pragma once
+
+#include <osg/Matrixd>
+
+namespace simgear::ProjectionMatrix {
 
 enum Type {
     STANDARD,
@@ -65,5 +64,4 @@ bool getOrtho(const osg::Matrixd &m,
 void clampNearFarPlanes(osg::Matrixd &old_proj, double near, double far,
                         osg::Matrixd &new_proj);
 
-} // namespace ProjectionMatrix
-} // namespace simgear
+} // namespace simgear::ProjectionMatrix

@@ -7,8 +7,7 @@
  * @brief Butterworth Frequency Filter Fouier Computations
  */
 
-#ifndef _SIMGEAR_FREQUENCY_FILTER_HXX
-#define _SIMGEAR_FREQUENCY_FILTER_HXX
+#pragma once
 
 #include <cstdint>
 
@@ -60,5 +59,3 @@ public:
 };
 
 }; // namespace simgear
-
-#endif // _SIMGEAR_FREQUENCY_FILTER_HXX

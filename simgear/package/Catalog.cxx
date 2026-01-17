@@ -23,9 +23,7 @@
 #include <simgear/package/Install.hxx>
 #include <simgear/misc/strutils.hxx>
 
-namespace simgear {
-
-namespace pkg {
+namespace simgear::pkg {
 
 bool checkVersion(const std::string& aVersion, SGPropertyNode_ptr props)
 {
@@ -751,6 +749,4 @@ PackageList Catalog::packagesProviding(const Type inferredType, const std::strin
 }
 
 
-} // of namespace pkg
-
-} // of namespace simgear
+} // of namespace simgear::pkg

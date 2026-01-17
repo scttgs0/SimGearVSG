@@ -20,8 +20,7 @@
 //
 //
 
-#ifndef _CLOUDFIELD_HXX
-#define _CLOUDFIELD_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 #include <vector>
@@ -164,5 +163,3 @@ public:
   static void setVisRange(float d) { view_distance = d; }
   void applyVisAndLoDRange(void);
 };
-
-#endif // _CLOUDFIELD_HXX

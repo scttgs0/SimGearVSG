@@ -17,8 +17,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef _SGMESH_HXX
-#define _SGMESH_HXX
+#pragma once
 
 /*
 The Simgear Mesh object is based on the GPLv2 library trimesh by
@@ -714,5 +713,3 @@ public:
 //	static void set_eprintf_hook(void (*hook)(const char *));
 //	static void eprintf(const char *format, ...);
 };
-
-#endif

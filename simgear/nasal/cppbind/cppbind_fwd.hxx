@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2018 Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_NASAL_CPPBIND_FWD_HXX_
-#define SG_NASAL_CPPBIND_FWD_HXX_
+#pragma once
 
 #include <simgear/nasal/nasal.h>
 #include <cstddef>
@@ -41,5 +40,3 @@ namespace nasal
   T get_member(naContext c, naRef obj, const std::string& name);
 
 } // namespace nasal
-
-#endif /* SG_NASAL_CPPBIND_FWD_HXX_ */

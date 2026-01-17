@@ -5,8 +5,7 @@
 
 #include <unordered_map>
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 /**
  * Lookup table that ties a string property value to a type that cannot be
@@ -52,5 +51,4 @@ const SGPropertyNode *getPropertyNode(const SGPropertyNode *prop);
 const SGPropertyNode *getPropertyChild(const SGPropertyNode *prop,
                                        const char *name);
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

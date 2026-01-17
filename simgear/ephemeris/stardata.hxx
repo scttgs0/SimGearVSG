@@ -6,8 +6,7 @@
  * @brief Manage star data
  */
 
-#ifndef _SG_STARDATA_HXX
-#define _SG_STARDATA_HXX
+#pragma once
 
 #include <string>
 #include <vector>
@@ -39,6 +38,3 @@ public:
 private:
     std::vector<Star> _stars;
 };
-
-
-#endif // _SG_STARDATA_HXX

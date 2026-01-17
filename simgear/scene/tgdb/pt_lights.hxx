@@ -20,10 +20,7 @@
 //
 // $Id$
 
-
-#ifndef _SG_PT_LIGHTS_HXX
-#define _SG_PT_LIGHTS_HXX
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -105,4 +102,3 @@ public:
 simgear::Effect* getLightEffect(float size, const osg::Vec3& attenuation,
                                 float minSize, float maxSize, bool directional,
                                 const simgear::SGReaderWriterOptions* options);
-#endif // _SG_PT_LIGHTS_HXX

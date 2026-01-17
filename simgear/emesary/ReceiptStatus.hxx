@@ -1,6 +1,3 @@
-#ifndef RECEIPTSTATUS_hxx
-#define RECEIPTSTATUS_hxx
-
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2002-2019 Richard Harrison <richard@zaretto.com>
 
@@ -10,35 +7,31 @@
  * @see http://www.chateau-logic.com/content/class-based-inter-object-communication
  */
 
-namespace simgear
-{
-    namespace Emesary
-    {
-    enum class ReceiptStatus
-        {
-            /// Processing completed successfully
-        OK = 0,
+#pragma once
 
-            /// Individual item failure
-        Fail = 1,
+namespace simgear::Emesary {
+enum class ReceiptStatus {
+    /// Processing completed successfully
+    OK = 0,
 
-            /// Fatal error; stop processing any further recipieints of this message. Implicitly fail
-        Abort = 2,
+    /// Individual item failure
+    Fail = 1,
 
-            /// Definitive completion - do not send message to any further recipieints
-        Finished = 3,
+    /// Fatal error; stop processing any further recipients of this message. Implicitly fail
+    Abort = 2,
 
-            /// Return value when method doesn't process a message.
-        NotProcessed = 4,
+    /// Definitive completion - do not send message to any further recipients
+    Finished = 3,
 
-            /// Message has been sent but the return status cannot be determined as it has not been processed by the recipient. 
-            /// e.g. a queue or outgoing bridge
-        Pending = 5,
+    /// Return value when method doesn't process a message.
+    NotProcessed = 4,
 
-            /// Message has been definitively handled but the return value cannot be determined. The message will not be sent any further
-            /// e.g. a point to point forwarding bridge
-        PendingFinished = 6,
-        };
-    }
-}
-#endif
+    /// Message has been sent but the return status cannot be determined as it has not been processed by the recipient.
+    /// e.g. a queue or outgoing bridge
+    Pending = 5,
+
+    /// Message has been definitively handled but the return value cannot be determined. The message will not be sent any further
+    /// e.g. a point to point forwarding bridge
+    PendingFinished = 6,
+};
+} // namespace simgear::Emesary

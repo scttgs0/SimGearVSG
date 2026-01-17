@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2005-2009, 2011 Mathias Froehlich
 
-#ifndef SGAtomic_HXX
-#define SGAtomic_HXX
+#pragma once
 
 #if defined(__GNUC__) && ((4 < __GNUC__)||(4 == __GNUC__ && 1 <= __GNUC_MINOR__)) && \
     defined(__x86_64__)
@@ -128,4 +127,3 @@ public:
     }
 };
 }
-#endif

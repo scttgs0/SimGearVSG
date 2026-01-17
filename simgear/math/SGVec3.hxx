@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006-2009 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGVec3_H
-#define SGVec3_H
+#pragma once
 
 #include <iosfwd>
 
@@ -502,5 +501,3 @@ inline
 SGVec3d
 toVec3d(const SGVec3f& v)
 { SGVec3d d(v); return d; }
-
-#endif

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef SGQUEUE_HXX_INCLUDED
-#define SGQUEUE_HXX_INCLUDED 1
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -431,5 +430,3 @@ private:
 protected:
     container_type queue;
 };
-
-#endif // SGQUEUE_HXX_INCLUDED

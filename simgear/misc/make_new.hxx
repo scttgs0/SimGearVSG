@@ -6,8 +6,7 @@
  * @brief  Helper functions which created objects with new.
  */
 
-#ifndef SG_MAKE_NEW_HXX_
-#define SG_MAKE_NEW_HXX_
+#pragma once
 
 namespace simgear
 {
@@ -38,5 +37,3 @@ namespace simgear
   // Add more if needed (Variadic templates would be really nice!)
 
 } // namespace simgear
-
-#endif /* SG_MAKE_NEW_HXX_ */

@@ -6,8 +6,7 @@
  * @brief Base class for property controlled subsystems
  */
 
-#ifndef SG_PROPERTY_BASED_MGR_HXX_
-#define SG_PROPERTY_BASED_MGR_HXX_
+#pragma once
 
 #include "PropertyBasedElement.hxx"
 #include <simgear/structure/subsystem_mgr.hxx>
@@ -84,5 +83,3 @@ protected:
 };
 
 } // namespace simgear
-
-#endif /* SG_PROPERTY_BASED_MGR_HXX_ */

@@ -6,8 +6,7 @@
  * @brief Visual environment helper class
  */
 
-#ifndef _VISUAL_ENVIRO_HXX
-#define _VISUAL_ENVIRO_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 #include <string>
@@ -238,5 +237,3 @@ public:
 };
 
 extern SGEnviro sgEnviro;
-
-#endif // _VISUAL_ENVIRO_HXX

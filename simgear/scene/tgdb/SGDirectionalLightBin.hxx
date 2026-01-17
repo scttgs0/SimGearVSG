@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_DIRECTIONAL_LIGHT_BIN_HXX
-#define SG_DIRECTIONAL_LIGHT_BIN_HXX
+#pragma once
 
 class SGDirectionalLightBin {
 public:
@@ -73,5 +72,3 @@ public:
 private:
   LightList _lights;
 };
-
-#endif

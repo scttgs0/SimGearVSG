@@ -19,9 +19,7 @@
 
 #include <osgGA/GUIEventHandler>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -375,5 +373,4 @@ namespace canvas
     _image_shadow->set<int>("z-index", -1);
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2009 Frederic Bouvier
 
-#ifndef SIMGEAR_BEZIERCURVE_HXX
-#define SIMGEAR_BEZIERCURVE_HXX 1
+#pragma once
 
 #include <list>
 using std::list;
@@ -83,5 +82,3 @@ namespace simgear
     size_t mMaxSubdiv;
   };
 }
-
-#endif

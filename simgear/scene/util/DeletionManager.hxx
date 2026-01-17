@@ -17,8 +17,7 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_DELETIONMANAGER_HXX
-#define SIMGEAR_DELETIONMANAGER_HXX 1
+#pragma once
 
 #include <vector>
 
@@ -45,5 +44,3 @@ protected:
     std::vector<osg::ref_ptr<osg::Referenced> > _staleObjects;
 };
 }
-
-#endif

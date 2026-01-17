@@ -14,8 +14,7 @@
  * Provides a audio sample encapsulation
  */
 
-#ifndef _SG_SAMPLE_HXX
-#define _SG_SAMPLE_HXX 1
+#pragma once
 
 #include <memory>
 #include <string>
@@ -604,6 +603,3 @@ private:
     bool _valid_buffer = false;
     unsigned int _buffer = SGSoundMgr::NO_BUFFER;
 };
-
-#endif // _SG_SAMPLE_HXX
-

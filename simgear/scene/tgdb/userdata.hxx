@@ -21,9 +21,7 @@
 //
 // $Id$
 
-
-#ifndef _SG_USERDATA_HXX
-#define _SG_USERDATA_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -46,5 +44,3 @@ namespace simgear
  */
 SGPropertyNode* getPropertyRoot();
 }
-
-#endif // _SG_USERDATA_HXX

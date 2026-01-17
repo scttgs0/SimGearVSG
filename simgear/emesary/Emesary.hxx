@@ -1,6 +1,3 @@
-#ifndef EMESARY_hxx
-#define EMESARY_hxx
-
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2019 Richard Harrison <richard@zaretto.com>
 
@@ -16,6 +13,8 @@
  * @see http://www.chateau-logic.com/content/class-based-inter-object-communication
  */
 
+#pragma once
+
 #include <typeinfo>
 
 #include "ReceiptStatus.hxx"
@@ -25,18 +24,13 @@
 #include "Transmitter.hxx"
 #include <simgear/structure/Singleton.hxx>
 
-namespace simgear
+namespace simgear::Emesary {
+class GlobalTransmitter : public simgear::Singleton<Transmitter>
 {
-    namespace Emesary
+public:
+    GlobalTransmitter()
     {
-        class GlobalTransmitter : public simgear::Singleton<Transmitter>
-        {
-        public:
-            GlobalTransmitter()
-            {
-            }
-            virtual ~GlobalTransmitter() {}
-        };
     }
-}
-#endif
+    virtual ~GlobalTransmitter() {}
+};
+} // namespace simgear::Emesary

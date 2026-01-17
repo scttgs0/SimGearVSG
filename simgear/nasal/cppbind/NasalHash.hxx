@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2012  Thomas Geymayer <tomgey@gmail.com>
 
-
-#ifndef SG_NASAL_HASH_HXX_
-#define SG_NASAL_HASH_HXX_
+#pragma once
 
 #include <boost/mpl/if.hpp>
 
@@ -279,5 +277,3 @@ from_nasal_helper( naContext c,
 
   return map;
 }
-
-#endif /* SG_NASAL_HASH_HXX_ */

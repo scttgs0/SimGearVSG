@@ -6,8 +6,7 @@
  * @brief A group of 2D Canvas elements which get automatically transformed according to the map parameters.
  */
 
-#ifndef CANVAS_MAP_HXX_
-#define CANVAS_MAP_HXX_
+#pragma once
 
 #include "CanvasGroup.hxx"
 
@@ -15,9 +14,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   class GeoNodePair;
   class HorizontalProjection;
@@ -71,7 +68,4 @@ namespace canvas
       GeoCoord parseGeoCoord(const std::string& val) const;
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_MAP_HXX_ */
+} // namespace simgear::canvas

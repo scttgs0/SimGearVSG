@@ -53,5 +53,4 @@ namespace simgear
       return str;
   }
 
-
 } // namespace simgear

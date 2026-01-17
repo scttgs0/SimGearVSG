@@ -14,9 +14,7 @@
 #include <simgear/props/props_io.hxx>
 #include <simgear/structure/exception.hxx>
 
-namespace simgear
-{
-namespace HTTP
+namespace simgear::HTTP
 {
 
 extern const int DEFAULT_HTTP_PORT;
@@ -484,5 +482,4 @@ std::string Request::lastModified() const
 }
 
 
-} // of namespace HTTP
-} // of namespace simgear
+} // of namespace simgear::HTTP

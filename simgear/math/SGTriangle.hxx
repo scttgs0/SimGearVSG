@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGTriangle_H
-#define SGTriangle_H
+#pragma once
 
 template<typename T>
 class SGTriangle {
@@ -87,5 +86,3 @@ operator<<(std::basic_ostream<char_type, traits_type>& s,
            << ", v1 = " << triangle.getVertex(1)
            << ", v2 = " << triangle.getVertex(2);
 }
-
-#endif

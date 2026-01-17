@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGBox_H
-#define SGBox_H
+#pragma once
 
 template<typename T>
 class SGBox {
@@ -148,5 +147,3 @@ inline
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& s, const SGBox<T>& box)
 { return s << "min = " << box.getMin() << ", max = " << box.getMax(); }
-
-#endif

@@ -6,15 +6,12 @@
  * @brief Manage event handling inside a Canvas similar to the DOM Level 3 Event Model
  */
 
-#ifndef CANVAS_EVENT_MANAGER_HXX_
-#define CANVAS_EVENT_MANAGER_HXX_
+#pragma once
 
 #include "canvas_fwd.hxx"
 #include <deque>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   struct EventTarget
@@ -100,7 +97,4 @@ namespace canvas
                          const EventPropagationPath& path2 ) const;
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_EVENT_MANAGER_HXX_ */
+} // namespace simgear::canvas

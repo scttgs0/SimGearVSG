@@ -6,8 +6,7 @@
  * @brief Canvas placement for placing a canvas texture onto osg objects
  */
 
-#ifndef CANVAS_OBJECT_PLACEMENT_HXX_
-#define CANVAS_OBJECT_PLACEMENT_HXX_
+#pragma once
 
 #include "CanvasPlacement.hxx"
 #include "canvas_fwd.hxx"
@@ -15,9 +14,7 @@
 #include <simgear/scene/util/SGSceneUserData.hxx>
 #include <osg/Material>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -59,7 +56,4 @@ namespace canvas
       SGSceneUserDataPtr  _scene_user_data;
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_OBJECT_PLACEMENT_HXX_ */
+} // namespace simgear::canvas

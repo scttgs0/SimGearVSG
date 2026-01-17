@@ -6,14 +6,11 @@
  * @brief osg::Operation to initialize the OpenVG context used for path rendering
  */
 
-#ifndef CANVAS_VG_INITOPERATION_HXX_
-#define CANVAS_VG_INITOPERATION_HXX_
+#pragma once
 
 #include <osg/GraphicsThread>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -34,7 +31,4 @@ namespace canvas
   /// osg::GraphicsOperation. This function can be called directly.
   void vgShutdown();
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_VG_INITOPERATION_HXX_ */
+} // namespace simgear::canvas

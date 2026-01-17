@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef _SG_GEODESY_HXX
-#define _SG_GEODESY_HXX
+#pragma once
 
 #include "SGMath.hxx"
 
@@ -154,5 +153,3 @@ inline int geo_inverse_wgs_84(const SGGeod& p1, const SGGeod& p2,
 {
   return !SGGeodesy::inverse(p1, p2, *az1, *az2, *s);
 }
-
-#endif // _SG_GEODESY_HXX

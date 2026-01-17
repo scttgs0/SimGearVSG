@@ -28,8 +28,7 @@
  *
  */
 
-#ifndef _SG_COMPILER_H
-#define _SG_COMPILER_H
+#pragma once
 
 /*
  * Helper macro SG_STRINGIZE:
@@ -127,5 +126,3 @@
 //
 // No user modifiable definitions beyond here.
 //
-
-#endif // _SG_COMPILER_H

@@ -17,8 +17,9 @@
  * MA 02110-1301, USA.
  *
  */
-#ifndef SGREADERWRITERBTG_HXX
-#define SGREADERWRITERBTG_HXX 1
+
+#pragma once
+
 #include <osgDB/Registry>
 
 class SGReaderWriterBTG : public osgDB::ReaderWriter {
@@ -33,6 +34,3 @@ public:
                                 const osgDB::Options* options)
         const;
 };
-
-#endif
-    

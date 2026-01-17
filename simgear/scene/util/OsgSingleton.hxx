@@ -1,5 +1,4 @@
-#ifndef SIMGEAR_OSGSINGLETON_HXX
-#define SIMGEAR_OSGSINGLETON_HXX 1
+#pragma once
 
 #include <simgear/structure/Singleton.hxx>
 
@@ -37,5 +36,3 @@ public:
 };
 
 }
-
-#endif

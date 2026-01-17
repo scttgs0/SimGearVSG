@@ -6,8 +6,7 @@
    Copyright (C) 1998-2009 Gilles Vollant
 */
 
-#ifndef _ZLIBIOAPI_H
-#define _ZLIBIOAPI_H
+#pragma once
 
 // Needed for some zlib installations:
 #ifndef OF
@@ -75,6 +74,3 @@ void fill_fopen_filefunc OF((zlib_filefunc_def* pzlib_filefunc_def));
 #ifdef __cplusplus
 }
 #endif
-
-#endif
-

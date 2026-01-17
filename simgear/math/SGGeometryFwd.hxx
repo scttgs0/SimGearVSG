@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGGeometryFwd_HXX
-#define SGGeometryFwd_HXX
+#pragma once
 
 template<typename T>
 class SGBox;
@@ -33,5 +32,3 @@ template<typename T>
 class SGTriangle;
 typedef SGTriangle<float> SGTrianglef;
 typedef SGTriangle<double> SGTriangled;
-
-#endif

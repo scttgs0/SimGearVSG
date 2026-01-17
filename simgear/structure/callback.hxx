@@ -5,13 +5,10 @@
  * @brief Declaration for simgear callback
 */
 
-#include <functional>
+#pragma once
 
-#ifndef _SG_CALLBACK_HXX
-#define _SG_CALLBACK_HXX
+#include <functional>
 
 namespace simgear {
     using Callback = std::function<void()>;
 }
-
-#endif // _SG_CALLBACK_HXX

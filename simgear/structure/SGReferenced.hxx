@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2005-2006 by Mathias Froehlich
 
-#ifndef SGReferenced_HXX
-#define SGReferenced_HXX
+#pragma once
 
 #include "SGAtomic.hxx"
 
@@ -36,5 +35,3 @@ public:
 private:
   mutable SGAtomic _refcount;
 };
-
-#endif

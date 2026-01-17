@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef _SG_VASI_DRAWABLE_HXX
-#define _SG_VASI_DRAWABLE_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 #include <simgear/math/SGMath.hxx>
@@ -60,5 +59,3 @@ private:
   SGVec4f _red;
   SGVec4f _white;
 };
-
-#endif // _SG_VASI_LIGHT_HXX

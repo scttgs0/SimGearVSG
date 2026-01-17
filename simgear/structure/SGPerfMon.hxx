@@ -6,8 +6,7 @@
  * @brief Performance Monitoring
  */
 
-#ifndef __SGPERFMON_HXX
-#define __SGPERFMON_HXX
+#pragma once
 
 #include <simgear/props/props.hxx>
 #include <simgear/structure/subsystem_mgr.hxx>
@@ -50,5 +49,3 @@ private:
     bool _isEnabled;
     int _count;
 };
-
-#endif // __SGPERFMON_HXX

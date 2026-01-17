@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGMatrix_H
-#define SGMatrix_H
+#pragma once
 
 #include <simgear/math/simd4x4.hxx>
 
@@ -508,5 +507,3 @@ toMatrixd(const SGMatrixf& m)
                    m(2,0), m(2,1), m(2,2), m(2,3),
                    m(3,0), m(3,1), m(3,2), m(3,3));
 }
-
-#endif

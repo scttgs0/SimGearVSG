@@ -1,5 +1,4 @@
-#ifndef __SG_DEM_SESSION_HXX__
-#define __SG_DEM_SESSION_HXX__
+#pragma once
 
 #include <simgear/scene/dem/SGDemRoot.hxx>
 
@@ -99,5 +98,3 @@ private:
 
     std::vector<SGDemTileRef> tileRefs;
 };
-
-#endif /* __SG_DEM_SESSION_HXX__ */

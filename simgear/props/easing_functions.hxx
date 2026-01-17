@@ -8,8 +8,7 @@
  * Based on easing functions by Robert Penner (http://www.robertpenner.com/easing)
  */
 
-#ifndef SG_EASING_HXX_
-#define SG_EASING_HXX_
+#pragma once
 
 namespace simgear
 {
@@ -23,5 +22,3 @@ namespace simgear
   extern const EasingMapEntry easing_functions[];
 
 } // namespace simgear
-
-#endif /* SG_EASING_HXX_ */

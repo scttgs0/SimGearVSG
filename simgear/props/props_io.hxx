@@ -8,8 +8,7 @@
  * See props.html for documentation [replace with URL when available].
  */
 
-#ifndef __PROPS_IO_HXX
-#define __PROPS_IO_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 #include <simgear/props/props.hxx>
@@ -93,7 +92,3 @@ using PropertyPredicate = std::function<bool (const SGPropertyNode* in)>;
  */
 bool copyPropertiesIf(const SGPropertyNode *in, SGPropertyNode *out,
                         PropertyPredicate predicate);
-
-#endif // __PROPS_IO_HXX
-
-// end of props_io.hxx

@@ -3,8 +3,7 @@
 // SPDX-FileCopyrightText: 2014  Thomas Geymayer <tomgey@gmail.com>
 
 
-#ifndef SG_NASAL_GHOST_HXX_
-#define SG_NASAL_GHOST_HXX_
+#pragma once
 
 #include "NasalCallContext.hxx"
 #include "NasalObjectHolder.hxx"
@@ -1520,5 +1519,3 @@ from_nasal_helper(naContext c, naRef ref, const T*)
   using TypeRef = osg::ref_ptr<std::remove_pointer_t<T>>;
   return T(nasal::Ghost<TypeRef>::fromNasalChecked(c, ref));
 }
-
-#endif /* SG_NASAL_GHOST_HXX_ */

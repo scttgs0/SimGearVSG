@@ -6,8 +6,7 @@
  * @brief Metaprogramming Integer sequence (Is in C++14 but not C++11)
  */
 
-#ifndef SIMGEAR_STD_INTEGER_SEQUENCE_HXX_
-#define SIMGEAR_STD_INTEGER_SEQUENCE_HXX_
+#pragma once
 
 #include <simgear/simgear_config.h>
 #include "type_traits.hxx"
@@ -32,7 +31,7 @@ namespace std
   };
 }
 
-namespace simgear { namespace detail
+namespace simgear::detail
 {
   template<class T, class Seq, T El>
   struct append;
@@ -55,7 +54,7 @@ namespace simgear { namespace detail
   {
     using type = std::integer_sequence<T>;
   };
-}}
+}
 
 namespace std
 {
@@ -73,5 +72,3 @@ namespace std
   using index_sequence_for = make_index_sequence<sizeof...(T)>;
 }
 #endif
-
-#endif /* SIMGEAR_STD_INTEGER_SEQUENCE_HXX_ */

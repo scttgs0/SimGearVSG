@@ -8,8 +8,7 @@
  * @brief A C++ I/O streams interface to the zlib gz* functions
  */
 
-#ifndef _gzfstream_hxx
-#define _gzfstream_hxx
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -147,5 +146,3 @@ struct gzofstream_base
 
     gzfilebuf gzbuf;
 };
-
-#endif // _gzfstream_hxx

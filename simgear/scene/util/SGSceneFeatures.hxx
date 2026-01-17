@@ -19,8 +19,7 @@
 *
 */
 
-#ifndef SG_SCENE_FEATURES_HXX
-#define SG_SCENE_FEATURES_HXX
+#pragma once
 
 #include <simgear/structure/SGReferenced.hxx>
 #include <string>
@@ -165,5 +164,3 @@ private:
     float _VPBSampleRatio;
     float _VPBVerticalScale;
 };
-
-#endif

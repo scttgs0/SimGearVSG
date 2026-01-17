@@ -9,9 +9,7 @@
 #pragma once
 
 #include "canvas_fwd.hxx"
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -121,5 +119,4 @@ namespace canvas
 
   };
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

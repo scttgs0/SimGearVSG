@@ -11,8 +11,7 @@
  * @note   Modified for the new SoundSystem by Erik Hofman, October 2009
  */
 
-#ifndef _SG_SOUNDMGR_HXX
-#define _SG_SOUNDMGR_HXX 1
+#pragma once
 
 #include <string>
 #include <vector>
@@ -340,6 +339,3 @@ private:
 
     void update_sample_config( SGSampleGroup *sound );
 };
-
-
-#endif // _SG_SOUNDMGR_HXX

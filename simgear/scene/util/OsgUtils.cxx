@@ -9,8 +9,7 @@
 
 #include <simgear/debug/logstream.hxx>
 
-namespace simgear {
-namespace osgutils {
+namespace simgear::osgutils {
 
 osgText::Text::AlignmentType mapAlignment(const std::string& val)
 {
@@ -52,5 +51,4 @@ osgText::Text::AlignmentType mapAlignment(const std::string& val)
     }
 }
 
-} // namespace osgutils
-} // namespace simgear
+} // namespace simgear::osgutils

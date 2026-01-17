@@ -16,8 +16,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef SimGear_BoundingVolumeBuildVisitor_hxx
-#define SimGear_BoundingVolumeBuildVisitor_hxx
+#pragma once
 
 #include <osg/Camera>
 #include <osg/CoordinateSystemNode>
@@ -273,5 +272,3 @@ private:
 };
 
 }
-
-#endif

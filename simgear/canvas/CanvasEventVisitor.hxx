@@ -6,15 +6,12 @@
  * @brief Visitor for traversing a canvas element hierarchy similar to the traversal of the DOM Level 3 Event Model
  */
 
-#ifndef CANVAS_EVENT_VISITOR_HXX_
-#define CANVAS_EVENT_VISITOR_HXX_
+#pragma once
 
 #include "canvas_fwd.hxx"
 #include "CanvasEventManager.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   class EventVisitor
@@ -50,8 +47,4 @@ namespace canvas
 
   };
 
-} // namespace canvas
-} // namespace simgear
-
-
-#endif /* CANVAS_EVENTVISITOR_HXX_ */
+} // namespace simgear::canvas

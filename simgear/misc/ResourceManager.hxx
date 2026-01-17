@@ -6,8 +6,7 @@
  * @brief  manage finding resources by names/paths
  */
 
-#ifndef SG_RESOURCE_MANAGER_HXX
-#define SG_RESOURCE_MANAGER_HXX
+#pragma once
 
 #include <vector>
 
@@ -87,5 +86,3 @@ protected:
 };
 
 } // of simgear namespace
-
-#endif // of header guard

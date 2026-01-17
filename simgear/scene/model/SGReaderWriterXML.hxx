@@ -18,8 +18,9 @@
  * MA 02110-1301, USA.
  *
  */
-#ifndef SGREADERWRITERXML_HXX
-#define SGREADERWRITERXML_HXX 1
+
+ #pragma once
+
 #include <osgDB/Registry>
 namespace simgear
 {
@@ -38,5 +39,3 @@ public:
 };
 
 }
-#endif
-

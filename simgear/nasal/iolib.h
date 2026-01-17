@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2003  Andy Ross  andy@plausible.org
 
-#ifndef _IOLIB_H
-#define _IOLIB_H
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,4 +42,3 @@ naRef naIOGhost(naContext c, FILE* f);
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // _IOLIB_H

@@ -27,9 +27,7 @@ const string_list static_typeNames = {
 
 } // namespace
 
-namespace simgear {
-
-namespace pkg {
+namespace simgear::pkg {
 
 Type typeFromString(const std::string& s)
 {
@@ -642,6 +640,4 @@ bool Package::doesProvidePath(const std::string& p) const
     return it != m_provides.end();
 }
 
-} // of namespace pkg
-
-} // of namespace simgear
+} // of namespace simgear::pkg

@@ -4,8 +4,7 @@
 // SPDX-FileCopyrightText: 2001 David Megginson <david@megginson.com>
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef _SG_MAT_HXX
-#define _SG_MAT_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -651,5 +650,3 @@ SGSetTextureFilter( int max);
 
 int
 SGGetTextureFilter();
-
-#endif // _SG_MAT_HXX

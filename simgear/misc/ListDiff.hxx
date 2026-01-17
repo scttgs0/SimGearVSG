@@ -6,8 +6,7 @@
  * @brief  Compare lists and get differences
  */
 
-#ifndef SG_LISTDIFF_HXX_
-#define SG_LISTDIFF_HXX_
+#pragma once
 
 #include <vector>
 
@@ -69,5 +68,3 @@ namespace simgear
   };
 
 } // namespace simgear
-
-#endif /* SG_LISTDIFF_HXX_ */

@@ -20,8 +20,7 @@
 //
 //
 
-#ifndef _NEWCLOUD_HXX
-#define _NEWCLOUD_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 #include <string>
@@ -109,7 +108,3 @@ private:
 
         osg::Geometry* createOrthQuad(float w, float h, int varieties_x, int varieties_y);
 };
-
-
-
-#endif // _NEWCLOUD_HXX

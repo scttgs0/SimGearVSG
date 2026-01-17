@@ -8,8 +8,7 @@
 
 // $Id$
 
-#ifndef SG_TABBED_VALUES_HXX
-#define SG_TABBED_VALUES_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -40,5 +39,3 @@ private:
 	don't iterative over the whole line. */
 	mutable vector<char*> _fields;
 };
-
-#endif

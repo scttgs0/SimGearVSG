@@ -23,9 +23,7 @@
 //
 // $Id$
 
-
-#ifndef _SG_CLOUD_HXX_
-#define _SG_CLOUD_HXX_
+#pragma once
 
 #include <simgear/compiler.h>
 #include <simgear/misc/sg_path.hxx>
@@ -250,5 +248,3 @@ private:
     SGCloudField *layer3D;
 
 };
-
-#endif // _SG_CLOUD_HXX_

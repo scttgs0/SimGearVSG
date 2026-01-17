@@ -6,8 +6,7 @@
  * @brief Glue for GUI widgets implemented in Nasal space
  */
 
-#ifndef SG_CANVAS_NASAL_WIDGET_HXX_
-#define SG_CANVAS_NASAL_WIDGET_HXX_
+#pragma once
 
 #include "LayoutItem.hxx"
 
@@ -15,9 +14,7 @@
 #include <simgear/nasal/cppbind/NasalHash.hxx>
 #include <simgear/nasal/cppbind/NasalObject.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -115,8 +112,4 @@ namespace canvas
 
   typedef SGSharedPtr<NasalWidget> NasalWidgetRef;
 
-} // namespace canvas
-} // namespace simgear
-
-
-#endif /* SG_CANVAS_NASAL_WIDGET_HXX_ */
+} // namespace simgear::canvas

@@ -10,8 +10,7 @@
  * of the* computer running the sim.
 */
 
-#ifndef _LOWLEVELTIME_H_
-#define _LOWLEVELTIME_H_
+#pragma once
 
 #include <time.h>
 
@@ -104,5 +103,3 @@ extern const unsigned short int mon_yday[2][13];
 
 #define EPOCH_YEAR	1970
 #define EPOCH_WDAY	TM_THURSDAY
-
-#endif

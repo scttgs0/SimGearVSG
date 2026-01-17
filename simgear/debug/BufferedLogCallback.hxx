@@ -6,8 +6,7 @@
  * @brief Buffer certain log messages permanently for later retrieval and display
  */
      
-#ifndef SG_DEBUG_BUFFEREDLOGCALLBACK_HXX
-#define SG_DEBUG_BUFFEREDLOGCALLBACK_HXX
+#pragma once
 
 #include <vector>
 #include <memory> // for std::unique_ptr
@@ -61,5 +60,3 @@ private:
      
 
 } // of namespace simgear
-
-#endif // of SG_DEBUG_BUFFEREDLOGCALLBACK_HXX

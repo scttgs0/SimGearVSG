@@ -3,8 +3,7 @@
 //
 // This file is in the Public Domain, and comes with no warranty.
 
-#ifndef __MODEL_HXX
-#define __MODEL_HXX 1
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -136,4 +135,3 @@ instantiateEffects(osg::Node* model,
     return instantiateEffects(model, effectProps, options, currentDir);
 }
 }
-#endif // __MODEL_HXX

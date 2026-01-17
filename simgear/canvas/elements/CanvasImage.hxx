@@ -6,8 +6,7 @@
  * @brief An image on the Canvas
  */
 
-#ifndef CANVAS_IMAGE_HXX_
-#define CANVAS_IMAGE_HXX_
+#pragma once
 
 #include "CanvasElement.hxx"
 
@@ -168,5 +167,3 @@ namespace canvas
 
 } // namespace canvas
 } // namespace canvas
-
-#endif /* CANVAS_IMAGE_HXX_ */

@@ -6,16 +6,13 @@
  * @brief A group of 2D Canvas elements
  */
 
-#ifndef CANVAS_GROUP_HXX_
-#define CANVAS_GROUP_HXX_
+#pragma once
 
 #include "CanvasElement.hxx"
 
 #include <list>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   typedef std::map<std::string, ElementFactory> ElementFactories;
@@ -120,7 +117,4 @@ namespace canvas
       std::unique_ptr<FocusScope> _focus_scope;
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_GROUP_HXX_ */
+} // namespace simgear::canvas

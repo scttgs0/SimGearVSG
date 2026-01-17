@@ -7,8 +7,7 @@
  *        and alutCodec.c (freealut is also LGPL licensed)
  */
 
-#ifndef SG_SOUND_READWAV_HXX
-#define SG_SOUND_READWAV_HXX
+#pragma once
 
 #if defined( __APPLE__ ) && !defined(SG_SOUND_USES_OPENALSOFT)
 # include <OpenAL/al.h>
@@ -28,5 +27,3 @@ namespace simgear
 {
   ALvoid* loadWAVFromFile(const SGPath& path, unsigned int& format, ALsizei& size, ALfloat& freqf, unsigned int& block_align);
 }
-
-#endif // of SG_SOUND_READWAV_HXX

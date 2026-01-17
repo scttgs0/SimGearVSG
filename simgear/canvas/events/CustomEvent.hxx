@@ -6,15 +6,12 @@
  * @brief Canvas user defined event
  */
 
-#ifndef CANVAS_CUSTOM_EVENT_HXX_
-#define CANVAS_CUSTOM_EVENT_HXX_
+#pragma once
 
 #include <simgear/canvas/CanvasEvent.hxx>
 #include <simgear/structure/map.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -76,7 +73,4 @@ namespace canvas
       bool bubbles;     //!< Whether the event supports bubbling
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_CUSTOM_EVENT_HXX_ */
+} // namespace simgear::canvas

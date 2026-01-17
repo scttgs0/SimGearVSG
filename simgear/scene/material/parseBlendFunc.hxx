@@ -17,8 +17,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
 
-#ifndef SG_PARSE_BLEND_FUNC_HXX_
-#define SG_PARSE_BLEND_FUNC_HXX_
+#pragma once
 
 #include <simgear/props/propsfwd.hxx>
 #include <osg/StateSet>
@@ -47,6 +46,3 @@ namespace simgear
                        const SGPropertyNode* dest_alpha = 0 );
 
 } // namespace simgear
-
-
-#endif /* SG_PARSE_BLEND_FUNC_HXX_ */

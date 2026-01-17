@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 1988 Free Software Foundation, written by Dirk Grunwald (grunwald@cs.uiuc.edu)
 
-#ifndef SampleStatistic_h
-
-#define SampleStatistic_h 1
-
+#pragma once
 
 #undef min
 #undef max
@@ -73,5 +70,3 @@ inline double SampleStatistic::cumulative () const
 inline SampleStatistic::~SampleStatistic ()
 {
 }
-
-#endif

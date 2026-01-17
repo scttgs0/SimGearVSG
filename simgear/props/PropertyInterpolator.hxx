@@ -6,8 +6,7 @@
  * @brief Adapter for interpolating different types of properties.
  */
 
-#ifndef SG_PROPERTY_INTERPOLATOR_HXX_
-#define SG_PROPERTY_INTERPOLATOR_HXX_
+#pragma once
 
 #include "easing_functions.hxx"
 #include "propsfwd.hxx"
@@ -86,6 +85,3 @@ namespace simgear
   };
 
 } // namespace simgear
-
-
-#endif /* SG_PROPERTY_INTERPOLATOR_HXX_ */

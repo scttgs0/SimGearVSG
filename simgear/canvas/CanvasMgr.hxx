@@ -6,15 +6,12 @@
  * @brief Canvas with 2D rendering API
  */
 
-#ifndef SG_CANVAS_MGR_H_
-#define SG_CANVAS_MGR_H_
+#pragma once
 
 #include "canvas_fwd.hxx"
 #include <simgear/props/PropertyBasedMgr.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
 class CanvasMgr : public PropertyBasedMgr
@@ -53,7 +50,4 @@ protected:
     void elementCreated(PropertyBasedElementPtr element) override;
 };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* SG_CANVAS_MGR_H_ */
+} // namespace simgear::canvas

@@ -12,9 +12,7 @@
 #include "CanvasEventVisitor.hxx"
 #include "elements/CanvasElement.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -78,5 +76,4 @@ namespace canvas
     return _target_path;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef TREE_BIN_HXX
-#define TREE_BIN_HXX
+#pragma once
 
 #include <vector>
 #include <string>
@@ -72,4 +71,3 @@ typedef std::list<TreeBin*> SGTreeBinList;
 
 osg::Group* createForest(SGTreeBinList& forestList, osg::ref_ptr<simgear::SGReaderWriterOptions> options);
 }
-#endif

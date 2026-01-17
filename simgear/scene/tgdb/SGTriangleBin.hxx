@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_TRIANGLE_BIN_HXX
-#define SG_TRIANGLE_BIN_HXX
+#pragma once
 
 #include <vector>
 #include <map>
@@ -119,5 +118,3 @@ private:
   EdgeMap _edgeMap;
 #endif
 };
-
-#endif

@@ -21,9 +21,7 @@
 //
 // $Id$
 
-
-#ifndef _SG_OBJ_HXX
-#define _SG_OBJ_HXX
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -51,5 +49,3 @@ class SGReaderWriterOptions;
 osg::Node*
 SGLoadBTG(const std::string& path, 
           const simgear::SGReaderWriterOptions* options);
-
-#endif // _SG_OBJ_HXX

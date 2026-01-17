@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2000 David Megginson <david@megginson.com>
 
-#ifndef __SUBSYSTEM_MGR_HXX
-#define __SUBSYSTEM_MGR_HXX 1
-
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -754,5 +752,3 @@ private:
     using DelegateVec = std::vector<Delegate*>;
     DelegateVec _delegates;
 };
-
-#endif // __SUBSYSTEM_MGR_HXX

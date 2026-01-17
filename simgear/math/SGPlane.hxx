@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGPlane_H
-#define SGPlane_H
+#pragma once
 
 template<typename T>
 class SGPlane {
@@ -56,5 +55,3 @@ private:
   SGVec3<T> _normal;
   T _dist;
 };
-
-#endif

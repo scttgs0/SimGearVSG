@@ -6,8 +6,7 @@
  * @brief  Test Parse and represent SVG preserveAspectRatio attribute
  */
 
-#ifndef SG_SVG_PRESERVE_ASPECT_RATIO_HXX_
-#define SG_SVG_PRESERVE_ASPECT_RATIO_HXX_
+#pragma once
 
 #include <string>
 
@@ -54,5 +53,3 @@ namespace simgear
   };
 
 } // namespace simgear
-
-#endif /* SG_SVG_PRESERVE_ASPECT_RATIO_HXX_ */

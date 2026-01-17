@@ -14,8 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_TECHNIQUE_HXX
-#define SIMGEAR_TECHNIQUE_HXX 1
+#pragma once
 
 #include "EffectGeode.hxx"
 
@@ -134,4 +133,3 @@ protected:
     // osg::ref_ptr<Effect> _effect;
 };
 }
-#endif

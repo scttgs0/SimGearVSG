@@ -6,9 +6,7 @@
  * @brief Serial I/O routines
 */
 
-#ifndef _SG_SERIAL_HXX
-#define _SG_SERIAL_HXX
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -77,8 +75,3 @@ public:
     /** @return the baud rate */
     inline string get_baud() const { return baud; }
 };
-
-
-#endif // _SG_SERIAL_HXX
-
-

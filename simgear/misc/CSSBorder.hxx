@@ -6,8 +6,7 @@
  * @brief CSS border definitions and parser (eg. margin, border-image-width)
  */
 
-#ifndef SG_CSSBORDER_HXX_
-#define SG_CSSBORDER_HXX_
+#pragma once
 
 #include <simgear/math/SGMath.hxx>
 #include <simgear/math/SGRect.hxx>
@@ -57,5 +56,3 @@ namespace simgear
   };
 
 } // namespace simgear
-
-#endif /* SG_CSSBORDER_HXX_ */

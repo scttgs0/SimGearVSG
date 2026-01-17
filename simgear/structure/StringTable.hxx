@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef SIMGEAR_STRINGTABLE_HXX
-#define SIMGEAR_STRINGTABLE_HXX 1
+#pragma once
 
 #include <string>
 #include <mutex>
@@ -27,4 +26,3 @@ private:
     StringContainer _strings;
 };
 }
-#endif

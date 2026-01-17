@@ -24,10 +24,7 @@
 //
 // $Id$
 
-
-#ifndef _SG_SKY_HXX
-#define _SG_SKY_HXX
-
+#pragma once
 
 #include <simgear/compiler.h>
 #include <simgear/math/sg_random.hxx>
@@ -433,4 +430,3 @@ public:
     void set_clouds_enabled(bool enabled);
 
 };
-#endif // _SG_SKY_HXX

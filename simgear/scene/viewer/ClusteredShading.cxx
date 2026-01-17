@@ -16,8 +16,7 @@
 
 #include "CompositorUtil.hxx"
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 ClusteredShading::ClusteredShading(osg::Camera *camera,
                                    const SGPropertyNode *config) :
@@ -616,5 +615,4 @@ ClusteredShading::getDepthForSlice(int slice) const
     return _zNear * pow(_zFar / _zNear, float(slice) / _depth_slices);
 }
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

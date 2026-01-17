@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef _SG_OceanTile_HXX
-#define _SG_OceanTile_HXX
+#pragma once
 
 #include <osg/Node>
 
@@ -30,5 +29,3 @@ class SGMaterialLib;
 // Generate an ocean tile
 osg::Node* SGOceanTile(double clat, double clon, double width, double height, SGMaterialLib *matlib, int latPoints = 5, int lonPoints = 5);
 osg::Node* SGOceanTile(const SGBucket& b, SGMaterialLib *matlib, int latPoints = 5, int lonPoints = 5);
-
-#endif // _SG_OBJ_HXX

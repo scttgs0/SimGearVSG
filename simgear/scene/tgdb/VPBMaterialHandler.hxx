@@ -20,8 +20,7 @@
  *
  */
 
-#ifndef VPBMATERIALHANDLER
-#define VPBMATERIALHANDLER 1
+#pragma once
 
 #include "LightBin.hxx"
 #include "TreeBin.hxx"
@@ -155,5 +154,3 @@ class RandomLightsHandler : public VPBMaterialHandler {
 };
 
 }; // namespace simgear
-
-#endif

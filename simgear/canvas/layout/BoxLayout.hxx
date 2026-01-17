@@ -6,8 +6,7 @@
  * @brief Align items horizontally or vertically in a box
  */
 
-#ifndef SG_CANVAS_BOX_LAYOUT_HXX_
-#define SG_CANVAS_BOX_LAYOUT_HXX_
+#pragma once
 
 #include "Layout.hxx"
 
@@ -204,7 +203,3 @@ namespace simgear::canvas
   typedef SGSharedPtr<BoxLayout> BoxLayoutRef;
 
 } // namespace simgear::canvas
-
-
-#endif /* SG_CANVAS_BOX_LAYOUT_HXX_ */
-

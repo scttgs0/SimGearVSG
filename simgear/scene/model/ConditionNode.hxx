@@ -15,8 +15,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef SIMGEAR_CONDITIONNODE_HXX
-#define SIMGEAR_CONDITIONNODE_HXX 1
+#pragma once
 
 #include <simgear/props/condition.hxx>
 #include <osg/Group>
@@ -44,4 +43,3 @@ protected:
 };
 
 }
-#endif

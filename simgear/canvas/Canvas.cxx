@@ -26,9 +26,7 @@
 #include <osgText/Text>
 #include <osgViewer/Viewer>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   /**
    * Camera Draw Callback for moving completed canvas images to subscribed listener.
@@ -830,5 +828,4 @@ namespace canvas
   Canvas::PlacementFactoryMap Canvas::_placement_factories;
   SystemAdapterPtr Canvas::_system_adapter;
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

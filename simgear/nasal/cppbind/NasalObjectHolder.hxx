@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2012  Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_NASAL_OBJECT_HOLDER_HXX_
-#define SG_NASAL_OBJECT_HOLDER_HXX_
+#pragma once
 
 #include <simgear/nasal/nasal.h>
 #include <simgear/structure/SGSharedPtr.hxx>
@@ -150,5 +149,3 @@ namespace nasal
   }
 
 } // namespace nasal
-
-#endif /* SG_NASAL_OBJECT_HOLDER_HXX_ */

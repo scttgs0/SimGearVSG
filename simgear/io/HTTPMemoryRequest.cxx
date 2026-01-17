@@ -9,9 +9,7 @@
 #include <simgear_config.h>
 #include "HTTPMemoryRequest.hxx"
 
-namespace simgear
-{
-namespace HTTP
+namespace simgear::HTTP
 {
 
   //----------------------------------------------------------------------------
@@ -42,5 +40,4 @@ namespace HTTP
     _response.append(s, n);
   }
 
-} // namespace HTTP
-} // namespace simgear
+} // namespace simgear::HTTP

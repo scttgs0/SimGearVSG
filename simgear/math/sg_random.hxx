@@ -6,9 +6,7 @@
  * @brief Routines to handle random number generation
  */
 
-#ifndef _SG_RANDOM_H
-#define _SG_RANDOM_H
-
+#pragma once
 
 #ifdef __cplusplus                                                          
 extern "C" {                            
@@ -127,8 +125,3 @@ double pc_map_norm(const unsigned int x, const unsigned int y, const unsigned in
 #ifdef __cplusplus
 }
 #endif
-
-
-#endif // _SG_RANDOM_H
-
-

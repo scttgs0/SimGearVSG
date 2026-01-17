@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_OFFSET_TRASNFORM_HXX
-#define SG_OFFSET_TRASNFORM_HXX
+#pragma once
 
 #include <osg/Transform>
 
@@ -49,5 +48,3 @@ private:
   double _scaleFactor;
   double _rScaleFactor;
 };
-
-#endif

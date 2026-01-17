@@ -11,10 +11,6 @@
 
 #include "simgear/emesary/Emesary.hxx"
 
-namespace simgear
-{
-    namespace Emesary
-    {
-      
-    }
+namespace simgear::Emesary {
+
 }

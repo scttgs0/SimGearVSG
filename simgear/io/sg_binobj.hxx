@@ -6,8 +6,7 @@
  * @brief Routines to read and write the low level (binary) SimGear 3D object format.
  */
 
-#ifndef _SG_BINOBJ_HXX
-#define _SG_BINOBJ_HXX
+#pragma once
 
 #include <zlib.h> // for gzFile
 
@@ -279,5 +278,3 @@ public:
     bool write_ascii( const std::string& base, const std::string& name,
 		      const SGBucket& b );
 };
-
-#endif // _SG_BINOBJ_HXX

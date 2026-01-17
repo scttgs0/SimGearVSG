@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2003  Andy Ross  andy@plausible.org
 
-#ifndef _PARSE_H
-#define _PARSE_H
+#pragma once
 
 #include <setjmp.h>
 
@@ -161,7 +160,3 @@ int naLexUtf8C(char* s, int len, int* used); /* in utf8lib.c */
 naRef naCodeGen(struct Parser* p, struct Token* block, struct Token* arglist);
 
 void naParse(struct Parser* p);
-
-
-
-#endif // _PARSE_H

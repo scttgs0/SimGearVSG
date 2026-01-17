@@ -6,8 +6,7 @@
  * @brief GZ Container File Format
  */
 
-#ifndef GZ_CONTAINER_FILE_HXX
-#define GZ_CONTAINER_FILE_HXX
+#pragma once
 
 #include <string>
 #include <simgear/io/iostreams/sgstream.hxx>
@@ -48,5 +47,3 @@ private:
 };
 
 }
-
-#endif // GZ_CONTAINER_FILE_HXX

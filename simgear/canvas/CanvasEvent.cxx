@@ -10,9 +10,7 @@
 
 #include "CanvasEvent.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -147,5 +145,4 @@ namespace canvas
     return type_map;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2012 Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_NASAL_TRAITS_HXX_
-#define SG_NASAL_TRAITS_HXX_
+#pragma once
 
 #include <memory>
 #include <simgear/std/type_traits.hxx>
@@ -241,4 +240,3 @@ SG_MAKE_TRAIT(<>, osg::Vec4f, is_vec4)
   };
 
 } // namespace nasal
-#endif /* SG_NASAL_TRAITS_HXX_ */

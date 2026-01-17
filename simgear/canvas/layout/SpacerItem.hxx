@@ -6,14 +6,11 @@
  * @brief Element providing blank space in a layout.
  */
 
-#ifndef SG_CANVAS_SPACER_ITEM_HXX_
-#define SG_CANVAS_SPACER_ITEM_HXX_
+#pragma once
 
 #include "LayoutItem.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   /**
    * Element for providing blank space in a layout.
@@ -29,7 +26,4 @@ namespace canvas
 
 using SpacerItemRef = SGSharedPtr<SpacerItem> ;
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* SG_CANVAS_SPACER_ITEM_HXX_ */
+} // namespace simgear::canvas

@@ -6,8 +6,7 @@
  * @brief Class for pointing to/accessing an embedded resource
  */
 
-#ifndef FG_EMBEDDEDRESOURCE_HXX
-#define FG_EMBEDDEDRESOURCE_HXX
+#pragma once
 
 #include <iosfwd>
 #include <string>
@@ -147,5 +146,3 @@ std::ostream& operator<<(std::ostream&, const RawEmbeddedResource&);
 std::ostream& operator<<(std::ostream&, const ZlibEmbeddedResource&);
 
 } // of namespace simgear
-
-#endif  // of FG_EMBEDDEDRESOURCE_HXX

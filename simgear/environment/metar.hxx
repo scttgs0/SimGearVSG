@@ -6,8 +6,7 @@
  * @brief Interface for encoded Meteorological Aerodrome Reports (METAR).
  */
 
-#ifndef _METAR_HXX
-#define _METAR_HXX
+#pragma once
 
 #include <vector>
 #include <map>
@@ -289,5 +288,3 @@ protected:
 	const struct Token *scanToken(char **str, const struct Token *list);
 	void	normalizeData();
 };
-
-#endif // _METAR_HXX

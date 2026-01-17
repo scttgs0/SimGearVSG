@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_SCENE_TEXTURESTATEATTRIBUTEVISITOR_HXX
-#define SG_SCENE_TEXTURESTATEATTRIBUTEVISITOR_HXX
+#pragma once
 
 #include <osg/Geode>
 #include <osg/Node>
@@ -38,5 +37,3 @@ public:
   virtual void apply(osg::Node& node);
   virtual void apply(osg::Geode& node);
 };
-
-#endif

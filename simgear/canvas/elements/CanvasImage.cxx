@@ -28,9 +28,7 @@
 #include <osgDB/Registry>
 #include <osg/Version>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   /**
    * Callback to enable/disable rendering of canvas displayed inside windows or
@@ -1007,5 +1005,4 @@ osg::ref_ptr<osg::Image> Image::getImage() const
     return _texture->getImage();
 }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

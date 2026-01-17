@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_TEXTURED_TRIANGLE_BIN_HXX
-#define SG_TEXTURED_TRIANGLE_BIN_HXX
+#pragma once
 
 #define MAX_RANDOM_OBJECTS 100.0
 
@@ -532,5 +531,3 @@ private:
   // does the triangle array have secondary texture coordinates
   bool has_sec_tcs;
 };
-
-#endif

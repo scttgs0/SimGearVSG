@@ -24,9 +24,7 @@
 #include <cmath>
 #include <cstring>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   const std::string NAME_TRANSFORM = "tf";
 
@@ -968,5 +966,4 @@ namespace canvas
     }
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

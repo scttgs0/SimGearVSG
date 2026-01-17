@@ -6,8 +6,7 @@
  * @brief Canvas forward declarations
  */
 
-#ifndef SG_CANVAS_FWD_HXX_
-#define SG_CANVAS_FWD_HXX_
+#pragma once
 
 #include <simgear/props/propsfwd.hxx>
 #include <simgear/structure/SGWeakPtr.hxx>
@@ -20,9 +19,7 @@
 #include <memory>
 #include <vector>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
 #define SG_FWD_DECL(name)\
@@ -77,8 +74,4 @@ namespace canvas
 
   typedef std::function<void(const EventPtr&)> EventListener;
 
-} // namespace canvas
-} // namespace simgear
-
-
-#endif /* SG_CANVAS_FWD_HXX_ */
+} // namespace simgear::canvas

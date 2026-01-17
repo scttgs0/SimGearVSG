@@ -5,8 +5,7 @@
  * @brief Template for defining an XML parser based on an element type and builder classes
  */
 
-#ifndef SIMGEAR_XMLSTATICPARSER_HXX
-#define SIMGEAR_XMLSTATICPARSER_HXX 1
+#pragma once
 
 #include <string>
 #include <map>
@@ -127,4 +126,3 @@ public:
 template <typename E>
 static osg::ref_ptr<BuilderFactory<E> > builderFactory;
 }
-#endif

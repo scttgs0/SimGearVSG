@@ -6,9 +6,7 @@
  * @brief Low level serial I/O support (for unix/cygwin and windows)
  */
 
-#ifndef _SERIAL_HXX
-#define _SERIAL_HXX
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -102,8 +100,3 @@ public:
     /** @return true if device open */
     inline bool is_enabled() { return dev_open; }
 };
-
-
-#endif // _SERIAL_HXX
-
-

@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2004-2009 Mathias Froehlich
 
-#ifndef SGWeakReferenced_HXX
-#define SGWeakReferenced_HXX
+#pragma once
 
 #include "SGReferenced.hxx"
 #include "SGSharedPtr.hxx"
@@ -177,6 +176,4 @@ SGWeakReferenced::WeakData::up_cast(SGWeakReferenced* ptr)
 
 #ifdef _MSC_VER
 # pragma warning(pop)
-#endif
-
 #endif

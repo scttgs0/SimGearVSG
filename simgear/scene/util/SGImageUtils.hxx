@@ -17,8 +17,7 @@
   * along with this program.  If not, see <http://www.gnu.org/licenses/>
   */
 
-#ifndef SIMGEAR_IMAGEUTILS_H
-#define SIMGEAR_IMAGEUTILS_H
+#pragma once
 
 #include <osg/Image>
 #include <osg/Texture>
@@ -538,5 +537,3 @@ namespace simgear
         virtual void apply(osg::StateSet& stateSet);
     };
 }
-
-#endif //SIMGEAR_IMAGEUTILS_H

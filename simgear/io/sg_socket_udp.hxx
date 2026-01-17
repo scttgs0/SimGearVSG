@@ -6,9 +6,7 @@
  * @brief UDP Socket I/O routines
 */
 
-#ifndef _SG_SOCKET_UDP_HXX
-#define _SG_SOCKET_UDP_HXX
-
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -108,6 +106,3 @@ public:
     /** @return the port number (in string form) */
     inline std::string get_port_str() const { return port_str; }
 };
-
-
-#endif // _SG_SOCKET_UDP_HXX

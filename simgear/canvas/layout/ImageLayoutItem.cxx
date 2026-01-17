@@ -14,8 +14,7 @@
 #include <simgear/canvas/elements/CanvasImage.hxx>
 
 
-namespace simgear {
-namespace canvas {
+namespace simgear::canvas {
 
 ImageLayoutItem::ImageLayoutItem(SGSharedPtr<Image> img) : _user_size_hint(0, 0),
                                                            _user_min_size(0, 0),
@@ -118,5 +117,4 @@ void ImageLayoutItem::setResizeCanvas(bool b)
   }
 
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

@@ -15,8 +15,8 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef SGTRANSIENTMODELDATA_HXX
-#define SGTRANSIENTMODELDATA_HXX 1
+#pragma once
+
 #include <simgear/math/SGGeometry.hxx>
 
 namespace simgear
@@ -95,4 +95,3 @@ namespace simgear
 
     };
 }
-#endif

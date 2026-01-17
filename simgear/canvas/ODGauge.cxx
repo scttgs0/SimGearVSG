@@ -35,9 +35,7 @@
 
 #include <cassert>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   class PreOrderBin:
@@ -370,5 +368,4 @@ namespace canvas
       );
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

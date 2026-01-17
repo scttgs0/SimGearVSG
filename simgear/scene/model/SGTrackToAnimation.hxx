@@ -19,8 +19,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
 
-#ifndef SG_TRACK_TO_ANIMATION_HXX_
-#define SG_TRACK_TO_ANIMATION_HXX_
+#pragma once
 
 #include <simgear/scene/model/animation.hxx>
 
@@ -47,5 +46,3 @@ class SGTrackToAnimation:
 
     void log(sgDebugPriority p, const std::string& msg) const;
 };
-
-#endif /* SG_TRACK_TO_ANIMATION_HXX_ */

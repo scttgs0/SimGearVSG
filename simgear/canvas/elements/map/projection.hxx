@@ -6,14 +6,11 @@
  * @brief Geographic projections for Canvas map element
  */
 
-#ifndef CANVAS_MAP_PROJECTION_HXX_
-#define CANVAS_MAP_PROJECTION_HXX_
+#pragma once
 
 #include <simgear/math/SGMisc.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -246,7 +243,4 @@ namespace canvas
   };
 
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_MAP_PROJECTION_HXX_ */
+} // namespace simgear::canvas

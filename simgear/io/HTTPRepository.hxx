@@ -6,8 +6,7 @@
  * @brief Plain HTTP TerraSync remote client
  */
 
-#ifndef SG_IO_HTTP_REPOSITORY_HXX
-#define SG_IO_HTTP_REPOSITORY_HXX
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -127,5 +126,3 @@ public:
 };
 
 } // of namespace simgear
-
-#endif // of HTTPRepository

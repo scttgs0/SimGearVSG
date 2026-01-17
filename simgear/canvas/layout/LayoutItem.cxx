@@ -10,9 +10,7 @@
 #include "LayoutItem.hxx"
 #include <simgear/canvas/Canvas.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -404,5 +402,4 @@ namespace canvas
     item->setVisibleInternal(visible);
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

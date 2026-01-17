@@ -17,8 +17,7 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA  02110-1301, USA.
 
-#ifndef SG_SCENE_ORTHOPHOTO_MANAGER
-#define SG_SCENE_ORTHOPHOTO_MANAGER
+#pragma once
 
 #include <unordered_map>
 
@@ -108,5 +107,3 @@ namespace simgear {
         OrthophotoRef getOrthophoto(const std::vector<SGVec3d>& nodes, const SGVec3d& center);
     };
 }
-
-#endif

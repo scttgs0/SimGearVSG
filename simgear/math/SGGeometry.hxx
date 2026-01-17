@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGGeometry_HXX
-#define SGGeometry_HXX
+#pragma once
 
 // Required ...
 #include "SGMath.hxx"
@@ -20,5 +19,3 @@
 
 // Intersection tests
 #include "SGIntersect.hxx"
-
-#endif

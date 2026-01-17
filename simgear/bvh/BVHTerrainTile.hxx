@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2023 Stuart Buchanan <stuart13@gmail.com>
 
-#ifndef BVHTerrainTile_hxx
-#define BVHTerrainTile_hxx
+#pragma once
 
 #include <simgear/structure/SGSharedPtr.hxx>
 #include "BVHGroup.hxx"
@@ -25,5 +24,3 @@ private:
 };
 
 }
-
-#endif

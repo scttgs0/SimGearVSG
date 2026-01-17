@@ -1,5 +1,4 @@
-#ifndef TRIMESH_H
-#define TRIMESH_H
+#pragma once
 
 /*
 Szymon Rusinkiewicz
@@ -251,5 +250,3 @@ public:
 };
 
 }; // namespace trimesh
-
-#endif

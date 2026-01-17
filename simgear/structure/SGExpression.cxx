@@ -642,9 +642,7 @@ SGReadDoubleExpression(SGPropertyNode *inputRoot,
 //                      const SGPropertyNode *configNode)
 // { return SGReadBExpression<bool>(inputRoot, configNode); }
 
-namespace simgear
-{
-namespace expression
+namespace simgear::expression
 {
 
 bool Parser::readChildren(const SGPropertyNode* exp,
@@ -827,6 +825,5 @@ bool BindingLayout::findBinding(const std::string& name,
     } else {
         return false;
     }
-}
 }
 }

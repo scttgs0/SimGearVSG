@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGRay_H
-#define SGRay_H
+#pragma once
 
 template<typename T>
 class SGRay {
@@ -54,5 +53,3 @@ operator<<(std::basic_ostream<char_type, traits_type>& s,
   return s << "ray: origin = " << ray.getOrigin()
            << ", direction = " << ray.getDirection();
 }
-
-#endif

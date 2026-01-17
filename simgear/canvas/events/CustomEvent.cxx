@@ -9,9 +9,7 @@
 #include <simgear_config.h>
 #include "CustomEvent.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -50,5 +48,4 @@ namespace canvas
     detail = data;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

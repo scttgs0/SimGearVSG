@@ -6,8 +6,7 @@
  * @brief Subsystem that manages interpolation of properties.
  */
 
-#ifndef SG_PROPERTY_INTERPOLATION_MGR_HXX_
-#define SG_PROPERTY_INTERPOLATION_MGR_HXX_
+#pragma once
 
 #include "PropertyInterpolator.hxx"
 
@@ -128,5 +127,3 @@ protected:
 };
 
 } // namespace simgear
-
-#endif /* SG_PROPERTY_INTERPOLATION_MGR_HXX_ */

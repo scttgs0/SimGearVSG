@@ -6,8 +6,7 @@
  * @brief Manager class for resources embedded in an executable
  */
 
-#ifndef FG_EMBEDDEDRESOURCEMANAGER_HXX
-#define FG_EMBEDDEDRESOURCEMANAGER_HXX
+#pragma once
 
 #include <string>
 #include <memory>               // std::unique_ptr, std::shared_ptr
@@ -187,5 +186,3 @@ EmbeddedResourceManager::getIStream(const std::string& virtualPath,
 #endif  // #ifndef _MSC_VER
 
 } // of namespace simgear
-
-#endif  // of FG_EMBEDDEDRESOURCEMANAGER_HXX

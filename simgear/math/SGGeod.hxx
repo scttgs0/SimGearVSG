@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGGeod_H
-#define SGGeod_H
+#pragma once
 
 #include <simgear/constants.h>
 #include <simgear/math/SGVec3.hxx>
@@ -406,5 +405,3 @@ operator<<(std::basic_ostream<char_type, traits_type>& s, const SGGeod& g)
            << "deg, elev = " << g.getElevationM()
            << "m";
 }
-
-#endif

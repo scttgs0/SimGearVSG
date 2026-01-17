@@ -6,14 +6,11 @@
  * @brief Canvas mouse event
  */
 
-#ifndef CANVAS_MOUSE_EVENT_HXX_
-#define CANVAS_MOUSE_EVENT_HXX_
+#pragma once
 
 #include "DeviceEvent.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -60,7 +57,4 @@ namespace canvas
                   click_count;  //!< Current click count
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_MOUSE_EVENT_HXX_ */
+} // namespace simgear::canvas

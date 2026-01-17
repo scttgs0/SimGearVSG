@@ -14,9 +14,7 @@
 
 #include <cmath>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   const unsigned int drag_threshold = 8;
@@ -345,5 +343,4 @@ namespace canvas
     return path;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

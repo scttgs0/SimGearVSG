@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2003  Andy Ross  andy@plausible.org
 
-#ifndef _DATA_H
-#define _DATA_H
+#pragma once
 
 #include "nasal.h"
 
@@ -223,5 +222,3 @@ void naiGCMarkHash(naRef h);
 void naStr_gcclean(struct naStr* s);
 void naVec_gcclean(struct naVec* s);
 void naiGCHashClean(struct naHash* h);
-
-#endif // _DATA_H

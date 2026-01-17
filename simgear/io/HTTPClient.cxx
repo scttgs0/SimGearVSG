@@ -45,10 +45,7 @@
 
 using namespace std::string_literals;
 
-namespace simgear
-{
-
-namespace HTTP
+namespace simgear::HTTP
 {
 
 extern const int DEFAULT_HTTP_PORT = 80;
@@ -597,6 +594,4 @@ void TestApi::markRequestAsFailed(Request_ptr req, int curlCode,
   req->setFailure(curlCode, message);
 }
 
-} // of namespace HTTP
-
-} // of namespace simgear
+} // of namespace simgear::HTTP

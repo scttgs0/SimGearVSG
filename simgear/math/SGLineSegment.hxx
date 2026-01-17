@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGLineSegment_H
-#define SGLineSegment_H
+#pragma once
 
 template<typename T>
 class SGLineSegment {
@@ -57,5 +56,3 @@ operator<<(std::basic_ostream<char_type, traits_type>& s,
   return s << "line segment: start = " << lineSegment.getStart()
            << ", end = " << lineSegment.getEnd();
 }
-
-#endif

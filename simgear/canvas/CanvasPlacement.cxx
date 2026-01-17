@@ -10,9 +10,7 @@
 #include "CanvasPlacement.hxx"
 #include <simgear/props/props.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -46,5 +44,4 @@ namespace canvas
     return false;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

@@ -9,9 +9,7 @@
 #include "VGInitOperation.hxx"
 #include <vg/openvg.h>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -39,5 +37,4 @@ namespace canvas
     vgDestroyContextSH();
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

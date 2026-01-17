@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_ROTATE_TRANSFORM_HXX
-#define SG_ROTATE_TRANSFORM_HXX
+#pragma once
 
 #include <osg/Transform>
 #include <simgear/math/SGMath.hxx>
@@ -72,5 +71,3 @@ private:
   SGVec3d _axis;
   double _angleRad;
 };
-
-#endif

@@ -6,8 +6,7 @@
  * @brief HTTP request writing response to a file.
  */
 
-#ifndef SG_HTTP_FILEREQUEST_HXX_
-#define SG_HTTP_FILEREQUEST_HXX_
+#pragma once
 
 #include <simgear/misc/sg_path.hxx>
 
@@ -17,9 +16,7 @@
 
 #include <functional>
 
-namespace simgear
-{
-namespace HTTP
+namespace simgear::HTTP
 {
 
   /**
@@ -63,7 +60,4 @@ namespace HTTP
 
   typedef SGSharedPtr<FileRequest> FileRequestRef;
 
-} // namespace HTTP
-} // namespace simgear
-
-#endif /* SG_HTTP_FILEREQUEST_HXX_ */
+} // namespace simgear::HTTP

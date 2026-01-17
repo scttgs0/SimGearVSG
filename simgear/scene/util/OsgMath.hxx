@@ -15,8 +15,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef SIMGEAR_SCENE_UTILS_OSGMATH_HXX
-#define SIMGEAR_SCENE_UTILS_OSGMATH_HXX
+#pragma once
 
 #include <osg/Vec2f>
 #include <osg/Vec2d>
@@ -141,5 +140,3 @@ makeZUpFrame(const SGGeod& geod)
     result.setTrans(toOsg(coord));
     return result;
 }
-
-#endif

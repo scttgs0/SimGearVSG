@@ -6,8 +6,7 @@
  * @brief Simple, generic parser for command-line arguments
  */
 
-#ifndef _SIMGEAR_ARGPARSE_HXX_
-#define _SIMGEAR_ARGPARSE_HXX_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -38,10 +37,7 @@
 //     std::cerr << "Got non-option argument '" << arg << "'\n";
 //   }
 
-namespace simgear
-{
-
-namespace argparse
+namespace simgear::argparse
 {
 
 // Custom exception classes
@@ -262,8 +258,4 @@ private:
                       std::shared_ptr<const OptionDesc> > _longOptionMap;
 };
 
-} // of namespace argparse
-
-} // of namespace simgear
-
-#endif  // _SIMGEAR_ARGPARSE_HXX_
+} // of namespace simgear::argparse

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef SIMGEAR_ATOMICCHANGELISTENER_HXX
-#define SIMGEAR_ATOMICCHANGELISTENER_HXX 1
+#pragma once
 
 #include <algorithm>
 #include <iterator>
@@ -111,4 +110,3 @@ private:
 };
 
 }
-#endif

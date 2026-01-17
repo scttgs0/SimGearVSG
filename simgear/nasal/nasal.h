@@ -4,8 +4,8 @@
 ///@file
 /// The Nasal scripting language
 ///
-#ifndef _NASAL_H
-#define _NASAL_H
+
+#pragma once
 
 #ifdef __cplusplus
     #define NASAL_NORETURN [[noreturn]]
@@ -358,4 +358,3 @@ void naAddSym(naContext c, naRef ns, char *sym, naRef val);
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // _NASAL_H

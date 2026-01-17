@@ -5,8 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef BVHPageNodeOSG_hxx
-#define BVHPageNodeOSG_hxx
+#pragma once
 
 #include <string>
 
@@ -51,5 +50,3 @@ private:
 };
 
 } // namespace simgear
-
-#endif

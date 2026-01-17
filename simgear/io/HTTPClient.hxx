@@ -6,8 +6,7 @@
  * @brief Simple HTTP client engine for SimHear
  */
 
-#ifndef SG_HTTP_CLIENT_HXX
-#define SG_HTTP_CLIENT_HXX
+#pragma once
 
 #include <functional>
 #include <memory>   // for std::unique_ptr
@@ -16,10 +15,7 @@
 #include <simgear/io/HTTPFileRequest.hxx>
 #include <simgear/io/HTTPMemoryRequest.hxx>
 
-namespace simgear
-{
-
-namespace HTTP
+namespace simgear::HTTP
 {
 
 // forward decls
@@ -117,8 +113,4 @@ private:
     std::unique_ptr<ClientPrivate> d;
 };
 
-} // of namespace HTTP
-
-} // of namespace simgear
-
-#endif // of SG_HTTP_CLIENT_HXX
+} // of namespace simgear::HTTP

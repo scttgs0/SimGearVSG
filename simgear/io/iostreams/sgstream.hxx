@@ -6,8 +6,7 @@
  * @brief zlib input file stream wrapper.
  */
 
-#ifndef _SGSTREAM_HXX
-#define _SGSTREAM_HXX
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -193,5 +192,3 @@ public:
     void open( const SGPath& name,
 	       ios_openmode io_mode = ios_out|ios_binary );
 };
-
-#endif /* _SGSTREAM_HXX */

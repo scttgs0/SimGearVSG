@@ -6,8 +6,7 @@
  * @brief Window for placing a Canvas onto it (for dialogs, menus, etc.)
  */
 
-#ifndef CANVAS_WINDOW_HXX_
-#define CANVAS_WINDOW_HXX_
+#pragma once
 
 #include <simgear/canvas/elements/CanvasImage.hxx>
 #include <simgear/canvas/layout/Layout.hxx>
@@ -19,9 +18,7 @@
 #include <osg/Geode>
 #include <osg/Geometry>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
 class FocusScope;
@@ -129,7 +126,4 @@ protected:
     void invalidate() override;
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_WINDOW_HXX_ */
+} // namespace simgear::canvas

@@ -6,8 +6,7 @@
  * @brief IOStreams classes for reading from, and writing to char arrays
  */
 
-#ifndef SG_CHAR_ARRAY_STREAM_HXX
-#define SG_CHAR_ARRAY_STREAM_HXX
+#pragma once
 
 #include <istream>
 #include <ostream>
@@ -151,5 +150,3 @@ private:
 };
 
 } // of namespace simgear
-
-#endif  // of SG_CHAR_ARRAY_STREAM_HXX

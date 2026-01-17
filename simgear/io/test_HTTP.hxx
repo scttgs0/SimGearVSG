@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef SIMGEAR_IO_TEST_HTTP_HXX
-#define SIMGEAR_IO_TEST_HTTP_HXX
+#pragma once
 
 #include <algorithm>
 #include <sstream>
@@ -254,5 +253,3 @@ public:
 };
 
 } // of namespace simgear
-
-#endif // of SIMGEAR_IO_TEST_HTTP_HXX

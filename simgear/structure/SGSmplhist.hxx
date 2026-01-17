@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 1988 Free Software Foundation, written by Dirk Grunwald (grunwald@cs.uiuc.edu)
 
-#ifndef SampleHistogram_h
-#define SampleHistogram_h 1
+#pragma once
 
 #include <iosfwd>
 #include "SGSmplstat.hxx"
@@ -55,5 +54,3 @@ inline int SampleHistogram::inBucket (int i)
     error ("invalid bucket access");
   return (bucketCount[i]);
 }
-
-#endif

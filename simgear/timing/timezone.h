@@ -7,8 +7,7 @@
  *        The latter is used in order to get the local time.
  */
 
-#ifndef _TIMEZONE_H_
-#define _TIMEZONE_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -80,7 +79,3 @@ private:
     
     std::unique_ptr<SGTimeZoneContainerPrivate> d;
 };
-
-
-
-#endif // _TIMEZONE_H_

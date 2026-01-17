@@ -20,8 +20,7 @@
 #include "Compositor.hxx"
 #include "CompositorUtil.hxx"
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 struct BufferFormat {
     GLint internal_format;
@@ -270,5 +269,4 @@ buildBuffer(Compositor *compositor, const SGPropertyNode *node,
     return buffer.release();
 }
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

@@ -6,9 +6,7 @@
  * @brief Routines to handle linear interpolation from a table of x,y. The table must be sorted by "x" in ascending order
  */
 
-#ifndef _INTERPOLATER_H
-#define _INTERPOLATER_H
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -93,6 +91,3 @@ private:
     };
     std::optional<Bounds> findBounds(double x) const;
 };
-
-
-#endif // _INTERPOLATER_H

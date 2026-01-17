@@ -6,8 +6,7 @@
  * @brief Clean drop-in replacement for the versionhelpers.h header
  */
 
-#ifndef SG_VERSIONHELPERS_HXX_
-#define SG_VERSIONHELPERS_HXX_
+#pragma once
 
 #include <sdkddkver.h>
 
@@ -109,4 +108,3 @@ VERSIONHELPERAPI IsWindowsServer() {
     return !VerifyVersionInfoW(&osVersionInfo, VER_PRODUCT_TYPE,
         dwlConditionMask);
 }
-#endif // SG_VERSIONHELPERS_HXX_

@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2011 Stuart Buchanan
 
-#ifndef SG_BUILDING_BIN_HXX
-#define SG_BUILDING_BIN_HXX
+#pragma once
 
 #include <math.h>
 
@@ -209,4 +208,3 @@ typedef std::list<SGBuildingBin*> SGBuildingBinList;
 osg::Group* createRandomBuildings(SGBuildingBinList& buildinglist, const osg::Matrix& transform,
                          const SGReaderWriterOptions* options);
 }
-#endif

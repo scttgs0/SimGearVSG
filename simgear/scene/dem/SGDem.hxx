@@ -21,8 +21,7 @@
 // $Id$
 
 
-#ifndef __SG_DEM_HXX__
-#define __SG_DEM_HXX__
+#pragma once
 
 #include <map>
 
@@ -78,5 +77,3 @@ private:
 };
 
 typedef SGSharedPtr<SGDem> SGDemPtr;
-
-#endif /* __SG_DEM_HXX__ */

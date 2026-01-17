@@ -6,11 +6,10 @@
  * @brief Detect timezones and locations based on latitude and longitude
  */
 
+#pragma once
+
 #include <stddef.h>
 #include <stdint.h>
-
-#ifndef INCL_ZONEDETECT_H_
-#define INCL_ZONEDETECT_H_
 
 #if !defined(ZD_EXPORT)
 #if defined(_MSC_VER)
@@ -70,5 +69,3 @@ ZD_EXPORT void ZDHelperSimpleLookupStringFree(char* str);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // INCL_ZONEDETECT_H_

@@ -15,8 +15,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef _SG_SGINTERACTIONANIMATION_HXX
-#define _SG_SGINTERACTIONANIMATION_HXX 1
+#pragma once
 
 #include "animation.hxx"
 
@@ -27,5 +26,3 @@ public:
 private:
   class LineCollector;
 };
-
-#endif

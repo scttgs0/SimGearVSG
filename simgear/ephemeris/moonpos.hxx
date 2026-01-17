@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 1997 Durk Talsma
 
-#ifndef _MOONPOS_HXX_
-#define _MOONPOS_HXX_
-
+#pragma once
 
 #include <simgear/constants.h>
 
@@ -87,5 +85,3 @@ inline double MoonPos::getPhaseAngle() const
 {
   return phase_angle;
 }
-
-#endif // _MOONPOS_HXX_

@@ -6,9 +6,7 @@
  * @brief Commonly used types
  */
 
-#ifndef _SG_TYPES_HXX
-#define _SG_TYPES_HXX
-
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -24,6 +22,3 @@
 typedef std::vector < std::string > string_list;
 typedef string_list::iterator string_list_iterator;
 typedef string_list::const_iterator const_string_list_iterator;
-
-#endif // _SG_TYPES_HXX
-

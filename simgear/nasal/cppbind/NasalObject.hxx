@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2014  Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_NASAL_OBJECT_HXX_
-#define SG_NASAL_OBJECT_HXX_
+#pragma once
 
 #include "NasalContext.hxx"
 #include "NasalObjectHolder.hxx"
@@ -61,5 +60,3 @@ namespace nasal
   typedef Ghost<ObjectRef> NasalObject;
 
 } // namespace nasal
-
-#endif /* SG_NASAL_OBJECT_HXX_ */

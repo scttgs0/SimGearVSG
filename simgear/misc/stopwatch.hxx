@@ -10,8 +10,7 @@
 // It will need to be rewritten for Windows, NT, Mac.
 // NEEDS_WORK
 
-#ifndef _STOPWATCH_HXX
-#define _STOPWATCH_HXX
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -97,6 +96,3 @@ private:
 
     double t1_, t2_;
 };
-
-#endif // _STOPWATCH_HXX
-

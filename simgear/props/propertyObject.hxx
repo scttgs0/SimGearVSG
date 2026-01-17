@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2010 James Turner <james@flightgear.com>
 
-#ifndef SG_PROPERTY_OBJECT
-#define SG_PROPERTY_OBJECT
+#pragma once
 
 #include <simgear/props/props.hxx>
 
@@ -250,5 +249,3 @@ typedef simgear::PropertyObject<double> SGPropObjDouble;
 typedef simgear::PropertyObject<bool> SGPropObjBool;
 typedef simgear::PropertyObject<std::string> SGPropObjString;
 typedef simgear::PropertyObject<long> SGPropObjInt;
-
-#endif

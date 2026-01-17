@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 1997 Durk Talsma
 
-#ifndef _CELESTIALBODY_H_
-#define _CELESTIALBODY_H_
+#pragma once
 
 #ifndef __cplusplus
 # error This library requires C++
@@ -77,6 +76,3 @@ inline double CelestialBody::getLat() const
 {
   return latEcl;
 }
-
-#endif // _CELESTIALBODY_H_
-

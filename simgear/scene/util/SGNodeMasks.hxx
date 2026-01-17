@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_SCENE_NODEMASKS_HXX
-#define SG_SCENE_NODEMASKS_HXX
+#pragma once
 
 #include "RenderConstants.hxx"
 
@@ -36,4 +35,3 @@
 #define SG_NODEMASK_2DPANEL_BIT        simgear::PANEL2D_BIT
 /// If set, the node is pickable
 #define SG_NODEMASK_PICK_BIT           simgear::PICK_BIT
-#endif

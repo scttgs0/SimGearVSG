@@ -15,10 +15,7 @@
 #include <simgear/structure/SGSharedPtr.hxx>
 #include <simgear/io/HTTPRequest.hxx>
 
-namespace simgear
-{
-
-namespace pkg
+namespace simgear::pkg
 {
 
 /**
@@ -166,6 +163,4 @@ private:
 };
 
 
-} // of namespace pkg
-
-} // namespace simgear
+} // of namespace simgear::pkg

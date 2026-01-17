@@ -11,8 +11,7 @@
 #include "simgear/structure/SGSharedPtr.hxx"
 #include <simgear/canvas/layout/LayoutItem.hxx>
 
-namespace simgear {
-namespace canvas {
+namespace simgear::canvas {
 
 class Image;
 
@@ -46,5 +45,4 @@ private:
 
 using ImageLayoutItemRef = SGSharedPtr<ImageLayoutItem> ;
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

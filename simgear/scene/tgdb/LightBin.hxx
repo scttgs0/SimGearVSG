@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef LIGHT_BIN_HXX
-#define LIGHT_BIN_HXX
+#pragma once
 
 #include <osg/Drawable>
 
@@ -112,4 +111,3 @@ private:
 
 osg::ref_ptr<simgear::EffectGeode> createLights(LightBin& lightList, const osg::Matrix& transform, const SGReaderWriterOptions* options);
 };
-#endif

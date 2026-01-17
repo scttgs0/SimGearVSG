@@ -25,9 +25,7 @@
  *                                                                      *
  ***********************************************************************/
 
-#ifndef __ogl2_demo_h__
-#define __ogl2_demo_h__
-
+#pragma once
 
 extern void SetNoiseFrequency(int frequency);
 
@@ -46,6 +44,3 @@ extern void normalize3(double vec[3]);
 extern double PerlinNoise1D(double x,double alpha, double beta, int n);
 extern double PerlinNoise2D(double x,double y,double alpha, double beta, int n);
 extern double PerlinNoise3D(double x,double y,double z,double alpha, double beta, int n);
-
-
-#endif // __ogl2_demo_h__

@@ -6,8 +6,7 @@
  * @brief SimGear testing macros
  */
 
-#ifndef SG_MISC_TEST_MACROS_HXX
-#define SG_MISC_TEST_MACROS_HXX
+#pragma once
 
 #include <iostream>
 #include <cmath>                // for std::fabs()
@@ -181,6 +180,3 @@
 #define SG_TEST_FAIL(msg) \
   std::cerr << "failure: " << msg; \
   exit(1);
-
-
-#endif // of SG_MISC_TEST_MACROS_HXX

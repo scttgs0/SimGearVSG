@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2008-2009 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef BVHNode_hxx
-#define BVHNode_hxx
+#pragma once
 
 #include <vector>
 #include <simgear/math/SGGeometry.hxx>
@@ -58,5 +57,3 @@ private:
 };
 
 }
-
-#endif

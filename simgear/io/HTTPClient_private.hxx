@@ -12,8 +12,7 @@
 
 #include <curl/multi.h>
 
-namespace simgear {
-namespace HTTP {
+namespace simgear::HTTP {
 
 typedef std::list<Request_ptr> RequestList;
 
@@ -54,6 +53,4 @@ public:
   ResponseDoneCallback testsuiteResponseDoneCallback;
 };
 
-} // namespace HTTP
-
-} // namespace simgear
+} // namespace simgear::HTTP

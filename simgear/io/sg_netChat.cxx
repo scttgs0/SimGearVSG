@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-namespace  simgear {
+namespace simgear {
 
 void
 NetChat::setTerminator(const std::string& t)
@@ -135,5 +135,3 @@ NetChat::handleBufferRead (NetBuffer& in_buffer)
 }
 
 } // of namespace simgear
-
-

@@ -22,9 +22,7 @@
 #include <osgDB/Registry>
 #include <osgText/Text>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   class Text::TextOSG:
     public osgText::Text
@@ -864,5 +862,4 @@ namespace canvas
     return _scene_group->getOrCreateStateSet();
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef _SG_EVENT_MGR_HXX
-#define _SG_EVENT_MGR_HXX
+#pragma once
 
 #include <simgear/props/props.hxx>
 #include <simgear/structure/subsystem_mgr.hxx>
@@ -112,5 +111,3 @@ private:
     SGTimerQueue _simQueue;
     bool _inited, _shutdown;
 };
-
-#endif // _SG_EVENT_MGR_HXX

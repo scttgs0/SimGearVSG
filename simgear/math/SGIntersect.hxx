@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006-2009 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGIntersect_HXX
-#define SGIntersect_HXX
+#pragma once
 
 #include <algorithm>
 
@@ -1047,5 +1046,3 @@ intersects(const SGBox<T1>& box1, const SGBox<T2>& box2)
 
   return true;
 }
-
-#endif

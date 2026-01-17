@@ -6,8 +6,7 @@
  * @brief Socket I/O routines
 */
 
-#ifndef _SG_SOCKET_HXX
-#define _SG_SOCKET_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -157,7 +156,3 @@ class SGBroadcastSocket : public SGSocket {
      bool open( const SGProtocolDir d );
      int write (const char *buf, const int length );
 };
-
-
-
-#endif // _SG_SOCKET_HXX

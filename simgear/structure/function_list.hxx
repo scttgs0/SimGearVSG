@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2014 Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_FUNCTION_LIST_HXX_
-#define SG_FUNCTION_LIST_HXX_
+#pragma once
 
 #include <functional>
 #include <vector>
@@ -48,5 +47,3 @@ namespace simgear
   };
 
 } // namespace simgear
-
-#endif /* SG_FUNCTION_LIST_HXX_ */

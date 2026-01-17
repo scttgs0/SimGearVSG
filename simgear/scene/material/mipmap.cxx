@@ -27,7 +27,7 @@
 #include <osg/Image>
 #include <osg/Vec4>
 
-namespace simgear { namespace effect {
+namespace simgear::effect {
 
 EffectNameValue<MipMapFunction> mipmapFunctionsInit[] =
 {
@@ -408,4 +408,4 @@ osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs )
     }
     return image;
 }
-} }
+}

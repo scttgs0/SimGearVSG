@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_ENLARGE_BOUNDING_BOX_HXX
-#define SG_ENLARGE_BOUNDING_BOX_HXX
+#pragma once
 
 #include <osg/Drawable>
 
@@ -37,5 +36,3 @@ public:
 private:
   float _offset;
 };
-
-#endif

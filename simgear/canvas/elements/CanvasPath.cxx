@@ -18,9 +18,7 @@
 #include <cassert>
 #include <cctype>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   typedef std::vector<VGubyte>  CmdList;
   typedef std::vector<VGfloat>  CoordList;
@@ -980,5 +978,4 @@ namespace canvas
     _path->setSegments(commands, coords);
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

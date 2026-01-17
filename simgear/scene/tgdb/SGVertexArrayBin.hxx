@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_VERTEX_ARRAY_BIN_HXX
-#define SG_VERTEX_ARRAY_BIN_HXX
+#pragma once
 
 #include <vector>
 #include <map>
@@ -59,5 +58,3 @@ private:
   ValueVector _values;
   ValueMap _valueMap;
 };
-
-#endif

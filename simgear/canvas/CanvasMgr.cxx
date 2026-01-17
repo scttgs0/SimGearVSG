@@ -12,9 +12,7 @@
 #include "Canvas.hxx"
 #include "CanvasEventManager.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -57,5 +55,4 @@ namespace canvas
     canvas->setCanvasMgr(this);
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

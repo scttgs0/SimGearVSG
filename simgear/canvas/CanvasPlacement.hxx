@@ -6,14 +6,11 @@
  * @brief Base class for canvas placements
  */
 
-#ifndef CANVAS_PLACEMENT_HXX_
-#define CANVAS_PLACEMENT_HXX_
+#pragma once
 
 #include <simgear/props/propsfwd.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   class Placement
@@ -34,7 +31,4 @@ namespace canvas
       Placement& operator=(const Placement&) = delete;
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_PLACEMENT_HXX_ */
+} // namespace simgear::canvas

@@ -6,8 +6,7 @@
  * @brief Data Distribution Service (DDS) I/O routines
 */
 
-#ifndef _SG_DDS_Topic_HXX
-#define _SG_DDS_Topic_HXX
+#pragma once
 
 #include <limits>
 #include <string>
@@ -168,6 +167,3 @@ public:
 
     const dds_guid_t& get_guid() { return guid; }
 };
-
-
-#endif // _SG_DDS_Topic_HXX

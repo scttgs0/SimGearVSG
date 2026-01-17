@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2003  Andy Ross  andy@plausible.org
 
-#ifndef _CODE_H
-#define _CODE_H
+#pragma once
 
 #include <setjmp.h>
 #include "nasal.h"
@@ -130,5 +129,3 @@ void naCheckBottleneck();
 
 #define LOCK() naLock(globals->lock)
 #define UNLOCK() naUnlock(globals->lock)
-
-#endif // _CODE_H

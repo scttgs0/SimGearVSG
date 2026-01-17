@@ -2,8 +2,7 @@
  * $Id$
  */
 
-#ifndef _SG_PERSPARAM_HXX
-#define _SG_PERSPARAM_HXX 1
+#pragma once
 
 #include <simgear/math/sg_random.hxx>
 
@@ -43,6 +42,3 @@ template <> double
 SGPersonalityParameter<double>::getNodeValue( const SGPropertyNode *props,
                                               const char *name,
                                               double defval ) const;
-
-#endif // _SG_PERSPARAM_HXX
-

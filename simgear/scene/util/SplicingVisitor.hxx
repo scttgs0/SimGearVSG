@@ -1,5 +1,4 @@
-#ifndef SIMGEAR_SPLICINGVISITOR_HXX
-#define SIMGEAR_SPLICINGVISITOR_HXX 1
+#pragma once
 
 #include <cstddef>
 #include <map>
@@ -90,4 +89,3 @@ T* SplicingVisitor::copy(T& node, const osg::NodeList& children)
     return result;
 }
 }
-#endif

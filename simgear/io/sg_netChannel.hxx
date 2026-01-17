@@ -19,8 +19,7 @@
  * the timing and state of the connection.
 */
 
-#ifndef SG_NET_CHANNEL_H
-#define SG_NET_CHANNEL_H
+#pragma once
 
 #include <simgear/io/raw_socket.hxx>
 
@@ -99,5 +98,3 @@ public:
 };
 
 } // of namespace simgear
-
-#endif // SG_NET_CHANNEL_H

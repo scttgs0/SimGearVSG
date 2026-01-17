@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2018  Thomas Geymayer <tomgey@gmail.com>
 
-
-#ifndef SG_NASAL_METHOD_HOLDER_HXX_
-#define SG_NASAL_METHOD_HOLDER_HXX_
+#pragma once
 
 #include "NasalContext.hxx"
 #include "NasalObjectHolder.hxx"
@@ -57,5 +55,3 @@ namespace nasal
   };
 
 } // namespace nasal
-
-#endif /* SG_NASAL_METHOD_HOLDER_HXX_ */

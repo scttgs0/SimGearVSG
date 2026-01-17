@@ -8,8 +8,7 @@
  * @brief Adapted from PLIB netSocket by James Turner
  */
 
-#ifndef SG_IO_SOCKET_HXX
-#define SG_IO_SOCKET_HXX
+#pragma once
 
 //#include <errno.h>
 
@@ -95,6 +94,3 @@ public:
 //const char* netFormat ( const char* fmt, ... ) ;
 
 } // of namespace simgear
-
-#endif // SG_IO_SOCKET_HXX
-

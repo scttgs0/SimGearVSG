@@ -17,8 +17,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_EFFECTBUILDER_HXX
-#define SIMGEAR_EFFECTBUILDER_HXX 1
+#pragma once
 
 #include <algorithm>
 #include <iterator>
@@ -701,4 +700,3 @@ initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
 extern const char* colorFields[];
 }
 }
-#endif

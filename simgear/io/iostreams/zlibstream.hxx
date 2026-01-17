@@ -6,8 +6,7 @@
  * @brief IOStreams classes for working with RFC 1950 and RFC 1952 compression formats (respectively known as the zlib and gzip formats)
  */
 
-#ifndef SG_ZLIBSTREAM_HXX
-#define SG_ZLIBSTREAM_HXX
+#pragma once
 
 #include <ios>                  // std::streamsize
 #include <istream>
@@ -466,5 +465,3 @@ private:
 };
 
 } // of namespace simgear
-
-#endif  // of SG_ZLIBSTREAM_HXX

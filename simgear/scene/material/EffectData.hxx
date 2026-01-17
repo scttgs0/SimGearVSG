@@ -14,8 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_EFFECT_DATA_HXX
-#define SIMGEAR_EFFECT_DATA_HXX 1
+#pragma once
 
 #include <osg/Vec4f>
 
@@ -44,4 +43,3 @@ typedef EffectData<osg::Vec4f> EffectVec4f;
 
 
 }
-#endif

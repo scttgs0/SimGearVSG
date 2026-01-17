@@ -30,8 +30,7 @@
 #include "CompositorUtil.hxx"
 
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 PropStringMap<osg::Camera::BufferComponent> buffer_component_map = {
     {"color", osg::Camera::COLOR_BUFFER},
@@ -1129,5 +1128,4 @@ buildPass(Compositor *compositor, const SGPropertyNode *root,
     return builder->build(compositor, root, options);
 }
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

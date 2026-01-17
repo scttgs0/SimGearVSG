@@ -6,8 +6,7 @@
  * @brief Simple DNS resolver client engine for SimGear
  */
 
-#ifndef SG_DNS_CLIENT_HXX
-#define SG_DNS_CLIENT_HXX
+#pragma once
 
 #include <memory> // for std::unique_ptr
 #include <string>
@@ -18,10 +17,7 @@
 #include <simgear/structure/SGSharedPtr.hxx>
 #include <simgear/structure/event_mgr.hxx>
 
-namespace simgear
-{
-
-namespace DNS
+namespace simgear::DNS
 {
 
 class Client;
@@ -138,8 +134,4 @@ public:
     std::unique_ptr<ClientPrivate> d;
 };
 
-} // of namespace DNS
-
-} // of namespace simgear
-
-#endif // of SG_DNS_CLIENT_HXX
+} // of namespace simgear::DNS

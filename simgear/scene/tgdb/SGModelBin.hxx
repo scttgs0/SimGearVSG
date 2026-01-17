@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_MAT_MODEL_BIN_HXX
-#define SG_MAT_MODEL_BIN_HXX
+#pragma once
 
 #include <vector>
 #include <simgear/math/SGMath.hxx>
@@ -57,5 +56,3 @@ public:
 private:
   MatModelList _models;
 };
-
-#endif

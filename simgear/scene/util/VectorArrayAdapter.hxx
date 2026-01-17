@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef VECTORARRAYADAPTERHXX
-#define VECTORARRAYADAPTERHXX 1
+#pragma once
 
 // #define SG_CHECK_VECTOR_ACCESS 1
 namespace simgear
@@ -71,4 +70,3 @@ private:
     const int _rowOffset;
 };
 }
-#endif

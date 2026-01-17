@@ -17,8 +17,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef SGREADERWRITEROPTIONS_HXX
-#define SGREADERWRITEROPTIONS_HXX 1
+#pragma once
 
 #include <osgDB/Options>
 #include <simgear/scene/model/modellib.hxx>
@@ -232,5 +231,3 @@ private:
 };
 
 }
-
-#endif

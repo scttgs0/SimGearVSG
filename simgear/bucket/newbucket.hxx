@@ -11,8 +11,7 @@
  * all tiles cover about the same amount of area of the earth surface.
  */
 
-#ifndef _NEWBUCKET_HXX
-#define _NEWBUCKET_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 #include <simgear/constants.h>
@@ -338,8 +337,3 @@ operator== ( const SGBucket& b1, const SGBucket& b2 )
 	     b1.x == b2.x &&
 	     b1.y == b2.y );
 }
-
-
-#endif // _NEWBUCKET_HXX
-
-

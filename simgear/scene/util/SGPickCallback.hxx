@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_SCENE_PICKCALLBACK_HXX
-#define SG_SCENE_PICKCALLBACK_HXX
+#pragma once
 
 #include <osg/Vec2d>
    
@@ -120,5 +119,3 @@ struct SGSceneryPick {
   SGPickCallback::Info info;
   SGSharedPtr<SGPickCallback> callback;
 };
-
-#endif

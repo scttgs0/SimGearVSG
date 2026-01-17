@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGMathFwd_H
-#define SGMathFwd_H
+#pragma once
 
 // All forward declarations in case they only need to be declared
 
@@ -45,5 +44,3 @@ typedef SGVec3<int> SGVec3i;
 typedef SGVec4<float> SGVec4f;
 typedef SGVec4<double> SGVec4d;
 typedef SGVec4<int> SGVec4i;
-
-#endif

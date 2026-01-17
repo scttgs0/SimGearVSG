@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SIMGEAR_PRIMITIVEUTILS_HXX
-#define SIMGEAR_PRIMITIVEUTILS_HXX 1
+#pragma once
 
 #include <osg/Vec3>
 #include <osg/Drawable>
@@ -40,4 +39,3 @@ struct Primitive
  */
 Primitive getPrimitive(osg::Drawable* drawable, unsigned primitiveIndex);
 }
-#endif

@@ -6,8 +6,7 @@
  * @brief Type Traits (Provide features of later C++ standards)
  */
 
-#ifndef SIMGEAR_STD_TYPE_TRAITS_HXX_
-#define SIMGEAR_STD_TYPE_TRAITS_HXX_
+#pragma once
 
 #include <simgear/simgear_config.h>
 #include <type_traits>
@@ -52,5 +51,3 @@ namespace std
   using bool_constant = integral_constant<bool, B>;
 #endif
 }
-
-#endif /* SIMGEAR_STD_TYPE_TRAITS_HXX_ */

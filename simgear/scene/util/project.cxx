@@ -45,4 +45,3 @@ GLint project(GLdouble objX, GLdouble objY, GLdouble objZ,
 }
 
 } // of namespace simgear
-

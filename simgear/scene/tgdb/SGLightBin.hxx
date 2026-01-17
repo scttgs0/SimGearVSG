@@ -19,8 +19,7 @@
  *
  */
 
-#ifndef SG_LIGHT_BIN_HXX
-#define SG_LIGHT_BIN_HXX
+#pragma once
 
 #include <simgear/math/SGMath.hxx>
 
@@ -48,5 +47,3 @@ public:
 private:
   LightList _lights;
 };
-
-#endif

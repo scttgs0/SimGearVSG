@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 1999 Curtis L. Olson - http://www.flightgear.org/~curt
 
-#ifndef _STDINT_HXX
-#define _STDINT_HXX 1
+#pragma once
 
 #include <cstdint>
 #include <cstdlib> // for _byteswap_foo on Win32
@@ -67,8 +66,3 @@ inline void sgEndianSwap(float *x) { *x = (float) sg_bswap_32((float) *x); }
 inline void sgEndianSwap(uint16_t *x) { *x = sg_bswap_16(*x); }
 inline void sgEndianSwap(uint32_t *x) { *x = sg_bswap_32(*x); }
 inline void sgEndianSwap(uint64_t *x) { *x = sg_bswap_64(*x); }
-
-
-
-#endif // !_STDINT_HXX
-

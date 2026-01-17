@@ -15,8 +15,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef SIMGEAR_PRIMITIVE_COLLECTOR_HXX
-#define SIMGEAR_PRIMITIVE_COLLECTOR_HXX
+#pragma once
 
 #include <osg/Matrix>
 #include <osg/PrimitiveSet>
@@ -73,5 +72,3 @@ private:
 };
 
 }
-
-#endif

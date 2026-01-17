@@ -6,16 +6,13 @@
  * @brief An OpenVG path on the Canvas
  */
 
-#ifndef CANVAS_PATH_HXX_
-#define CANVAS_PATH_HXX_
+#pragma once
 
 #include "CanvasElement.hxx"
 #include <simgear/math/SGRect.hxx>
 #include <initializer_list>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   class Path:
     public Element
@@ -85,7 +82,4 @@ namespace canvas
       void parseRectToVGPath();
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_PATH_HXX_ */
+} // namespace simgear::canvas

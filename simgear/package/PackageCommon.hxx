@@ -8,9 +8,7 @@
 
 #include <simgear/structure/SGSharedPtr.hxx>
 
-namespace simgear {
-
-namespace pkg {
+namespace simgear::pkg {
 
 enum Type {
     AircraftPackage = 0,
@@ -37,6 +35,4 @@ typedef SGSharedPtr<Install> InstallRef;
 typedef std::vector<PackageRef> PackageList;
 typedef std::vector<CatalogRef> CatalogList;
 
-} // namespace pkg
-
-} // namespace simgear
+} // namespace simgear::pkg

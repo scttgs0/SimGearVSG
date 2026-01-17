@@ -24,10 +24,7 @@ using std::string;
 using std::shared_ptr;
 
 
-namespace simgear
-{
-
-namespace argparse
+namespace simgear::argparse
 {
 
 // ***************************************************************************
@@ -374,6 +371,4 @@ int ArgumentParser::readShortOptions(int argc, const char *const *argv,
   }
 }
 
-} // of namespace argparse
-
-} // of namespace simgear
+} // of namespace simgear::argparse

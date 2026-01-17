@@ -10,10 +10,7 @@
  *        Written for the new SoundSystem by Erik Hofman, October 2009
  */
 
-
-#ifndef _SG_SAMPLE_GROUP_HXX
-#define _SG_SAMPLE_GROUP_HXX 1
-
+#pragma once
 
 #include <string>
 #include <vector>
@@ -248,6 +245,3 @@ private:
 
     float _mach = 0.0;
 };
-
-#endif // _SG_SAMPLE_GROUP_OPENAL_HXX
-

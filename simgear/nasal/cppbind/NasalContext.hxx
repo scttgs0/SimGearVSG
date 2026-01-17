@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2014  Thomas Geymayer <tomgey@gmail.com>
 
-
-#ifndef SG_NASAL_CONTEXT_HXX_
-#define SG_NASAL_CONTEXT_HXX_
+#pragma once
 
 #include "cppbind_fwd.hxx"
 #include "NasalMe.hxx"
@@ -110,5 +108,3 @@ namespace nasal
 
 #include "from_nasal.hxx"
 #include "to_nasal.hxx"
-
-#endif /* SG_NASAL_CONTEXT_HXX_ */

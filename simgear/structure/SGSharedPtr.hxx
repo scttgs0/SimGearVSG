@@ -6,8 +6,7 @@
  * @brief Pointer proxy doing reference counting.
  */
 
-#ifndef SGSharedPtr_HXX
-#define SGSharedPtr_HXX
+#pragma once
 
 #include <simgear/sg_inlines.h>
 
@@ -267,4 +266,3 @@ bool operator<(const SGSharedPtr<T>& lhs, const SGSharedPtr<U>& rhs)
 {
   return lhs.get() < rhs.get();
 }
-#endif

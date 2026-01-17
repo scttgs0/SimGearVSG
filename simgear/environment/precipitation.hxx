@@ -6,8 +6,7 @@
  * @brief Precipitation effects to draw rain and snow.
  */
 
-#ifndef _PRECIPITATION_HXX
-#define _PRECIPITATION_HXX
+#pragma once
 
 #include <osg/Group>
 #include <osg/Referenced>
@@ -51,5 +50,3 @@ public:
     void setEnabled(bool);
     bool getEnabled() const;
 };
-
-#endif

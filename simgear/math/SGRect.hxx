@@ -6,8 +6,7 @@
  * @brief Class representing a rectangular prism
  */
 
-#ifndef SG_RECT_HXX_
-#define SG_RECT_HXX_
+#pragma once
 
 #include "SGLimits.hxx"
 #include "SGVec2.hxx"
@@ -196,5 +195,3 @@ operator<<(std::basic_ostream<char_type, traits_type>& s, const SGRect<T>& rect)
 typedef SGRect<int> SGRecti;
 typedef SGRect<float> SGRectf;
 typedef SGRect<double> SGRectd;
-
-#endif /* SG_RECT_HXX_ */

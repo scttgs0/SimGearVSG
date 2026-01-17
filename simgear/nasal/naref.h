@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2003  Andy Ross  andy@plausible.org
 
-#ifndef _NAREF_H
-#define _NAREF_H
+#pragma once
 
 #if (defined(__x86_64) && defined(__linux__))
 /* NASAL_NAN64 mode requires 64 bit pointers that only use the
@@ -61,5 +60,3 @@ typedef union { double num; void* ptr; } naRef;
 #else
 typedef union { double num; naRefPart ref; } naRef;
 #endif
-
-#endif // _NAREF_H

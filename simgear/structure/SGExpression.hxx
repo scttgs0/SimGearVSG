@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-FileCopyrightText: 2006-2007 by Mathias Froehlich
 
-#ifndef _SG_EXPRESSION_HXX
-#define _SG_EXPRESSION_HXX 1
+#pragma once
 
 #include <string>
 #include <vector>
@@ -1284,4 +1283,3 @@ namespace simgear
     }
   };
 }
-#endif // _SG_EXPRESSION_HXX

@@ -23,9 +23,7 @@
 
 #include <iterator>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   typedef osgGA::GUIEventAdapter EA;
 
@@ -352,5 +350,4 @@ namespace canvas
     return true;
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

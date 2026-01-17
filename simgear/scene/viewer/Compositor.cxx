@@ -47,8 +47,7 @@ public:
     }
 };
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 int Compositor::_order_offset = 0;
 
@@ -642,5 +641,4 @@ Compositor::getPass(const std::string &name) const
     return (*it);
 }
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

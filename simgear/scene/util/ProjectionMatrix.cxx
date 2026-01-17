@@ -3,8 +3,7 @@
 
 #include "ProjectionMatrix.hxx"
 
-namespace simgear {
-namespace ProjectionMatrix {
+namespace simgear::ProjectionMatrix {
 
 bool
 isOrtho(const osg::Matrixd &m)
@@ -185,5 +184,4 @@ clampNearFarPlanes(osg::Matrixd &old_proj, double near, double far,
     }
 }
 
-} // namespace ProjectionMatrix
-} // namespace simgear
+} // namespace simgear::ProjectionMatrix

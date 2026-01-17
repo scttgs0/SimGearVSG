@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2012 Thomas Geymayer <tomgey@gmail.com>
 
-#ifndef SG_FROM_NASAL_HELPER_HXX_
-#define SG_FROM_NASAL_HELPER_HXX_
+#pragma once
 
 #include "nasal_traits.hxx"
 
@@ -219,5 +218,3 @@ namespace nasal
   }
 
 } // namespace nasal
-
-#endif /* SG_FROM_NASAL_HELPER_HXX_ */

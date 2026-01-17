@@ -17,10 +17,7 @@
 
 typedef std::set<std::string> string_set;
 
-namespace simgear
-{
-
-namespace pkg
+namespace simgear::pkg
 {
 class Package : public SGReferenced
 {
@@ -238,9 +235,4 @@ private:
     mutable function_list<InstallCallback> _install_cb;
 };
 
-
-
-
-} // of namespace pkg
-
-} // namespace simgear
+} // of namespace simgear::pkg

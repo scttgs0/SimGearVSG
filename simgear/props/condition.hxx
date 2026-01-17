@@ -6,8 +6,7 @@
  * @brief Declarations and inline methods for property conditions
  */
 
-#ifndef __SG_CONDITION_HXX
-#define __SG_CONDITION_HXX
+#pragma once
 
 #include <set>
 #include <simgear/structure/SGReferenced.hxx>
@@ -75,6 +74,3 @@ private:
  */
 SGCondition *sgReadCondition( SGPropertyNode *prop_root,
                               const SGPropertyNode *node );
-
-
-#endif // __SG_CONDITION_HXX

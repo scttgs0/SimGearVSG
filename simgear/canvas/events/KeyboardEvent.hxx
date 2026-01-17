@@ -6,14 +6,11 @@
  * @brief Canvas keyboard event
  */
 
-#ifndef CANVAS_KEYBOARD_EVENT_HXX_
-#define CANVAS_KEYBOARD_EVENT_HXX_
+#pragma once
 
 #include "DeviceEvent.hxx"
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   /**
@@ -65,7 +62,4 @@ namespace canvas
 
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_KEYBOARD_EVENT_HXX_ */
+} // namespace simgear::canvas

@@ -23,9 +23,7 @@
 #include <simgear/misc/strutils.hxx>
 #include <simgear/io/iostreams/sgstream.hxx>
 
-namespace simgear {
-
-namespace pkg {
+namespace simgear::pkg {
 
 class Install::PackageArchiveDownloader : public HTTP::Request
 {
@@ -444,6 +442,4 @@ Delegate::StatusCode Install::status() const
     return m_status;
 }
 
-} // of namespace pkg
-
-} // of namespace simgear
+} // of namespace simgear::pkg

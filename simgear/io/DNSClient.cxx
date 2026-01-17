@@ -17,9 +17,7 @@
 
 #include <simgear/debug/logstream.hxx>
 
-namespace simgear {
-
-namespace DNS {
+namespace simgear::DNS {
 
 class Client::ClientPrivate {
 public:
@@ -293,6 +291,4 @@ void Client::update(int waitTimeout)
     d->_activeRequests.erase(it, d->_activeRequests.end());
 }
 
-} // of namespace DNS
-
-} // of namespace simgear
+} // of namespace simgear::DNS

@@ -6,8 +6,7 @@
  * @brief Dump a copy of the OpenGL screen buffer to a file
  */
 
-#ifndef SG_SCREEN_DUMP_HXX
-#define SG_SCREEN_DUMP_HXX
+#pragma once
 
 /**
  * Dump the screen buffer to a PNG file.
@@ -16,6 +15,3 @@
  * @param win_height height of our opengl window
  */
 bool sg_glDumpWindow( const char *filename, int win_width, int win_height );
-
-
-#endif // of SG_SCREEN_DUMP_HXX

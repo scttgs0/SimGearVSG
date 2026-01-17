@@ -17,8 +17,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef _BUCKETBOX_HXX
-#define _BUCKETBOX_HXX
+#pragma once
 
 #include <cassert>
 #include <istream>
@@ -642,5 +641,3 @@ operator>>(std::basic_istream<char_type, traits_type>& is, BucketBox& bucketBox)
 }
 
 } // namespace simgear
-
-#endif

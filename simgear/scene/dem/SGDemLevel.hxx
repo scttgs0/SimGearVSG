@@ -1,5 +1,4 @@
-#ifndef __SG_DEM_LEVEL_HXX__
-#define __SG_DEM_LEVEL_HXX__
+#pragma once
 
 #include <cstring>
 #include <cstdio>
@@ -86,5 +85,3 @@ private:
     // bitmap of tiles (1x1 degree)
     unsigned char extent[180][360/8];
 };
-
-#endif /* __SG_DEM_LEVEL_HXX__ */

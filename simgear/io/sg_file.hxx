@@ -6,8 +6,7 @@
  * @brief File I/O routines
  */
 
-#ifndef _SG_FILE_HXX
-#define _SG_FILE_HXX
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -85,5 +84,3 @@ class SGBinaryFile : public SGFile {
 public:
     SGBinaryFile( const SGPath& file, int repeat_ = 1 );
 };
-
-#endif // _SG_FILE_HXX

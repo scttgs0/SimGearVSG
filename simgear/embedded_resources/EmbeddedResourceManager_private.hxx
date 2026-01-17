@@ -6,8 +6,7 @@
  * @brief Private implementation class for SimGear's EmbeddedResourceManager
  */
 
-#ifndef FG_EMBEDDEDRESOURCEMANAGERPRIVATE_HXX
-#define FG_EMBEDDEDRESOURCEMANAGERPRIVATE_HXX
+#pragma once
 
 #include <string>
 #include <memory>               // std::unique_ptr, std::shared_ptr
@@ -85,5 +84,3 @@ public:
 };
 
 } // of namespace simgear
-
-#endif  // of FG_EMBEDDEDRESOURCEMANAGERPRIVATE_HXX

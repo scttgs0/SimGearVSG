@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2006-2009 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGQuat_H
-#define SGQuat_H
+#pragma once
 
 #ifdef min
 #undef min
@@ -761,5 +760,3 @@ inline
 SGQuatd
 toQuatd(const SGQuatf& v)
 { return SGQuatd(v(0), v(1), v(2), v(3)); }
-
-#endif

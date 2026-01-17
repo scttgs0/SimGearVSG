@@ -6,8 +6,8 @@
  * @brief Maintain tied properties
  */
 
-#ifndef __TIEDPROPERTYLIST_HXX
-#define  __TIEDPROPERTYLIST_HXX
+#pragma once
+
 #include <simgear/props/props.hxx>
 #include <assert.h>
 
@@ -134,4 +134,3 @@ private:
 };
 
 } // namespace
-#endif

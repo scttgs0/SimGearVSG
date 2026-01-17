@@ -14,8 +14,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-#ifndef SIMGEAR_PROJECT_HXX
-#define SIMGEAR_PROJECT_HXX 1
+
+#pragma once
 
 #include <osg/GL>
 
@@ -27,6 +27,3 @@ extern GLint project(GLdouble objX, GLdouble objY, GLdouble objZ,
                      const GLint *view,
                      GLdouble* winX, GLdouble* winY, GLdouble* winZ);
 }
-
-#endif
-

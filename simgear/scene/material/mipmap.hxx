@@ -14,8 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_MIPMAP_HXX
-#define SIMGEAR_MIPMAP_HXX 1
+#pragma once
 
 #include <tuple>
 
@@ -50,5 +49,3 @@ MipMapTuple makeMipMapTuple(Effect* effect, const SGPropertyNode* props,
                       const SGReaderWriterOptions* options);
 osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs );
 } }
-
-#endif

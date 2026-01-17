@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2012 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef SGLocation_HXX
-#define SGLocation_HXX
+#pragma once
 
 /// Encapsulates a pair SGVec3 and SGQuat.
 /// Together they encapsulate a cartesian position/orientation.
@@ -99,5 +98,3 @@ private:
     SGVec3<T> _position;
     SGQuat<T> _orientation;
 };
-
-#endif

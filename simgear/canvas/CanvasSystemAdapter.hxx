@@ -6,8 +6,7 @@
  * @brief Adapter for using the canvas with different applications
  */
 
-#ifndef SG_CANVAS_SYSTEM_ADAPTER_HXX_
-#define SG_CANVAS_SYSTEM_ADAPTER_HXX_
+#pragma once
 
 #include "canvas_fwd.hxx"
 
@@ -38,5 +37,3 @@ namespace canvas
 
 } // namespace canvas
 } // namespace simgear
-
-#endif /* SG_CANVAS_SYSTEM_ADAPTER_HXX_ */

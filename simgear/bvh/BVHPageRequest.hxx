@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // SPDX-FileCopyrightText: 2008-2012 Mathias Froehlich <mathias.froehlich@web.de>
 
-#ifndef BVHPageRequest_hxx
-#define BVHPageRequest_hxx
+#pragma once
 
 #include <simgear/structure/SGReferenced.hxx>
 
@@ -24,5 +23,3 @@ public:
 };
 
 }
-
-#endif

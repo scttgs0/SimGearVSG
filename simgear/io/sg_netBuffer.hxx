@@ -42,8 +42,7 @@
  * When the library gives a buffer to the user, the user should copy it.
 */
 
-#ifndef SG_NET_BUFFER_H
-#define SG_NET_BUFFER_H
+#pragma once
 
 #include <simgear/io/sg_netChannel.hxx>
 
@@ -118,5 +117,3 @@ public:
 };
 
 } // namespace simgear
-
-#endif // SG_NET_BUFFER_H

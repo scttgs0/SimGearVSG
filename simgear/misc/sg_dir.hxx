@@ -2,8 +2,7 @@
 // SPDX-FileCopyrightText: 2010 James Turner
 // SPDX-FileCopyrightText: 2010 Curtis L. Olson
 
-#ifndef _SG_DIR_HXX
-#define _SG_DIR_HXX
+#pragma once
 
 #include <sys/types.h>
 
@@ -105,7 +104,3 @@ namespace simgear
     bool _removeOnDestroy;
   };
 } // of namespace simgear
-
-#endif // _SG_DIR_HXX
-
-

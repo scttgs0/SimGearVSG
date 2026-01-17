@@ -6,12 +6,9 @@
  * @brief Groups together two nodes representing a geographic position (lat + lon)
  */
 
-#ifndef CANVAS_GEO_NODE_PAIR_HXX_
-#define CANVAS_GEO_NODE_PAIR_HXX_
+#pragma once
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   class GeoNodePair
   {
@@ -138,7 +135,4 @@ namespace canvas
 
   };
 
-} // namespace canvas
-} // namespace simgear
-
-#endif /* CANVAS_GEO_NODE_PAIR_HXX_ */
+} // namespace simgear::canvas

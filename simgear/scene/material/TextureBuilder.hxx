@@ -14,8 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_TEXTUREBUILDER_HXX
-#define SIMGEAR_TEXTUREBUILDER_HXX 1
+#pragma once
 
 #include <osg/StateSet>
 #include <osg/Texture>
@@ -41,4 +40,3 @@ struct TextureUnitBuilder : public PassAttributeBuilder
 
 bool makeTextureParameters(SGPropertyNode* paramRoot, const osg::StateSet* ss);
 }
-#endif

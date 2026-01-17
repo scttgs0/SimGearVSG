@@ -18,9 +18,7 @@
 #include <simgear/canvas/events/CanvasKeyBinding.hxx>
 #include <simgear/canvas/events/MouseEvent.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
   /**
    * Add canvas Element type to factory map
@@ -444,5 +442,4 @@ namespace canvas
   }
 
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

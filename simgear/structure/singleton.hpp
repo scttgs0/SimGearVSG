@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: BSL-1.0
 // SPDX-FileCopyrightText: 2000 Stephen Cleary
 
-#ifndef BOOST_POOL_SINGLETON_HPP
-#define BOOST_POOL_SINGLETON_HPP
+#pragma once
 
 // The following code might be put into some Boost.Config header in a later revision
 #ifdef __BORLANDC__
@@ -97,6 +96,4 @@ singleton_default<T>::create_object;
 // The following code might be put into some Boost.Config header in a later revision
 #ifdef __BORLANDC__
 # pragma option pop
-#endif
-
 #endif

@@ -7,8 +7,7 @@
 
 #include "CompositorUtil.hxx"
 
-namespace simgear {
-namespace compositor {
+namespace simgear::compositor {
 
 bool
 checkConditional(const SGPropertyNode *node)
@@ -45,5 +44,4 @@ getPropertyChild(const SGPropertyNode *prop,
     return getPropertyNode(child);
 }
 
-} // namespace compositor
-} // namespace simgear
+} // namespace simgear::compositor

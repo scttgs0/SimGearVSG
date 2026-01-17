@@ -14,9 +14,7 @@
 #include <simgear/nasal/cppbind/NasalContext.hxx>
 #include <simgear/nasal/cppbind/Ghost.hxx>
 
-namespace simgear
-{
-namespace canvas
+namespace simgear::canvas
 {
 
   //----------------------------------------------------------------------------
@@ -282,5 +280,4 @@ namespace canvas
     }
   }
 
-} // namespace canvas
-} // namespace simgear
+} // namespace simgear::canvas

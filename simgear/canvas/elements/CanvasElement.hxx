@@ -6,8 +6,7 @@
  * @brief Interface for 2D Canvas elements
  */
 
-#ifndef CANVAS_ELEMENT_HXX_
-#define CANVAS_ELEMENT_HXX_
+#pragma once
 
 #include <simgear/canvas/canvas_fwd.hxx>
 #include <simgear/canvas/CanvasEvent.hxx>
@@ -652,5 +651,3 @@ namespace canvas
   };
 
 } // namespace simgear
-
-#endif /* CANVAS_ELEMENT_HXX_ */

@@ -14,8 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SIMGEAR_EFFECT_ELEMENT_HXX
-#define SIMGEAR_EFFECT_ELEMENT_HXX 1
+#pragma once
 
 namespace simgear
 {
@@ -25,4 +24,3 @@ protected:
     virtual ~EffectElement() {}
 };
 }
-#endif

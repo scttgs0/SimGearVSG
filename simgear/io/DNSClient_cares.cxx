@@ -16,9 +16,7 @@
 #include <sys/select.h>
 #endif
 
-namespace simgear {
-
-namespace DNS {
+namespace simgear::DNS {
 
 #if ARES_VERSION < 0x11B00
 #define ARES_CLASS_IN 1
@@ -331,6 +329,4 @@ void Client::update(int waitTimeout)
 #endif
 }
 
-} // of namespace DNS
-
-} // of namespace simgear
+} // of namespace simgear::DNS

@@ -6,9 +6,7 @@
  * @brief Interface definition for encapsulated commands
  */
 
-#ifndef __SGBINDING_HXX
-#define __SGBINDING_HXX
-
+#pragma once
 
 #include <simgear/compiler.h>
 
@@ -195,5 +193,3 @@ void clearBindingList(const SGBindingList& aBindings);
  * list is empty, or all bindings are conditinally disabled.
  */
 bool anyBindingEnabled(const SGBindingList& bindings);
-
-#endif

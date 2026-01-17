@@ -18,6 +18,7 @@
 //
 // $Id$
 
+#pragma once
 
 #include <simgear/compiler.h>
 

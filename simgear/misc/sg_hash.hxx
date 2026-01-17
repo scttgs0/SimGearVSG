@@ -6,6 +6,7 @@
  * @brief  manage finding resources by names/paths
  */
 
+#pragma once
 
 #include <stdint.h>
 #include <sys/types.h>

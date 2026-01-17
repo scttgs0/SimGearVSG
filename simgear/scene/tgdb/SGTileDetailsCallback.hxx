@@ -21,6 +21,8 @@
 //
 // $Id$
 
+#pragma once
+
 #include <osg/LOD>
 
 #include <boost/foreach.hpp>

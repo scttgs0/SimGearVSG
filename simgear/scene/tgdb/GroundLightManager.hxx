@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
+ #pragma once
+ 
 #include <simgear/scene/util/OsgSingleton.hxx>
 #include <simgear/scene/util/SGUpdateVisitor.hxx>
 

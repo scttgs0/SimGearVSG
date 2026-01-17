@@ -6,6 +6,8 @@
  * @brief Mapping between canvas gui Event types and their names
  */
 
+#pragma once
+
 #ifndef ENUM_MAPPING
 # error "Don't include this file directly!"
 #endif

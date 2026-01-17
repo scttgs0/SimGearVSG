@@ -6,6 +6,8 @@
  * @brief Mapping between strings and osg text alignment flags
  */
 
+ #pragma once
+
 #ifndef ENUM_MAPPING
 # error "Only include with ENUM_MAPPING defined!"
 #endif

@@ -6,6 +6,8 @@
  * @brief Enumeration of layout alignment flags.
  */
 
+#pragma once
+
 #ifndef ALIGN_ENUM_MAPPING
 # error "Only include with ALIGN_ENUM_MAPPING defined!"
 #endif

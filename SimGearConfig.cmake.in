@@ -64,15 +64,6 @@ if (SIMGEAR_USE_FFMPEG)
   include(${CMAKE_CURRENT_LIST_DIR}/CreateFFmpegImportedTargets.cmake)
 endif()
 
-# OpenRTI support
-set(ENABLE_RTI @ENABLE_RTI@)
-if(ENABLE_RTI)
-    find_dependency(PkgConfig)
-    if(PKG_CONFIG_FOUND)
-      pkg_check_modules(RTI IMPORTED_TARGET hla-rti13)
-    endif(PKG_CONFIG_FOUND)
-endif(ENABLE_RTI)
-
 # Alternative terrain engine based on pagedLOD
 
 set(ENABLE_GDAL @ENABLE_GDAL@)

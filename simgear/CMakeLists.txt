@@ -57,10 +57,6 @@ foreach( mylibfolder
     add_subdirectory(${mylibfolder})
 endforeach( mylibfolder )
 
-if(ENABLE_RTI)
-    add_subdirectory(hla)
-endif(ENABLE_RTI)
-
 set(HEADERS compiler.h constants.h sg_inlines.h ${PROJECT_BINARY_DIR}/simgear/version.h)
 install (FILES ${HEADERS}  DESTINATION include/simgear/)
 
@@ -96,12 +92,6 @@ target_link_libraries(SimGearCore PUBLIC ZLIB::ZLIB)
 if (SG_HAVE_DDS)
     target_link_libraries(SimGearCore PRIVATE CycloneDDS::ddsc)
 endif()
-
-if (ENABLE_RTI)
-    target_sources(SimGearCore PRIVATE $<TARGET_OBJECTS:rti> $<TARGET_OBJECTS:rti13>)
-    target_link_libraries(SimGearCore PRIVATE PkgConfig::RTI)
-endif()
-
 
 if (APPLE)
     # PCH doesn't work for Objective-C++

@@ -130,7 +130,6 @@ windows-build:
       -D CMAKE_INSTALL_PREFIX=$env:PREFIX_DIR
       -D CMAKE_PREFIX_PATH=$env:CI_PROJECT_DIR/osg-dist
       -D MSVC_3RDPARTY_ROOT=$WIN_FG_DIR
-      -D OSG_FSTREAM_EXPORT_FIXED:BOOL=ON
 
     - cmake --build $BUILD_DIR --config RelWithDebInfo
     - cmake --build $BUILD_DIR --config RelWithDebInfo --target install

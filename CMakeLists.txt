@@ -129,10 +129,6 @@ option(ENABLE_VIDEO_RECORD "Set to ON to build SimGear with video recording" ON)
 include (DetectArch)
 include (ExportDebugSymbols)
 
-# until the fstream fix is applied and generally available in OSG,
-# keep the compatibility link option as the default
-option(OSG_FSTREAM_EXPORT_FIXED "Set to ON if the osgDB fstream export patch is applied" OFF)
-
 if (MSVC)
   # override CMake default RelWithDebInfo flags. This is important to ensure
   # good performance
@@ -418,13 +414,6 @@ if(WIN32)
         if (X86)
           set(SIMD_COMPILER_FLAGS "/arch:SSE /arch:SSE2")
         endif()
-
-        if (NOT OSG_FSTREAM_EXPORT_FIXED)
-          message(STATUS "For better linking performance, use OSG with patched fstream header")
-          # needed to avoid link errors on multiply-defined standard C++
-          # symbols. Suspect this may be an OSG-DB export bug
-            set( MSVC_LD_FLAGS "/FORCE:MULTIPLE" )
-        endif ()
     endif(MSVC)
 
     # assumed on Windows

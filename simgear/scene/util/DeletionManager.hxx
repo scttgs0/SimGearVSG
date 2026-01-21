@@ -21,26 +21,28 @@
 
 #include <vector>
 
+#include <vsg/all.h>
+
 #include <OpenThreads/Mutex>
-#include <osg/ref_ptr>
 #include <osg/NodeCallback>
 #include <osg/Referenced>
 #include <osgGA/GUIEventHandler>
 
-namespace simgear
-{
+
+namespace simgear {
 class DeletionManager : public osgGA::GUIEventHandler
 {
 public:
     virtual bool handle(const osgGA::GUIEventAdapter& ea,
                         osgGA::GUIActionAdapter& aa,
-                        osg::Object* object, osg::NodeVisitor* nv);
+                        vsg::Object* object, osg::NodeVisitor* nv);
     void addStaleObject(osg::Referenced* obj);
-    static void install(osg::Node* node);
-    static void uninstall(osg::Node* node);
+    static void install(vsg::Node* node);
+    static void uninstall(vsg::Node* node);
     static DeletionManager* instance();
+
 protected:
     OpenThreads::Mutex _mutex;
-    std::vector<osg::ref_ptr<osg::Referenced> > _staleObjects;
+    std::vector<vsg::ref_ptr<osg::Referenced>> _staleObjects;
 };
-}
+} // namespace simgear

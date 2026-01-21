@@ -48,7 +48,7 @@ struct DistanceHeightXYZ
         height(dh.height),
         position(dh.position) {}
 
-    DistanceHeightXYZ(double d, double h, const osg::Vec3d& pos):
+    DistanceHeightXYZ(double d, double h, const vsg::dvec3& pos):
         distance(d),
         height(h),
         position(pos) {}
@@ -80,13 +80,13 @@ struct DistanceHeightXYZ
 
     double      distance;
     double      height;
-    osg::Vec3d  position;
+    vsg::dvec3  position;
 };
 
 struct Point : public osg::Referenced, public DistanceHeightXYZ
 {
     Point() {}
-    Point(double d, double h, const osg::Vec3d& pos):
+    Point(double d, double h, const vsg::dvec3& pos):
          DistanceHeightXYZ(d,h,pos)
     {
     }
@@ -225,8 +225,8 @@ struct Segment
     }
 
 
-    osg::ref_ptr<Point> _p1;
-    osg::ref_ptr<Point> _p2;
+    vsg::ref_ptr<Point> _p1;
+    vsg::ref_ptr<Point> _p2;
 
 };
 
@@ -240,9 +240,9 @@ struct LineConstructor
 
 
 
-    void add(double d, double h, const osg::Vec3d& pos)
+    void add(double d, double h, const vsg::dvec3& pos)
     {
-        osg::ref_ptr<Point> newPoint = new Point(d,h,pos);
+        vsg::ref_ptr<Point> newPoint = new Point(d,h,pos);
 
 
         if (_previousPoint.valid() && newPoint->distance != _previousPoint->distance)
@@ -300,7 +300,7 @@ struct LineConstructor
 
                         if (rhs_p1_inside && lhs_p2_inside)
                         {
-                            double distance_between = osg::Vec2d(lhs._p2->distance - rhs._p1->distance,
+                            double distance_between = vsg::dvec2(lhs._p2->distance - rhs._p1->distance,
                                                                  lhs._p2->height - rhs._p1->height).length2();
 
                             if (distance_between < epsilon)
@@ -831,9 +831,9 @@ struct LineConstructor
     }
 
     SegmentSet _segments;
-    osg::ref_ptr<Point> _previousPoint;
+    vsg::ref_ptr<Point> _previousPoint;
     osg::Plane  _plane;
-    osg::ref_ptr<osg::EllipsoidModel>   _em;
+    vsg::ref_ptr<osg::EllipsoidModel>   _em;
 
 };
 
@@ -851,28 +851,28 @@ VPBElevationSlice::VPBElevationSlice()
     _intersectionVisitor.setReadCallback(0);
 }
 
-void VPBElevationSlice::computeIntersections(osg::Node* scene, osg::Node::NodeMask traversalMask)
+void VPBElevationSlice::computeIntersections(vsg::Node* scene, vsg::Node::NodeMask traversalMask)
 {
     osg::Plane plane;
     osg::Polytope boundingPolytope;
 
 
     // set up the main intersection plane
-    osg::Vec3d planeNormal = (_endPoint - _startPoint) ^ _upVector;
+    vsg::dvec3 planeNormal = (_endPoint - _startPoint) ^ _upVector;
     planeNormal.normalize();
     plane.set( planeNormal, _startPoint );
 
     // set up the start cut off plane
-    osg::Vec3d startPlaneNormal = _upVector ^ planeNormal;
+    vsg::dvec3 startPlaneNormal = _upVector ^ planeNormal;
     startPlaneNormal.normalize();
     boundingPolytope.add( osg::Plane(startPlaneNormal, _startPoint) );
 
     // set up the end cut off plane
-    osg::Vec3d endPlaneNormal = planeNormal ^ _upVector;
+    vsg::dvec3 endPlaneNormal = planeNormal ^ _upVector;
     endPlaneNormal.normalize();
     boundingPolytope.add( osg::Plane(endPlaneNormal, _endPoint) );
 
-    osg::ref_ptr<osgUtil::PlaneIntersector> intersector = new osgUtil::PlaneIntersector(plane, boundingPolytope);
+    vsg::ref_ptr<osgUtil::PlaneIntersector> intersector = new osgUtil::PlaneIntersector(plane, boundingPolytope);
 
 
     intersector->setRecordHeightsAsAttributes(true);
@@ -926,8 +926,8 @@ void VPBElevationSlice::computeIntersections(osg::Node* scene, osg::Node::NodeMa
                 pitr != intersection.polyline.end();
                 ++pitr)
             {
-                const osg::Vec3d& v = *pitr;
-                osg::Vec2d delta_xy( v.x() - _startPoint.x(), v.y() - _startPoint.y());
+                const vsg::dvec3& v = *pitr;
+                vsg::dvec2 delta_xy( v.x() - _startPoint.x(), v.y() - _startPoint.y());
                 double distance = delta_xy.length();
 
                 constructor.add( distance, v.z(), v);
@@ -958,7 +958,7 @@ void VPBElevationSlice::computeIntersections(osg::Node* scene, osg::Node::NodeMa
     }
 }
 
-VPBElevationSlice::Vec3dList VPBElevationSlice::computeVPBElevationSlice(osg::Node* scene, const osg::Vec3d& startPoint, const osg::Vec3d& endPoint, const osg::Vec3d& upVector, osg::Node::NodeMask traversalMask)
+VPBElevationSlice::Vec3dList VPBElevationSlice::computeVPBElevationSlice(vsg::Node* scene, const vsg::dvec3& startPoint, const vsg::dvec3& endPoint, const vsg::dvec3& upVector, vsg::Node::NodeMask traversalMask)
 {
     VPBElevationSlice es;
     es.setStartPoint(startPoint);

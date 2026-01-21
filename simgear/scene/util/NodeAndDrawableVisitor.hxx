@@ -19,13 +19,15 @@
  *
  */
 
- #pragma once
+#pragma once
+
+#include <vsg/all.h>
 
 #include <osg/Drawable>
 #include <osg/NodeVisitor>
 
-namespace simgear
-{
+
+namespace simgear {
 /** A node visitor that descends into Drawables too.
  */
 class NodeAndDrawableVisitor : public osg::NodeVisitor
@@ -36,7 +38,7 @@ public:
                            osg::NodeVisitor::TraversalMode tm);
     virtual ~NodeAndDrawableVisitor();
     using osg::NodeVisitor::apply;
-    virtual void apply(osg::Node& node);
+    virtual void apply(vsg::Node& node);
     /** Visit a Drawable node. Note that you cannot write an apply()
     method with an argument that is a subclass of Drawable and expect
     it to be called, because this visitor can't add the double dispatch
@@ -44,7 +46,7 @@ public:
     */
     virtual void apply(osg::Drawable& drawable);
     // hides NodeVisitor::traverse
-    void traverse(osg::Node& node);
+    void traverse(vsg::Node& node);
 };
 
-}
+} // namespace simgear

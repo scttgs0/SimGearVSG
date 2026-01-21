@@ -13,14 +13,15 @@
 
 #pragma once
 
-#include <simgear/compiler.h>
-#include <simgear/constants.h>
-#include <simgear/math/SGMath.hxx>
-
 #include <cmath>
 #include <string>
 #include <iosfwd>
 #include <vector>
+
+#include <simgear/compiler.h>
+#include <simgear/constants.h>
+#include <simgear/math/SGMath.hxx>
+
 
 // #define NO_DEPRECATED_API
 

@@ -7,23 +7,25 @@
 
 #pragma once
 
-namespace osg
-{
-class Node;
-}
-#include <osg/ref_ptr>
+#include <vsg/all.h>
 
 #include <simgear/math/SGMath.hxx>
 #include <simgear/structure/SGReferenced.hxx>
+
+
+namespace osg {
+class Node;
+}
 
 namespace simgear {
 class SGReaderWriterOptions;
 }
 
-class SGGalaxy : public SGReferenced {
+class SGGalaxy : public SGReferenced
+{
 public:
     SGGalaxy() = default;
 
     // build the galaxy object
-    osg::Node* build(double galaxy_size, const simgear::SGReaderWriterOptions* options);
+    vsg::Node* build(double galaxy_size, const simgear::SGReaderWriterOptions* options);
 };

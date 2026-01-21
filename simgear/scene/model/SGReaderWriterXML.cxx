@@ -43,7 +43,7 @@ using namespace std;
 using namespace simgear;
 using namespace osg;
 
-static std::tuple<int, osg::Node *>
+static std::tuple<int, vsg::Node *>
 sgLoad3DModel_internal(const SGPath& path,
                        const osgDB::Options* options,
                        SGPropertyNode *overlay = 0);
@@ -70,7 +70,7 @@ SGReaderWriterXML::readNode(const std::string& name,
     std::string fileName = osgDB::findDataFile(name, options);
     simgear::ErrorReportContext ec{"model-xml", fileName};
 
-    osg::Node *result=0;
+    vsg::Node *result=0;
     try {
         SGPath p = SGModelLib::findDataFile(fileName);
         if (!p.exists()) {
@@ -82,7 +82,7 @@ SGReaderWriterXML::readNode(const std::string& name,
     } catch (const sg_exception &t) {
         SG_LOG(SG_IO, SG_DEV_ALERT, "Failed to load model: " << t.getFormattedMessage()
           << "\n\tfrom:" << fileName);
-        result=new osg::Node;
+        result=new vsg::Node;
     }
     if (result)
         return result;
@@ -95,7 +95,7 @@ class SGSwitchUpdateCallback : public osg::NodeCallback
 public:
     SGSwitchUpdateCallback(SGCondition* condition) :
             mCondition(condition) {}
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv) {
+    virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv) {
         assert(dynamic_cast<osg::Switch*>(node));
         osg::Switch* s = static_cast<osg::Switch*>(node);
 
@@ -135,7 +135,7 @@ public:
         mReferenced = 0;
     }
 private:
-    osg::ref_ptr<osg::Referenced> mReferenced;
+    vsg::ref_ptr<osg::Referenced> mReferenced;
 };
 
 }
@@ -143,7 +143,7 @@ private:
 namespace simgear {
 class SetNodeMaskVisitor : public osg::NodeVisitor {
 public:
-    SetNodeMaskVisitor(osg::Node::NodeMask nms, osg::Node::NodeMask nmc) :
+    SetNodeMaskVisitor(vsg::Node::NodeMask nms, vsg::Node::NodeMask nmc) :
         osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), nodeMaskSet(nms), nodeMaskClear(nmc)
     {}
     virtual void apply(osg::Geode& node) {
@@ -151,8 +151,8 @@ public:
         traverse(node);
     }
 private:
-    osg::Node::NodeMask nodeMaskSet;
-    osg::Node::NodeMask nodeMaskClear;
+    vsg::Node::NodeMask nodeMaskSet;
+    vsg::Node::NodeMask nodeMaskClear;
 };
 
 }
@@ -169,11 +169,11 @@ namespace {
         }
     };
 
-    bool removeNamedNode(osg::Group* aGroup, const std::string& aName)
+    bool removeNamedNode(vsg::Group* aGroup, const std::string& aName)
     {
         int nKids = aGroup->getNumChildren();
         for (int i = 0; i < nKids; i++) {
-            osg::Node* child = aGroup->getChild(i);
+            vsg::Node* child = aGroup->getChild(i);
             if (child->getName() == aName) {
                 aGroup->removeChild(child);
                 return true;
@@ -181,7 +181,7 @@ namespace {
         }
 
         for (int i = 0; i < nKids; i++) {
-            osg::Group* childGroup = aGroup->getChild(i)->asGroup();
+            vsg::Group* childGroup = aGroup->getChild(i)->asGroup();
             if (!childGroup)
                 continue;
 
@@ -216,10 +216,10 @@ struct DumpSGPropertyNode {
 };
 
 struct DumpOsgNode {
-    osg::Node*          _node;
+    vsg::Node*          _node;
     const std::string&  _indent;
 
-    DumpOsgNode(osg::Node* node, const std::string& indent="")
+    DumpOsgNode(vsg::Node* node, const std::string& indent="")
     :
     _node(node),
     _indent(indent)
@@ -229,7 +229,7 @@ struct DumpOsgNode {
     {
         if (!dump._node)    return out;
         out << dump._indent << dump._node->getName() << "\n";
-        osg::Group* group = dynamic_cast<osg::Group*>(dump._node);
+        vsg::Group* group = dynamic_cast<vsg::Group*>(dump._node);
         if (group) {
             for (unsigned i=0; i<group->getNumChildren(); ++i) {
                 out << DumpOsgNode(group->getChild(i), dump._indent + "    ");
@@ -239,23 +239,23 @@ struct DumpOsgNode {
     }
 };
 
-/* Finds all names recursively in an osg::Node. */
+/* Finds all names recursively in an vsg::Node. */
 struct OSGNodeGetNames
 {
     std::vector<std::string>    names;
 
-    OSGNodeGetNames(osg::Node* node=NULL)
+    OSGNodeGetNames(vsg::Node* node=NULL)
     {
         add(node);
     }
 
-    void add(osg::Node* node)
+    void add(vsg::Node* node)
     {
         if (!node)  return;
         const std::string&  name = node->getName();
         if (name != "") names.push_back(name);
 
-        osg::Group* group = dynamic_cast<osg::Group*>(node);
+        vsg::Group* group = dynamic_cast<vsg::Group*>(node);
         if (group) {
             for (unsigned i=0; i<group->getNumChildren(); ++i) {
                 add(group->getChild(i));
@@ -273,7 +273,7 @@ At runtime, the tooltips only show if sim/animation-tooltips is true.
 The dummy animations will show up as yellow (like clickable items) if the user
 presses Ctrl-C, even if tooltips aren't showing because sim/animation-tooltips
 is false. */
-void addTooltipAnimations(const SGPath& path, SGPropertyNode_ptr props, osg::ref_ptr<osg::Node> model, int autoTooltipsMasterMax)
+void addTooltipAnimations(const SGPath& path, SGPropertyNode_ptr props, vsg::ref_ptr<vsg::Node> model, int autoTooltipsMasterMax)
 {
     OSGNodeGetNames model_names;
     if (0) {
@@ -441,7 +441,7 @@ void addTooltipAnimations(const SGPath& path, SGPropertyNode_ptr props, osg::ref
  * If "attach-to" is not defined in `config`, silently attach `child` to `group`.
  * If it is defined, but no such parent is found, report an error and attach to `group` anyways.
  */
-static void findAndAttach(osg::Group* group, osg::Node* child, const SGPropertyNode_ptr config, const SGPath& path)
+static void findAndAttach(vsg::Group* group, vsg::Node* child, const SGPropertyNode_ptr config, const SGPath& path)
 {
     const SGPropertyNode_ptr attach = config->getNode("attach-to", false);
     std::string name;
@@ -482,7 +482,7 @@ static void findAndAttach(osg::Group* group, osg::Node* child, const SGPropertyN
     group->addChild(child);
 }
 
-static std::tuple<int, osg::Node *>
+static std::tuple<int, vsg::Node *>
 sgLoad3DModel_internal(const SGPath& path,
                        const osgDB::Options* dbOptions,
                        SGPropertyNode *overlay)
@@ -490,7 +490,7 @@ sgLoad3DModel_internal(const SGPath& path,
     SGPath modelpath(path);
     SGPath texturepath(path);
 
-    osg::ref_ptr<SGReaderWriterOptions> options;
+    vsg::ref_ptr<SGReaderWriterOptions> options;
     options = SGReaderWriterOptions::copyOrCreate(dbOptions);
 
 
@@ -501,15 +501,15 @@ sgLoad3DModel_internal(const SGPath& path,
     if (!prop_root.valid())
         prop_root = new SGPropertyNode;
     // The model data appear to be only used in the topmost model
-    osg::ref_ptr<SGModelData> data = options->getModelData();
+    vsg::ref_ptr<SGModelData> data = options->getModelData();
     options->setModelData(0);
 
     // remember the current value of the vertex order setting
     // because an included <model> may change this.
     bool currentVertexOrderXYZ = options->getVertexOrderXYZ();
 
-    osg::ref_ptr<osg::Node> model;
-    osg::ref_ptr<osg::Group> group;
+    vsg::ref_ptr<vsg::Node> model;
+    vsg::ref_ptr<vsg::Group> group;
     SGPropertyNode_ptr props = new SGPropertyNode;
     bool previewMode = (dbOptions->getPluginStringData("SimGear::PREVIEW") == "ON");
 
@@ -533,7 +533,7 @@ sgLoad3DModel_internal(const SGPath& path,
         }
 
         if (previewMode && props->hasChild("nopreview")) {
-            return std::make_tuple(0, (osg::Node *) NULL);
+            return std::make_tuple(0, (vsg::Node *) NULL);
         }
 
         if (props->hasChild("defaults")) {
@@ -567,7 +567,7 @@ sgLoad3DModel_internal(const SGPath& path,
                 }
             }
         } else {
-            model = new osg::Node;
+            model = new vsg::Node;
         }
 
         SGPropertyNode *mp = props->getNode("multiplay");
@@ -628,17 +628,17 @@ sgLoad3DModel_internal(const SGPath& path,
     if (offsets) {
         needTransform=true;
         osg::MatrixTransform *alignmainmodel = new osg::MatrixTransform;
-        alignmainmodel->setDataVariance(osg::Object::STATIC);
-        osg::Matrix res_matrix;
+        alignmainmodel->setDataVariance(vsg::Object::STATIC);
+        vsg::mat4 res_matrix;
         res_matrix.makeRotate(
             offsets->getFloatValue("pitch-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-            osg::Vec3(0, 1, 0),
+            vsg::vec3(0, 1, 0),
             offsets->getFloatValue("roll-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-            osg::Vec3(1, 0, 0),
+            vsg::vec3(1, 0, 0),
             offsets->getFloatValue("heading-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-            osg::Vec3(0, 0, 1));
+            vsg::vec3(0, 0, 1));
 
-        osg::Matrix tmat;
+        vsg::mat4 tmat;
         tmat.makeTranslate(offsets->getFloatValue("x-m", 0.0),
                            offsets->getFloatValue("y-m", 0.0),
                            offsets->getFloatValue("z-m", 0.0));
@@ -646,7 +646,7 @@ sgLoad3DModel_internal(const SGPath& path,
         group = alignmainmodel;
     }
     if (!group) {
-        group = new osg::Group;
+        group = new vsg::Group;
     }
     group->addChild(model.get());
 
@@ -656,7 +656,7 @@ sgLoad3DModel_internal(const SGPath& path,
         SGPropertyNode_ptr sub_props = model_nodes[i];
 
         SGPath submodelpath;
-        osg::ref_ptr<osg::Node> submodel;
+        vsg::ref_ptr<vsg::Node> submodel;
 
         string subPathStr = sub_props->getStringValue("path");
         SGPath submodelPath = SGModelLib::findDataFile(subPathStr,
@@ -695,22 +695,22 @@ sgLoad3DModel_internal(const SGPath& path,
         if (!submodel)
             continue;
 
-        osg::ref_ptr<osg::Node> submodel_final = submodel;
+        vsg::ref_ptr<vsg::Node> submodel_final = submodel;
         SGPropertyNode *offs = sub_props->getNode("offsets", false);
         if (offs) {
-            osg::Matrix res_matrix;
-            osg::ref_ptr<osg::MatrixTransform> align = new osg::MatrixTransform;
-            align->setDataVariance(osg::Object::STATIC);
+            vsg::mat4 res_matrix;
+            vsg::ref_ptr<osg::MatrixTransform> align = new osg::MatrixTransform;
+            align->setDataVariance(vsg::Object::STATIC);
             res_matrix.makeIdentity();
             res_matrix.makeRotate(
                 offs->getDoubleValue("pitch-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-                osg::Vec3(0, 1, 0),
+                vsg::vec3(0, 1, 0),
                 offs->getDoubleValue("roll-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-                osg::Vec3(1, 0, 0),
+                vsg::vec3(1, 0, 0),
                 offs->getDoubleValue("heading-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-                osg::Vec3(0, 0, 1));
+                vsg::vec3(0, 0, 1));
 
-            osg::Matrix tmat;
+            vsg::mat4 tmat;
             tmat.makeIdentity();
             tmat.makeTranslate(offs->getDoubleValue("x-m", 0),
                                offs->getDoubleValue("y-m", 0),
@@ -723,7 +723,7 @@ sgLoad3DModel_internal(const SGPath& path,
 
         SGPropertyNode *cond = sub_props->getNode("condition", false);
         if (cond) {
-            osg::ref_ptr<osg::Switch> sw = new osg::Switch;
+            vsg::ref_ptr<osg::Switch> sw = new osg::Switch;
             sw->setUpdateCallback(new SGSwitchUpdateCallback(sgReadCondition(prop_root, cond)));
             findAndAttach(group, sw.get(), sub_props, path);
             sw->addChild(submodel_final.get());
@@ -739,7 +739,7 @@ sgLoad3DModel_internal(const SGPath& path,
         particle_nodes = props->getChildren("particlesystem");
         for (unsigned i = 0; i < particle_nodes.size(); ++i) {
             SG_LOG(SG_PARTICLES, SG_DEBUG, "Reading in particle " << i << " from file: " << path);
-            osg::ref_ptr<SGReaderWriterOptions> options2;
+            vsg::ref_ptr<SGReaderWriterOptions> options2;
             options2 = new SGReaderWriterOptions(*options);
             if (i==0) {
                 if (!texturepath.extension().empty())
@@ -747,7 +747,7 @@ sgLoad3DModel_internal(const SGPath& path,
 
                 options2->setDatabasePath(texturepath.utf8Str());
             }
-            osg::ref_ptr<osg::Node> particle;
+            vsg::ref_ptr<vsg::Node> particle;
             particle = particlesManager->appendParticles(particle_nodes[i],
                                                          prop_root,
                                                          options2.get());
@@ -758,7 +758,7 @@ sgLoad3DModel_internal(const SGPath& path,
     std::vector<SGPropertyNode_ptr> text_nodes;
     text_nodes = props->getChildren("text");
     for (unsigned i = 0; i < text_nodes.size(); ++i) {
-        osg::ref_ptr<osg::Node> text;
+        vsg::ref_ptr<vsg::Node> text;
         text = SGText::appendText(text_nodes[i], prop_root, options.get());
         findAndAttach(group, text, text_nodes[i], path);
     }
@@ -766,7 +766,7 @@ sgLoad3DModel_internal(const SGPath& path,
     std::vector<SGPropertyNode_ptr> light_nodes;
     light_nodes = props->getChildren("light");
     for (unsigned i = 0; i < light_nodes.size(); ++i) {
-        osg::ref_ptr<osg::Node> light;
+        vsg::ref_ptr<vsg::Node> light;
         light = SGLight::appendLight(light_nodes[i], prop_root, false /* legacy mode */);
         findAndAttach(group, light, light_nodes[i], path);
     }
@@ -807,7 +807,7 @@ sgLoad3DModel_internal(const SGPath& path,
 
             // note from James: we used to re-throw these errors, and they
             // were caught one level up as an SG_DEV_ALERT log message and
-            // loading an empty osg::Node for the entire model.
+            // loading an empty vsg::Node for the entire model.
             // Choosing instead to trap them there, since a single failed animation
             // isn't necessarily a reason to abandon the model load.
         } catch (sg_exception& e) {

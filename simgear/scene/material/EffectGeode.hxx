@@ -16,52 +16,52 @@
 
 #pragma once
 
-#include <osg/Geode>
-
 #include <boost/iterator/iterator_adaptor.hpp>
+
+#include <vsg/all.h>
+
+#include <osg/Geode>
 
 #include "Effect.hxx"
 #include "mat.hxx"
 
-namespace simgear
-{
+
+namespace simgear {
 class EffectGeode : public osg::Geode
 {
-  public:
-
-    class DrawablesIterator:
-      public boost::iterator_adaptor<
-        DrawablesIterator,
-        osg::NodeList::iterator,
-        osg::ref_ptr<osg::Drawable>,
-        boost::use_default,
-        osg::ref_ptr<osg::Drawable> // No reference as Reference type.
-                                    // The child list does not contain Drawable
-                                    // ref_ptr so we can not return any
-                                    // references to them.
-      >
+public:
+    class DrawablesIterator : public boost::iterator_adaptor<
+                                  DrawablesIterator,
+                                  osg::NodeList::iterator,
+                                  vsg::ref_ptr<osg::Drawable>,
+                                  boost::use_default,
+                                  vsg::ref_ptr<osg::Drawable> // No reference as Reference type.
+                                                              // The child list does not contain Drawable
+                                                              // ref_ptr so we can not return any
+                                                              // references to them.
+                                  >
     {
-      public:
-
+    public:
         DrawablesIterator()
-        {}
-
-        explicit DrawablesIterator(osg::NodeList::iterator const& node_it):
-          DrawablesIterator::iterator_adaptor_(node_it)
-        {}
-
-      private:
-        friend class boost::iterator_core_access;
-        osg::ref_ptr<osg::Drawable> dereference() const
         {
-          return base_reference()->get()->asDrawable();
+        }
+
+        explicit DrawablesIterator(osg::NodeList::iterator const& node_it) : DrawablesIterator::iterator_adaptor_(node_it)
+        {
+        }
+
+    private:
+        friend class boost::iterator_core_access;
+        vsg::ref_ptr<osg::Drawable> dereference() const
+        {
+            return base_reference()->get()->asDrawable();
         }
     };
 
     EffectGeode();
     EffectGeode(const EffectGeode& rhs,
                 const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY);
-    META_Node(simgear,EffectGeode);
+    META_Node(simgear, EffectGeode);
     Effect* getEffect() const { return _effect.get(); }
     void setEffect(Effect* effect);
     SGMaterial* getMaterial() const { return _material; }
@@ -69,16 +69,17 @@ class EffectGeode : public osg::Geode
     SGPropertyNode_ptr getEffectPropTree() { return _effectPropTree; }
     void setEffectPropTree(SGPropertyNode_ptr effectPropTree) { _effectPropTree = effectPropTree; }
     virtual void resizeGLObjectBuffers(unsigned int maxSize);
-    virtual void releaseGLObjects(osg::State* = 0) const;
+    virtual void releaseGLObjects(vsg::State* = 0) const;
 
 
     DrawablesIterator drawablesBegin() { return DrawablesIterator(_children.begin()); }
     DrawablesIterator drawablesEnd() { return DrawablesIterator(_children.end()); }
 
-    void runGenerators(osg::Geometry *geometry);
+    void runGenerators(vsg::Geometry* geometry);
+
 private:
-    osg::ref_ptr<Effect> _effect;
+    vsg::ref_ptr<Effect> _effect;
     SGMaterial* _material;
     SGPropertyNode_ptr _effectPropTree;
 };
-}
+} // namespace simgear

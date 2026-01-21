@@ -1,4 +1,4 @@
-// CopyOp.cxx - Simgear CopyOp for copying our own classes
+// CopyOp.cxx - SimGear CopyOp for copying our own classes
 //
 // Copyright (C) 2009  Tim Moore timoore@redhat.com
 //
@@ -28,14 +28,14 @@
 
 namespace simgear
 {
-osg::Object* CopyOp::operator()(const osg::Object* obj) const
+vsg::Object* CopyOp::operator()(const vsg::Object* obj) const
 {
     if (dynamic_cast<const Effect*>(obj)
         || dynamic_cast<const Technique*>(obj)) {
         if (_flags & DEEP_COPY_STATESETS)
             return obj->clone(*this);
         else
-            return const_cast<osg::Object*>(obj);
+            return const_cast<vsg::Object*>(obj);
     }
     else {
         return osg::CopyOp::operator()(obj);

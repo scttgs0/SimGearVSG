@@ -122,7 +122,7 @@ struct ReaderWriterSTG::_ModelBin {
         SGPath _errorLocation;
         std::string _token;
         std::string _name;
-        osg::ref_ptr<SGReaderWriterOptions> _options;
+        vsg::ref_ptr<SGReaderWriterOptions> _options;
     };
     struct _ObjectStatic {
         _ObjectStatic() : _agl(false), _proxy(false), _lon(0), _lat(0), _elev(0), _hdg(0), _pitch(0), _roll(0), _range(SG_OBJECT_RANGE_ROUGH), _radius(10) { }
@@ -134,7 +134,7 @@ struct ReaderWriterSTG::_ModelBin {
         double _lon, _lat, _elev;
         double _hdg, _pitch, _roll;
         double _range, _radius;
-        osg::ref_ptr<SGReaderWriterOptions> _options;
+        vsg::ref_ptr<SGReaderWriterOptions> _options;
     };
     struct _Sign {
         _Sign() : _agl(false), _lon(0), _lat(0), _elev(0), _hdg(0), _size(-1) { }
@@ -182,7 +182,7 @@ struct ReaderWriterSTG::_ModelBin {
         std::string _filename;
         std::string _effect;
         double _lon, _lat, _elev;
-        osg::ref_ptr<SGReaderWriterOptions> _options;
+        vsg::ref_ptr<SGReaderWriterOptions> _options;
     };
 
     struct _LineFeatureList {
@@ -207,9 +207,9 @@ struct ReaderWriterSTG::_ModelBin {
       struct AddModelLOD {
           void operator() (osg::LOD* leaf, _ObjectStatic o) const
           {
-            osg::ref_ptr<osg::Node> node;
+            vsg::ref_ptr<vsg::Node> node;
             if (o._proxy)  {
-                osg::ref_ptr<osg::ProxyNode> proxy = new osg::ProxyNode;
+                vsg::ref_ptr<osg::ProxyNode> proxy = new osg::ProxyNode;
                 proxy->setName("proxyNode");
                 proxy->setLoadingExternalReferenceMode(osg::ProxyNode::DEFER_LOADING_TO_DATABASE_PAGER);
                 proxy->setFileName(0, o._name);
@@ -217,7 +217,7 @@ struct ReaderWriterSTG::_ModelBin {
 
                 // Give the node some values so the Quadtree builder has
                 // a BoundingBox to work with prior to the model being loaded.
-                proxy->setCenter(osg::Vec3f(0.0f,0.0f,0.0f));
+                proxy->setCenter(vsg::vec3(0.0f,0.0f,0.0f));
                 proxy->setRadius(o._radius);
                 proxy->setCenterMode(osg::ProxyNode::UNION_OF_BOUNDING_SPHERE_AND_USER_DEFINED);
                 node = proxy;
@@ -233,16 +233,16 @@ struct ReaderWriterSTG::_ModelBin {
             if (SGPath(o._name).lower_extension() == "ac")
                 node->setNodeMask(~simgear::MODELLIGHT_BIT);
 
-            osg::Matrix matrix;
+            vsg::mat4 matrix;
             matrix = makeZUpFrame(SGGeod::fromDegM(o._lon, o._lat, o._elev));
-            matrix.preMultRotate(osg::Quat(SGMiscd::deg2rad(o._hdg), osg::Vec3(0, 0, 1)));
-            matrix.preMultRotate(osg::Quat(SGMiscd::deg2rad(o._pitch), osg::Vec3(0, 1, 0)));
-            matrix.preMultRotate(osg::Quat(SGMiscd::deg2rad(o._roll), osg::Vec3(1, 0, 0)));
+            matrix.preMultRotate(osg::Quat(SGMiscd::deg2rad(o._hdg), vsg::vec3(0, 0, 1)));
+            matrix.preMultRotate(osg::Quat(SGMiscd::deg2rad(o._pitch), vsg::vec3(0, 1, 0)));
+            matrix.preMultRotate(osg::Quat(SGMiscd::deg2rad(o._roll), vsg::vec3(1, 0, 0)));
 
             osg::MatrixTransform* matrixTransform;
             matrixTransform = new osg::MatrixTransform(matrix);
             matrixTransform->setName("rotateStaticObject");
-            matrixTransform->setDataVariance(osg::Object::STATIC);
+            matrixTransform->setDataVariance(vsg::Object::STATIC);
             matrixTransform->addChild(node.get());
 
             leaf->addChild(matrixTransform, 0, o._range);
@@ -252,7 +252,7 @@ struct ReaderWriterSTG::_ModelBin {
           GetModelLODCoord() {}
           GetModelLODCoord(const GetModelLODCoord& rhs)
           {}
-          osg::Vec3 operator() (const _ObjectStatic& o) const
+          vsg::vec3 operator() (const _ObjectStatic& o) const
           {
               SGVec3d coord;
               SGGeodesy::SGGeodToCart(SGGeod::fromDegM(o._lon, o._lat, o._elev), coord);
@@ -269,10 +269,10 @@ struct ReaderWriterSTG::_ModelBin {
 
             STGObjectsQuadtree quadtree((GetModelLODCoord()), (AddModelLOD()));
             quadtree.buildQuadTree(_objectStaticList.begin(), _objectStaticList.end());
-            osg::ref_ptr<osg::Group> group = quadtree.getRoot();
+            vsg::ref_ptr<vsg::Group> group = quadtree.getRoot();
             string group_name = string("STG-group-A ").append(_bucket.gen_index_str());
             group->setName(group_name);
-            group->setDataVariance(osg::Object::STATIC);
+            group->setDataVariance(vsg::Object::STATIC);
 
             simgear::AirportSignBuilder signBuilder(_options->getMaterialLib(), _bucket.get_center());
             for (std::list<_Sign>::iterator i = _signList.begin(); i != _signList.end(); ++i)
@@ -307,8 +307,8 @@ struct ReaderWriterSTG::_ModelBin {
                         osg::MatrixTransform* matrixTransform;
                         matrixTransform = new osg::MatrixTransform(makeZUpFrame(SGGeod::fromDegM(b._lon, b._lat, b._elev)));
                         matrixTransform->setName("rotateBuildings");
-                        matrixTransform->setDataVariance(osg::Object::STATIC);
-                        matrixTransform->addChild(createRandomBuildings(bbList, osg::Matrix::identity(), _options));
+                        matrixTransform->setDataVariance(vsg::Object::STATIC);
+                        matrixTransform->addChild(createRandomBuildings(bbList, vsg::mat4::identity(), _options));
                         group->addChild(matrixTransform);
 
                         std::for_each(bbList.begin(), bbList.end(), [](SGBuildingBin* bb) {
@@ -345,7 +345,7 @@ struct ReaderWriterSTG::_ModelBin {
                         osg::MatrixTransform* matrixTransform;
                         matrixTransform = new osg::MatrixTransform(makeZUpFrame(SGGeod::fromDegM(b._lon, b._lat, b._elev)));
                         matrixTransform->setName("rotateTrees");
-                        matrixTransform->setDataVariance(osg::Object::STATIC);
+                        matrixTransform->setDataVariance(vsg::Object::STATIC);
                         matrixTransform->addChild(createForest(treeList, _options));
                         group->addChild(matrixTransform);
 
@@ -365,11 +365,11 @@ struct ReaderWriterSTG::_ModelBin {
                 osg::MatrixTransform* matrixTransform;
                 matrixTransform = new osg::MatrixTransform(makeZUpFrame(_bucket.get_center()));
                 matrixTransform->setName("rotateLights");
-                matrixTransform->setDataVariance(osg::Object::STATIC);
+                matrixTransform->setDataVariance(vsg::Object::STATIC);
 
                 LightBin lightList;
                 for (const auto& light : _lightList) {
-                    osg::Matrix _position_frame(makeZUpFrame(SGGeod::fromDegM(light._lon, light._lat, light._elev)));
+                    vsg::mat4 _position_frame(makeZUpFrame(SGGeod::fromDegM(light._lon, light._lat, light._elev)));
                     SGVec3f _position(_position_frame(3,0), _position_frame(3,1), _position_frame(3,2));
 
                     lightList.insert(
@@ -392,12 +392,12 @@ struct ReaderWriterSTG::_ModelBin {
                     osg::MatrixTransform* matrixTransform;
                     matrixTransform = new osg::MatrixTransform(makeZUpFrame(SGGeod::fromDegM(ll._lon, ll._lat, ll._elev)));
                     matrixTransform->setName("rotateLights");
-                    matrixTransform->setDataVariance(osg::Object::STATIC);
+                    matrixTransform->setDataVariance(vsg::Object::STATIC);
 
                     const auto path = SGPath(ll._filename);
                     LightBin lightList(path);
 
-                    matrixTransform->addChild(createLights(lightList, osg::Matrix::identity(), _options));
+                    matrixTransform->addChild(createLights(lightList, vsg::mat4::identity(), _options));
                     group->addChild(matrixTransform);
                 }
             }
@@ -407,12 +407,12 @@ struct ReaderWriterSTG::_ModelBin {
                     osg::MatrixTransform* matrixTransform;
                     matrixTransform = new osg::MatrixTransform(makeZUpFrame(SGGeod::fromDegM(io._lon, io._lat, io._elev)));
                     matrixTransform->setName("rotateInstancedObject");
-                    matrixTransform->setDataVariance(osg::Object::STATIC);
+                    matrixTransform->setDataVariance(vsg::Object::STATIC);
 
                     const auto path = SGPath(io._filename);
                     ObjectInstanceBin objectInstances(io._modelname, io._effect, io._STGFilePath, path);
 
-                    const auto instancedNode = createObjectInstances(objectInstances, osg::Matrix::identity(), io._options);
+                    const auto instancedNode = createObjectInstances(objectInstances, vsg::mat4::identity(), io._options);
                     if (instancedNode) {
                         matrixTransform->addChild(instancedNode);
                         group->addChild(matrixTransform);
@@ -433,7 +433,7 @@ struct ReaderWriterSTG::_ModelBin {
         std::list<_InstancedObject> _instancedObjectList;
 
         /// The original options to use for this bunch of models
-        osg::ref_ptr<SGReaderWriterOptions> _options;
+        vsg::ref_ptr<SGReaderWriterOptions> _options;
         SGBucket _bucket;
     };
 
@@ -446,7 +446,7 @@ struct ReaderWriterSTG::_ModelBin {
 
     SGReaderWriterOptions* sharedOptions(const std::string& filePath, const osgDB::Options* options)
     {
-        osg::ref_ptr<SGReaderWriterOptions> sharedOptions;
+        vsg::ref_ptr<SGReaderWriterOptions> sharedOptions;
         sharedOptions = SGReaderWriterOptions::copyOrCreate(options);
         sharedOptions->getDatabasePathList().clear();
 
@@ -476,7 +476,7 @@ struct ReaderWriterSTG::_ModelBin {
     }
     SGReaderWriterOptions* staticOptions(const std::string& filePath, const osgDB::Options* options)
     {
-        osg::ref_ptr<SGReaderWriterOptions> staticOptions;
+        vsg::ref_ptr<SGReaderWriterOptions> staticOptions;
         staticOptions = SGReaderWriterOptions::copyOrCreate(options);
         staticOptions->getDatabasePathList().clear();
 
@@ -495,12 +495,12 @@ struct ReaderWriterSTG::_ModelBin {
         return staticOptions.release();
     }
 
-    double elevation(osg::Group& group, const SGGeod& geod)
+    double elevation(vsg::Group& group, const SGGeod& geod)
     {
         SGVec3d start = SGVec3d::fromGeod(SGGeod::fromGeodM(geod, 10000));
         SGVec3d end = SGVec3d::fromGeod(SGGeod::fromGeodM(geod, -1000));
 
-        osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
+        vsg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
         intersector = new osgUtil::LineSegmentIntersector(toOsg(start), toOsg(end));
         osgUtil::IntersectionVisitor visitor(intersector.get());
         group.accept(visitor);
@@ -620,7 +620,7 @@ struct ReaderWriterSTG::_ModelBin {
                 else if (lrand < 0.4) range = range * 1.5;
 
                 if (token == "OBJECT_STATIC" || token == "OBJECT_STATIC_AGL") {
-                    osg::ref_ptr<SGReaderWriterOptions> opt;
+                    vsg::ref_ptr<SGReaderWriterOptions> opt;
                     opt = staticOptions(filePath, options);
                     if (SGPath(name).lower_extension() == "ac")
                             opt->setInstantiateEffects(true);
@@ -640,7 +640,7 @@ struct ReaderWriterSTG::_ModelBin {
                     checkInsideBucket(absoluteFileName, obj._lon, obj._lat);
                     _objectStaticList.push_back(obj);
                 } else if (token == "OBJECT_SHARED" || token == "OBJECT_SHARED_AGL") {
-                    osg::ref_ptr<SGReaderWriterOptions> opt;
+                    vsg::ref_ptr<SGReaderWriterOptions> opt;
                     opt = sharedOptions(filePath, options);
                     if (SGPath(name).lower_extension() == "ac")
                             opt->setInstantiateEffects(true);
@@ -667,7 +667,7 @@ struct ReaderWriterSTG::_ModelBin {
                 } else if (token == BUILDING_ROUGH || token == BUILDING_DETAILED ||
                            token == ROAD_ROUGH     || token == ROAD_DETAILED     ||
                            token == RAILWAY_ROUGH  || token == RAILWAY_DETAILED)   {
-                    osg::ref_ptr<SGReaderWriterOptions> opt;
+                    vsg::ref_ptr<SGReaderWriterOptions> opt;
                     opt = staticOptions(filePath, options);
                     _ObjectStatic obj;
 
@@ -798,14 +798,14 @@ struct ReaderWriterSTG::_ModelBin {
         return true;
     }
 
-    osg::Node* load(const SGBucket& bucket, const osgDB::Options* opt)
+    vsg::Node* load(const SGBucket& bucket, const osgDB::Options* opt)
     {
-        osg::ref_ptr<SGReaderWriterOptions> options;
+        vsg::ref_ptr<SGReaderWriterOptions> options;
         options = SGReaderWriterOptions::copyOrCreate(opt);
         float pagedLODExpiry = atoi(options->getPluginStringData("SimGear::PAGED_LOD_EXPIRY").c_str());
 
-        osg::ref_ptr<osg::Group> terrainGroup = new osg::Group;
-        terrainGroup->setDataVariance(osg::Object::STATIC);
+        vsg::ref_ptr<vsg::Group> terrainGroup = new vsg::Group;
+        terrainGroup->setDataVariance(vsg::Object::STATIC);
         std::string terrain_name = string("terrain ").append(bucket.gen_index_str());
         terrainGroup->setName(terrain_name);
 
@@ -830,7 +830,7 @@ struct ReaderWriterSTG::_ModelBin {
 
             // OBJECTs include airports
             for (auto stgObject : _objectList) {
-                osg::ref_ptr<osg::Node> node;
+                vsg::ref_ptr<vsg::Node> node;
                 node = osgDB::readRefNodeFile(stgObject._name, stgObject._options.get());
 
                 if (!node.valid()) {
@@ -847,7 +847,7 @@ struct ReaderWriterSTG::_ModelBin {
             }
         } else if (_foundBase) {
             for (auto stgObject : _objectList) {
-                osg::ref_ptr<osg::Node> node;
+                vsg::ref_ptr<vsg::Node> node;
                 simgear::ErrorReportContext ec("terrain-stg", stgObject._errorLocation.utf8Str());
                 node = osgDB::readRefNodeFile(stgObject._name, stgObject._options.get());
 
@@ -861,7 +861,7 @@ struct ReaderWriterSTG::_ModelBin {
         } else {
             SG_LOG(SG_TERRAIN, SG_INFO, "  Generating ocean tile: " << bucket.gen_base_path() << "/" << bucket.gen_index_str());
 
-            osg::Node* node = SGOceanTile(bucket, options->getMaterialLib());
+            vsg::Node* node = SGOceanTile(bucket, options->getMaterialLib());
             if (node) {
                 node->setName("SGOceanTile");
                 terrainGroup->addChild(node);
@@ -906,7 +906,7 @@ struct ReaderWriterSTG::_ModelBin {
         pagedLOD->setMinimumExpiryTime(0, pagedLODExpiry);
 
         // we just need to know about the read file callback that itself holds the data
-        osg::ref_ptr<DelayLoadReadFileCallback> readFileCallback = new DelayLoadReadFileCallback;
+        vsg::ref_ptr<DelayLoadReadFileCallback> readFileCallback = new DelayLoadReadFileCallback;
         readFileCallback->_objectStaticList = _objectStaticList;
         readFileCallback->_buildingList = _buildingListList;
         readFileCallback->_treeList = _treeListList;
@@ -917,7 +917,7 @@ struct ReaderWriterSTG::_ModelBin {
         readFileCallback->_options = options;
         readFileCallback->_bucket = bucket;
 
-        osg::ref_ptr<osgDB::Options> callbackOptions = new osgDB::Options;
+        vsg::ref_ptr<osgDB::Options> callbackOptions = new osgDB::Options;
         callbackOptions->setReadFileCallback(readFileCallback.get());
         pagedLOD->setDatabaseOptions(callbackOptions.get());
 

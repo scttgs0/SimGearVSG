@@ -24,6 +24,8 @@
 
 #include <boost/functional/hash.hpp>
 
+#include <vsg/all.h>
+
 #include <osg/Object>
 #include <osg/observer_ptr>
 #include <osgDB/ReaderWriter>
@@ -64,10 +66,10 @@ public:
     virtual ~DeferredPropertyListener() {};
 };
 
-class Effect : public osg::Object
+class Effect : public vsg::Object
 {
 public:
-    META_Object(simgear,Effect)
+    //!!META_Object(simgear,Effect)
     Effect();
     Effect(const Effect& rhs,
            const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY);
@@ -84,13 +86,13 @@ public:
     int getGenerator(Generator what) const;  // Returns -1 if generator should not be used
     std::map<Generator, int> generator;  // What is generated into which attribute location
 
-    std::vector<osg::ref_ptr<Technique> > techniques;
+    std::vector<vsg::ref_ptr<Technique> > techniques;
     SGPropertyNode_ptr root;
     // Pointer to the parameters node, if it exists
     SGPropertyNode_ptr parametersProp;
     Technique* chooseTechnique(osg::RenderInfo* renderInfo, const std::string &scheme);
     virtual void resizeGLObjectBuffers(unsigned int maxSize);
-    virtual void releaseGLObjects(osg::State* state = 0) const;
+    virtual void releaseGLObjects(vsg::State* state = 0) const;
     /**
      * Build the techniques from the effect properties.
      */
@@ -101,7 +103,7 @@ public:
     friend struct InitializeCallback;
     struct InitializeCallback : public UpdateOnceCallback
     {
-        void doUpdate(osg::Node* node, osg::NodeVisitor* nv);
+        void doUpdate(vsg::Node* node, osg::NodeVisitor* nv);
     };
 
     std::string getName(){return _name;}
@@ -184,7 +186,7 @@ void mergePropertyTrees(SGPropertyNode* resultNode,
 
 class UniformFactoryImpl {
 public:
-    osg::ref_ptr<osg::Uniform> getUniform(Effect* effect,
+    vsg::ref_ptr<osg::Uniform> getUniform(Effect* effect,
                                           const std::string& name,
                                           osg::Uniform::Type uniformType,
                                           SGConstPropertyNode_ptr valProp,
@@ -200,8 +202,8 @@ private:
     std::mutex _mutex;
 
     typedef std::tuple<std::string, osg::Uniform::Type, std::string, std::string> UniformCacheKey;
-    typedef std::tuple<osg::ref_ptr<osg::Uniform>, SGPropertyChangeListener*> UniformCacheValue;
-    std::map<UniformCacheKey,osg::ref_ptr<osg::Uniform> > uniformCache;
+    typedef std::tuple<vsg::ref_ptr<osg::Uniform>, SGPropertyChangeListener*> UniformCacheValue;
+    std::map<UniformCacheKey,vsg::ref_ptr<osg::Uniform> > uniformCache;
 
     typedef std::queue<DeferredPropertyListener*> DeferredListenerList;
     DeferredListenerList deferredListenerList;
@@ -222,7 +224,7 @@ public:
 private:
     struct EffectScheme {
         std::string name, description;
-        osg::ref_ptr<Effect> fallback;
+        vsg::ref_ptr<Effect> fallback;
     };
 
     void read_schemes_xml(const SGReaderWriterOptions* options);

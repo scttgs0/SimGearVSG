@@ -23,17 +23,20 @@
 
 #define MAX_RANDOM_OBJECTS 100.0
 
+#include <stdio.h>
+
+#include <vsg/all.h>
+
 #include <osg/Array>
 #include <osg/Geometry>
 #include <osg/PrimitiveSet>
 #include <osg/Texture2D>
-#include <osg/ref_ptr>
-#include <stdio.h>
 
-#include "SGTriangleBin.hxx"
 #include <simgear/debug/logstream.hxx>
 #include <simgear/math/sg_random.hxx>
 #include <simgear/scene/util/OsgMath.hxx>
+
+#include "SGTriangleBin.hxx"
 
 
 struct SGVertNormTex {
@@ -134,8 +137,8 @@ public:
         }
     }
 protected:
-    osg::ref_ptr<osg::DrawElementsUShort> _ushortElements;
-    osg::ref_ptr<osg::DrawElementsUInt> _uintElements;
+    vsg::ref_ptr<osg::DrawElementsUShort> _ushortElements;
+    vsg::ref_ptr<osg::DrawElementsUInt> _uintElements;
     unsigned count;
 };
 
@@ -196,7 +199,7 @@ public:
           
           // Check this random point against the object mask
           // blue channel.
-          osg::Image* img = object_mask->getImage();            
+          vsg::Image* img = object_mask->getImage();            
           unsigned int x = (int) (img->s() * texCoord.x()) % img->s();
           unsigned int y = (int) (img->t() * texCoord.y()) % img->t();
           
@@ -293,7 +296,7 @@ public:
                       if (object_mask != NULL) {
                           // Check this point against the object mask
                           // green (for trees) channel.
-                          osg::Image* img = object_mask->getImage();
+                          vsg::Image* img = object_mask->getImage();
                           unsigned int x = (int)(img->s() * newpt.x()) % img->s();
                           unsigned int y = (int)(img->t() * newpt.y()) % img->t();
 
@@ -334,7 +337,7 @@ public:
 
                       // Check this random point against the object mask
                       // green (for trees) channel.
-                      osg::Image* img = object_mask->getImage();
+                      vsg::Image* img = object_mask->getImage();
                       unsigned int x = (int)(img->s() * texCoord.x()) % img->s();
                       unsigned int y = (int)(img->t() * texCoord.y()) % img->t();
 
@@ -406,7 +409,7 @@ public:
             
             // Check this random point against the object mask
             // blue (for buildings) channel. 
-            osg::Image* img = object_mask->getImage();            
+            vsg::Image* img = object_mask->getImage();            
             unsigned int x = (int) (img->s() * texCoord.x()) % img->s();
             unsigned int y = (int) (img->t() * texCoord.y()) % img->t();
             
@@ -425,34 +428,34 @@ public:
 
   // If include_norms is true, normals from the input vertices are added to the geometry. If false,
   // they should be generated during geometry initialisation.
-  osg::Geometry* buildGeometry(const TriangleVector& triangles, bool include_norms) const
+  vsg::Geometry* buildGeometry(const TriangleVector& triangles, bool include_norms) const
   {
     // Do not build anything if there is nothing in here ...
     if (empty() || triangles.empty())
       return 0;
 
     // FIXME: do not include all values here ...
-    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
-    osg::ref_ptr<osg::Vec2Array> priTexCoords = new osg::Vec2Array;
-    osg::ref_ptr<osg::Vec2Array> secTexCoords = new osg::Vec2Array;
-    osg::ref_ptr<osg::Vec2Array> overlayCoords = new osg::Vec2Array;
+    vsg::ref_ptr<vsg::vec3Array> vertices = new vsg::vec3Array;
+    vsg::ref_ptr<vsg::vec3Array> normals = new vsg::vec3Array;
+    vsg::ref_ptr<osg::Vec2Array> priTexCoords = new osg::Vec2Array;
+    vsg::ref_ptr<osg::Vec2Array> secTexCoords = new osg::Vec2Array;
+    vsg::ref_ptr<osg::Vec2Array> overlayCoords = new osg::Vec2Array;
 
-    osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-    colors->push_back(osg::Vec4(1, 1, 1, 1));
+    vsg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
+    colors->push_back(vsg::vec4(1, 1, 1, 1));
 
-    osg::Geometry* geometry = new osg::Geometry;
+    vsg::Geometry* geometry = new vsg::Geometry;
     geometry->setUseDisplayList(false);
     geometry->setUseVertexBufferObjects(true);
 
-    geometry->setDataVariance(osg::Object::STATIC);
+    geometry->setDataVariance(vsg::Object::STATIC);
     geometry->setVertexArray(vertices.get());
     if (include_norms) { 
         geometry->setNormalArray(normals.get());
-        geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+        geometry->setNormalBinding(vsg::Geometry::BIND_PER_VERTEX);
     }
     geometry->setColorArray(colors.get());
-    geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+    geometry->setColorBinding(vsg::Geometry::BIND_OVERALL);
     if ( has_sec_tcs ) {
         geometry->setTexCoordArray(0, priTexCoords.get());
         geometry->setTexCoordArray(1, secTexCoords.get());
@@ -508,7 +511,7 @@ public:
     return geometry;
   }
 
-  osg::Geometry* buildGeometry(bool include_norms) const
+  vsg::Geometry* buildGeometry(bool include_norms) const
   { return buildGeometry(getTriangles(), include_norms); }
   
   int getTextureIndex() const

@@ -40,9 +40,9 @@ SGMakeSphere(double radius, int slices, int stacks)
 
     /* build slices as quad strips */
     for ( i = imin; i < imax; i++ ) {
-        osg::Geometry* geometry = new osg::Geometry;
-        osg::Vec3Array* vl = new osg::Vec3Array;
-        osg::Vec3Array* nl = new osg::Vec3Array;
+        vsg::Geometry* geometry = new vsg::Geometry;
+        vsg::vec3Array* vl = new vsg::vec3Array;
+        vsg::vec3Array* nl = new vsg::vec3Array;
         osg::Vec2Array* tl = new osg::Vec2Array;
 
         rho = i * drho;
@@ -54,31 +54,31 @@ SGMakeSphere(double radius, int slices, int stacks)
             double z = nsign * cos(rho);
 
             // glNormal3f( x*nsign, y*nsign, z*nsign );
-            osg::Vec3 normal(x*nsign, y*nsign, z*nsign);
+            vsg::vec3 normal(x*nsign, y*nsign, z*nsign);
             normal.normalize();
             nl->push_back(normal);
 
             // glTexCoord2f(s,t);
-            tl->push_back(osg::Vec2(s, t));
+            tl->push_back(vsg::vec2(s, t));
 
             // glVertex3f( x*radius, y*radius, z*radius );
-            vl->push_back(osg::Vec3(x*radius, y*radius, z*radius));
+            vl->push_back(vsg::vec3(x*radius, y*radius, z*radius));
 
             x = -sin(theta) * sin(rho+drho);
             y = cos(theta) * sin(rho+drho);
             z = nsign * cos(rho+drho);
 
             // glNormal3f( x*nsign, y*nsign, z*nsign );
-            normal = osg::Vec3(x*nsign, y*nsign, z*nsign);
+            normal = vsg::vec3(x*nsign, y*nsign, z*nsign);
             normal.normalize();
             nl->push_back(normal);
 
             // glTexCoord2f(s,t-dt);
-            tl->push_back(osg::Vec2(s, t-dt));
+            tl->push_back(vsg::vec2(s, t-dt));
             s += ds;
 
             // glVertex3f( x*radius, y*radius, z*radius );
-            vl->push_back(osg::Vec3(x*radius, y*radius, z*radius));
+            vl->push_back(vsg::vec3(x*radius, y*radius, z*radius));
         }
 
         assert(vl->size() == nl->size());
@@ -87,7 +87,7 @@ SGMakeSphere(double radius, int slices, int stacks)
         geometry->setUseVertexBufferObjects(true);
         geometry->setVertexArray(vl);
         geometry->setNormalArray(nl);
-        geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+        geometry->setNormalBinding(vsg::Geometry::BIND_PER_VERTEX);
         geometry->setTexCoordArray(0, tl);
         geometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, vl->size()));
 

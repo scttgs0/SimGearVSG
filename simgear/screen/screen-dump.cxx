@@ -7,21 +7,20 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#  include <simgear_config.h>
+#include <simgear_config.h>
 #endif
 
 #include <simgear/compiler.h>
 
-#include <osg/Image>
 #include <osgDB/WriteFile>
 
 #include "screen-dump.hxx"
 
 
 // dump the screen buffer to a png file, returns true on success
-bool sg_glDumpWindow(const char *filename, int win_width, int win_height) {
-  osg::ref_ptr<osg::Image> img(new osg::Image);
-  img->readPixels(0,0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE);
-  return osgDB::writeImageFile(*img, filename);
+bool sg_glDumpWindow(const char* filename, int win_width, int win_height)
+{
+    vsg::ref_ptr<vsg::Image> img(new vsg::Image);
+    img->readPixels(0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE);
+    return osgDB::writeImageFile(*img, filename);
 }
-

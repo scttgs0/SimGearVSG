@@ -20,29 +20,29 @@
 #pragma once
 
 #include <algorithm>
+#include <cstring>
 #include <iterator>
 #include <map>
 #include <string>
-#include <cstring>
 
-#include <osg/Object>
-#include <osgDB/Registry>
-
-#include <boost/multi_index_container.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index_container.hpp>
+
+#include <vsg/all.h>
+
+#include <osgDB/Registry>
 
 #include <simgear/props/AtomicChangeListener.hxx>
 #include <simgear/props/props.hxx>
 #include <simgear/scene/util/SGReaderWriterOptions.hxx>
-#include <simgear/structure/exception.hxx>
 #include <simgear/structure/SGSharedPtr.hxx>
 #include <simgear/structure/Singleton.hxx>
+#include <simgear/structure/exception.hxx>
 
 #include "Effect.hxx"
 
-namespace simgear
-{
+namespace simgear {
 class Effect;
 class Pass;
 class SGReaderWriterOptions;
@@ -50,7 +50,7 @@ class SGReaderWriterOptions;
 /**
  * Builder that returns an object, probably an OSG object.
  */
-template<typename T>
+template <typename T>
 class EffectBuilder : public SGReferenced
 {
 public:
@@ -58,7 +58,7 @@ public:
     virtual T* build(Effect* effect, const SGPropertyNode*,
                      const SGReaderWriterOptions* options) = 0;
     static T* buildFromType(Effect* effect, const std::string& type,
-                            const SGPropertyNode*props,
+                            const SGPropertyNode* props,
                             const SGReaderWriterOptions* options)
     {
         BuilderMap& builderMap = getMap();
@@ -70,17 +70,16 @@ public:
     }
     struct Registrar;
     friend struct Registrar;
-    struct Registrar
-    {
+    struct Registrar {
         Registrar(const std::string& type, EffectBuilder* builder)
         {
             getMap().insert(std::make_pair(type, builder));
         }
     };
+
 protected:
-    typedef std::map<std::string, SGSharedPtr<EffectBuilder> > BuilderMap;
-    struct BuilderMapSingleton : public simgear::Singleton<BuilderMapSingleton>
-    {
+    typedef std::map<std::string, SGSharedPtr<EffectBuilder>> BuilderMap;
+    struct BuilderMapSingleton : public simgear::Singleton<BuilderMapSingleton> {
         BuilderMap _map;
     };
     static BuilderMap& getMap()
@@ -95,19 +94,19 @@ protected:
 // two-way map for building StateSets from property descriptions, and
 // vice versa. Mostly copied from the boost documentation.
 
-namespace effect
-{
+namespace effect {
 using boost::multi_index_container;
 using namespace boost::multi_index;
 
 // tags for accessing both sides of a bidirectional map
 
-struct from{};
-struct to{};
+struct from {
+};
+struct to {
+};
 
 template <typename T>
-struct EffectNameValue
-{
+struct EffectNameValue {
     // Don't use std::pair because we want to use aggregate intialization.
     const char* first;
     T second;
@@ -116,17 +115,16 @@ struct EffectNameValue
 // The class template bidirectional_map wraps the specification
 // of a bidirectional map based on multi_index_container.
 
-template<typename FromType,typename ToType>
-struct bidirectional_map
-{
+template <typename FromType, typename ToType>
+struct bidirectional_map {
 #if _MSC_VER >= 1600
     struct value_type {
         FromType first;
         ToType second;
-        value_type(FromType f, ToType s) : first(f),second(s){}
+        value_type(FromType f, ToType s) : first(f), second(s) {}
     };
 #else
-    typedef std::pair<FromType,ToType> value_type;
+    typedef std::pair<FromType, ToType> value_type;
 #endif
 
     /* A bidirectional map can be simulated as a multi_index_container
@@ -137,24 +135,22 @@ struct bidirectional_map
         value_type,
         indexed_by<
             ordered_unique<
-                tag<from>, member<value_type, FromType, &value_type::first> >,
+                tag<from>, member<value_type, FromType, &value_type::first>>,
             ordered_unique<
-                tag<to>,  member<value_type, ToType, &value_type::second> >
-            >
-        > type;
+                tag<to>, member<value_type, ToType, &value_type::second>>>>
+        type;
 };
 
-template<typename T>
-struct EffectPropertyMap
-{
+template <typename T>
+struct EffectPropertyMap {
     typedef typename bidirectional_map<std::string, T>::type BMap;
     BMap _map;
-    template<int N>
+    template <int N>
     EffectPropertyMap(const EffectNameValue<T> (&attrs)[N]);
 };
 
-template<typename T>
-template<int N>
+template <typename T>
+template <int N>
 EffectPropertyMap<T>::EffectPropertyMap(const EffectNameValue<T> (&attrs)[N])
 {
     for (int i = 0; i < N; ++i)
@@ -162,17 +158,16 @@ EffectPropertyMap<T>::EffectPropertyMap(const EffectNameValue<T> (&attrs)[N])
 }
 
 // A one-way map that can be initialized using an array
-template<typename T>
-struct SimplePropertyMap
-{
+template <typename T>
+struct SimplePropertyMap {
     typedef std::map<std::string, T> map_type;
     map_type _map;
-    template<int N>
+    template <int N>
     SimplePropertyMap(const EffectNameValue<T> (&attrs)[N])
     {
         for (int i = 0; i < N; ++i)
-        _map.insert(typename map_type::value_type(attrs[i].first,
-                                                  attrs[i].second));
+            _map.insert(typename map_type::value_type(attrs[i].first,
+                                                      attrs[i].second));
     }
 };
 
@@ -184,25 +179,23 @@ public:
     BuilderException(const std::string& message, const std::string& = "");
     virtual ~BuilderException();
 };
-}
+} // namespace effect
 
-template<typename T>
+template <typename T>
 void findAttr(const effect::EffectPropertyMap<T>& pMap,
               const char* name,
               T& result)
 {
     using namespace effect;
-    typename EffectPropertyMap<T>::BMap::iterator itr
-        = pMap._map.template get<from>().find(name);
+    typename EffectPropertyMap<T>::BMap::iterator itr = pMap._map.template get<from>().find(name);
     if (itr == pMap._map.end()) {
-        throw effect::BuilderException(std::string("findAttr: could not find attribute ")
-                                       + std::string(name));
+        throw effect::BuilderException(std::string("findAttr: could not find attribute ") + std::string(name));
     } else {
         result = itr->second;
     }
 }
 
-template<typename T>
+template <typename T>
 inline void findAttr(const effect::EffectPropertyMap<T>& pMap,
                      const std::string& name,
                      T& result)
@@ -210,7 +203,7 @@ inline void findAttr(const effect::EffectPropertyMap<T>& pMap,
     findAttr(pMap, name.c_str(), result);
 }
 
-template<typename T>
+template <typename T>
 void findAttr(const effect::EffectPropertyMap<T>& pMap,
               const SGPropertyNode* prop,
               T& result)
@@ -223,53 +216,50 @@ void findAttr(const effect::EffectPropertyMap<T>& pMap,
 
 // Versions that don't throw an error
 
-template<typename T>
+template <typename T>
 const T* findAttr(const effect::EffectPropertyMap<T>& pMap,
                   const char* name)
 {
     using namespace effect;
-    typename EffectPropertyMap<T>::BMap::iterator itr
-        = pMap._map.template get<from>().find(name);
+    typename EffectPropertyMap<T>::BMap::iterator itr = pMap._map.template get<from>().find(name);
     if (itr == pMap._map.end())
         return 0;
-    else 
+    else
         return &itr->second;
 }
 
-template<typename T>
+template <typename T>
 const T* findAttr(const effect::SimplePropertyMap<T>& pMap,
                   const char* name)
 {
     using namespace effect;
-    typename SimplePropertyMap<T>::map_type::const_iterator itr
-        = pMap._map.find(name);
+    typename SimplePropertyMap<T>::map_type::const_iterator itr = pMap._map.find(name);
     if (itr == pMap._map.end())
         return 0;
-    else 
+    else
         return &itr->second;
 }
 
-template<typename T, template<class> class Map>
+template <typename T, template <class> class Map>
 const T* findAttr(const Map<T>& pMap,
-                     const std::string& name)
+                  const std::string& name)
 {
     return findAttr(pMap, name.c_str());
 }
 
 
-template<typename T>
+template <typename T>
 std::string findName(const effect::EffectPropertyMap<T>& pMap, T value)
 {
     using namespace effect;
     std::string result;
-    typename EffectPropertyMap<T>::BMap::template index_iterator<to>::type itr
-        = pMap._map.template get<to>().find(value);
+    typename EffectPropertyMap<T>::BMap::template index_iterator<to>::type itr = pMap._map.template get<to>().find(value);
     if (itr != pMap._map.template get<to>().end())
         result = itr->first;
     return result;
 }
 
-template<typename T>
+template <typename T>
 std::string findName(const effect::EffectPropertyMap<T>& pMap, GLenum value)
 {
     return findName(pMap, static_cast<T>(value));
@@ -297,12 +287,12 @@ const SGPropertyNode* getEffectPropertyChild(Effect* effect,
  * mentioned node name.
  */
 std::string getGlobalProperty(const SGPropertyNode* prop,
-                              const SGReaderWriterOptions *);
+                              const SGReaderWriterOptions*);
 
-template<typename NameItr>
+template <typename NameItr>
 std::vector<std::string>
 getVectorProperties(const SGPropertyNode* prop,
-                    const SGReaderWriterOptions *options, size_t vecSize,
+                    const SGReaderWriterOptions* options, size_t vecSize,
                     NameItr defaultNames)
 {
     using namespace std;
@@ -323,7 +313,7 @@ getVectorProperties(const SGPropertyNode* prop,
         string parentName = useProps[0]->getStringValue();
         parentName += "/";
         for (PropertyList::const_iterator itr = useProps.begin(),
-                 end = useProps.end();
+                                          end = useProps.end();
              itr != end;
              ++itr) {
             string childName = (*itr)->getStringValue();
@@ -339,36 +329,33 @@ getVectorProperties(const SGPropertyNode* prop,
 class PassAttributeBuilder : public SGReferenced
 {
 protected:
-    typedef std::map<const std::string, SGSharedPtr<PassAttributeBuilder> >
-    PassAttrMap;
+    typedef std::map<const std::string, SGSharedPtr<PassAttributeBuilder>>
+        PassAttrMap;
 
-    struct PassAttrMapSingleton : public simgear::Singleton<PassAttrMapSingleton>
-    {
+    struct PassAttrMapSingleton : public simgear::Singleton<PassAttrMapSingleton> {
         PassAttrMap passAttrMap;
-      
     };
+
 public:
     virtual ~PassAttributeBuilder(); // anchor into the compilation unit.
-  
+
     virtual void buildAttribute(Effect* effect, Pass* pass,
                                 const SGPropertyNode* prop,
-                                const SGReaderWriterOptions* options)
-    = 0;
+                                const SGReaderWriterOptions* options) = 0;
     static PassAttributeBuilder* find(const std::string& str)
     {
-        PassAttrMap::iterator itr
-            = PassAttrMapSingleton::instance()->passAttrMap.find(str);
+        PassAttrMap::iterator itr = PassAttrMapSingleton::instance()->passAttrMap.find(str);
         if (itr == PassAttrMapSingleton::instance()->passAttrMap.end())
             return 0;
         else
             return itr->second.ptr();
     }
-    template<typename T> friend struct InstallAttributeBuilder;
+    template <typename T>
+    friend struct InstallAttributeBuilder;
 };
 
-template<typename T>
-struct InstallAttributeBuilder
-{
+template <typename T>
+struct InstallAttributeBuilder {
     InstallAttributeBuilder(const std::string& name)
     {
         PassAttributeBuilder::PassAttrMapSingleton::instance()
@@ -383,55 +370,48 @@ struct InstallAttributeBuilder
 // from any OSG mode settings that might be around.
 bool isAttributeActive(Effect* effect, const SGPropertyNode* prop);
 
-namespace effect
-{
+namespace effect {
 /**
  * Bridge between types stored in properties and what OSG or the
  * effects code want.
  */
-template<typename T> struct Bridge;
+template <typename T>
+struct Bridge;
 
 /**
  * Default just passes on the same type.
  *
  */
-template<typename T>
-struct Bridge
-{
+template <typename T>
+struct Bridge {
     typedef T sg_type;
     static T get(const T& val) { return val; }
 };
 
-template<typename T>
-struct Bridge<const T> : public Bridge<T>
-{
+template <typename T>
+struct Bridge<const T> : public Bridge<T> {
 };
 
 // Save some typing...
-template<typename InType, typename OutType>
-struct BridgeOSGVec
-{
+template <typename InType, typename OutType>
+struct BridgeOSGVec {
     typedef InType sg_type;
     static OutType get(const InType& val) { return toOsg(val); }
 };
-template<>
-struct Bridge<osg::Vec3f> : public BridgeOSGVec<SGVec3d, osg::Vec3f>
-{
+template <>
+struct Bridge<vsg::vec3> : public BridgeOSGVec<SGVec3d, vsg::vec3> {
 };
 
-template<>
-struct Bridge<osg::Vec3d> : public BridgeOSGVec<SGVec3d, osg::Vec3d>
-{
+template <>
+struct Bridge<vsg::dvec3> : public BridgeOSGVec<SGVec3d, vsg::dvec3> {
 };
 
-template<>
-struct Bridge<osg::Vec4f> : public BridgeOSGVec<SGVec4d, osg::Vec4f>
-{
+template <>
+struct Bridge<vsg::vec4> : public BridgeOSGVec<SGVec4d, vsg::vec4> {
 };
 
-template<>
-struct Bridge<osg::Vec4d> : public BridgeOSGVec<SGVec4d, osg::Vec4d>
-{
+template <>
+struct Bridge<vsg::dvec4> : public BridgeOSGVec<SGVec4d, vsg::dvec4> {
 };
 
 /**
@@ -441,57 +421,56 @@ struct Bridge<osg::Vec4d> : public BridgeOSGVec<SGVec4d, osg::Vec4d>
  *
  * General version, function takes obj, val
  */
-template<typename OSGParam, typename Obj, typename Func>
-struct OSGFunctor : public Bridge<OSGParam>
-{
+template <typename OSGParam, typename Obj, typename Func>
+struct OSGFunctor : public Bridge<OSGParam> {
     OSGFunctor(Obj* obj, const Func& func)
         : _obj(obj), _func(func) {}
     void operator()(const typename Bridge<OSGParam>::sg_type& val) const
     {
         _func(_obj, this->get(val));
     }
-    osg::ref_ptr<Obj>_obj;
+    vsg::ref_ptr<Obj> _obj;
     const Func _func;
 };
 
 /**
  * Version which uses a pointer to member function instead.
  */
-template<typename OSGParam, typename Obj>
+template <typename OSGParam, typename Obj>
 struct OSGFunctor<OSGParam, Obj, void (Obj::* const)(const OSGParam&)>
-    : public Bridge<OSGParam>
-{
-    typedef void (Obj::*const MemFunc)(const OSGParam&);
+    : public Bridge<OSGParam> {
+    typedef void (Obj::* const MemFunc)(const OSGParam&);
     OSGFunctor(Obj* obj, MemFunc func)
         : _obj(obj), _func(func) {}
     void operator()(const typename Bridge<OSGParam>::sg_type& val) const
     {
         (_obj->*_func)(this->get(val));
     }
-    osg::ref_ptr<Obj>_obj;
+    vsg::ref_ptr<Obj> _obj;
     MemFunc _func;
 };
 
 /**
  * Typical convenience constructors
  */
-template<typename OSGParam, typename Obj, typename Func>
+template <typename OSGParam, typename Obj, typename Func>
 OSGFunctor<OSGParam, Obj, Func> make_OSGFunctor(Obj* obj, const Func& func)
 {
     return OSGFunctor<OSGParam, Obj, Func>(obj, func);
 }
 
-template<typename OSGParam, typename Obj>
-OSGFunctor<OSGParam, Obj, void (Obj::*const)(const OSGParam&)>
-make_OSGFunctor(Obj* obj, void (Obj::*const func)(const OSGParam&))
+template <typename OSGParam, typename Obj>
+OSGFunctor<OSGParam, Obj, void (Obj::* const)(const OSGParam&)>
+make_OSGFunctor(Obj* obj, void (Obj::* const func)(const OSGParam&))
 {
     return OSGFunctor<OSGParam, Obj,
-        void (Obj::* const)(const OSGParam&)>(obj, func);
+                      void (Obj::* const)(const OSGParam&)>(obj, func);
 }
 
-template<typename OSGParamType, typename ObjType, typename F>
+template <typename OSGParamType, typename ObjType, typename F>
 class ScalarChangeListener
-    : public SGPropertyChangeListener, public DeferredPropertyListener
+    : public SGPropertyChangeListener,
+      public DeferredPropertyListener
 {
 public:
     ScalarChangeListener(ObjType* obj, const F& setter,
@@ -499,7 +478,7 @@ public:
         : _obj(obj), _setter(setter)
     {
         _propName = new std::string(propName);
-    	SG_LOG(SG_GL,SG_DEBUG,"Creating ScalarChangeListener for " << *_propName );
+        SG_LOG(SG_GL, SG_DEBUG, "Creating ScalarChangeListener for " << *_propName);
     }
     virtual ~ScalarChangeListener()
     {
@@ -512,24 +491,25 @@ public:
     }
     void activate(SGPropertyNode* propRoot)
     {
-        SG_LOG(SG_GL,SG_DEBUG,"Adding change listener to " << *_propName );
+        SG_LOG(SG_GL, SG_DEBUG, "Adding change listener to " << *_propName);
         SGPropertyNode* listenProp = makeNode(propRoot, *_propName);
         delete _propName;
         _propName = 0;
         if (listenProp)
             listenProp->addChangeListener(this, true);
     }
+
 private:
-    osg::ref_ptr<ObjType> _obj;
+    vsg::ref_ptr<ObjType> _obj;
     F _setter;
     std::string* _propName;
 };
 
-template<typename T, typename Func>
+template <typename T, typename Func>
 class EffectExtendedPropListener : public DeferredPropertyListener
 {
 public:
-    template<typename Itr>
+    template <typename Itr>
     EffectExtendedPropListener(const Func& func,
                                const std::string* propName, Itr childNamesBegin,
                                Itr childNamesEnd)
@@ -552,42 +532,41 @@ public:
             parent = propRoot->getNode(*_propName, true);
         else
             parent = propRoot;
-        _propListener
-            = new ExtendedPropListener<T, Func>(parent, _childNames->begin(),
-                                                _childNames->end(),
-                                                _func, true);
+        _propListener = new ExtendedPropListener<T, Func>(parent, _childNames->begin(),
+                                                          _childNames->end(),
+                                                          _func, true);
         delete _propName;
         _propName = 0;
         delete _childNames;
         _childNames = 0;
     }
+
 private:
     std::string* _propName;
     std::vector<std::string>* _childNames;
-    SGSharedPtr<ExtendedPropListener<T, Func> > _propListener;
+    SGSharedPtr<ExtendedPropListener<T, Func>> _propListener;
     Func _func;
 };
 
-template<typename T, typename Func, typename Itr>
+template <typename T, typename Func, typename Itr>
 DeferredPropertyListener*
 new_EEPropListener(const Func& func, const std::string* propName,
                    const Itr& namesBegin, const Itr& namesEnd)
 {
-    return new EffectExtendedPropListener<T, Func>
-        (func, 0, namesBegin, namesEnd);
+    return new EffectExtendedPropListener<T, Func>(func, 0, namesBegin, namesEnd);
 }
 
 /**
- * Set DYNAMIC data variance on an osg::Object.
+ * Set DYNAMIC data variance on an vsg::Object.
  */
 
 inline void setDynamicVariance(void* obj)
 {
 }
 
-inline void setDynamicVariance(osg::Object* obj)
+inline void setDynamicVariance(vsg::Object* obj)
 {
-    obj->setDataVariance(osg::Object::DYNAMIC);
+    obj->setDataVariance(vsg::Object::DYNAMIC);
 }
 
 /**
@@ -602,10 +581,9 @@ inline void setDynamicVariance(osg::Object* obj)
  * For relative property names, the property root found in options is
  * used.
  */
-template<typename OSGParamType, typename ObjType, typename F>
-void
-initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
-                   const F& setter, const SGReaderWriterOptions* options)
+template <typename OSGParamType, typename ObjType, typename F>
+void initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
+                        const F& setter, const SGReaderWriterOptions* options)
 {
     const SGPropertyNode* valProp = getEffectPropertyNode(effect, prop);
     if (!valProp)
@@ -618,15 +596,14 @@ initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
         // REVIEW: Memory Leak - 156,910 (2,320 direct, 154,590 indirect) bytes in 29 blocks are definitely lost
         // Weak Efforts::dtor
         // Weak UniformFactoryImpl handling of dynamic memory
-        ScalarChangeListener<OSGParamType, ObjType, F>* listener
-            = new ScalarChangeListener<OSGParamType, ObjType, F>(obj, setter,
-                                                                 propName);
+        ScalarChangeListener<OSGParamType, ObjType, F>* listener = new ScalarChangeListener<OSGParamType, ObjType, F>(obj, setter,
+                                                                                                                      propName);
         effect->addDeferredPropertyListener(listener);
     }
     return;
 }
 
-template<typename OSGParamType, typename ObjType, typename SetterReturn>
+template <typename OSGParamType, typename ObjType, typename SetterReturn>
 inline void
 initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
                    SetterReturn (ObjType::*setter)(const OSGParamType),
@@ -656,12 +633,11 @@ initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
  * For relative property names, the property root found in options is
  * used.
  */
-template<typename OSGParamType, typename ObjType, typename NameItrType,
-         typename F>
-void
-initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
-                   const F& setter,
-                   NameItrType nameItr, const SGReaderWriterOptions* options)
+template <typename OSGParamType, typename ObjType, typename NameItrType,
+          typename F>
+void initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
+                        const F& setter,
+                        NameItrType nameItr, const SGReaderWriterOptions* options)
 {
     typedef typename Bridge<OSGParamType>::sg_type sg_type;
     const int numComponents = props::NumComponents<sg_type>::num_components;
@@ -672,22 +648,19 @@ initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
         setter(obj, Bridge<OSGParamType>::get(valProp->getValue<sg_type>()));
     } else {
         setDynamicVariance(obj);
-        std::vector<std::string> paramNames
-            = getVectorProperties(valProp, options,numComponents, nameItr);
+        std::vector<std::string> paramNames = getVectorProperties(valProp, options, numComponents, nameItr);
         if (paramNames.empty())
             throw BuilderException();
         std::vector<std::string>::const_iterator pitr = paramNames.begin();
-        DeferredPropertyListener* listener
-            =  new_EEPropListener<sg_type>(make_OSGFunctor<OSGParamType>
-                                           (obj, setter),
-                                           0, pitr, pitr + numComponents);
+        DeferredPropertyListener* listener = new_EEPropListener<sg_type>(make_OSGFunctor<OSGParamType>(obj, setter),
+                                                                         0, pitr, pitr + numComponents);
         effect->addDeferredPropertyListener(listener);
     }
     return;
 }
 
-template<typename OSGParamType, typename ObjType, typename NameItrType,
-         typename SetterReturn>
+template <typename OSGParamType, typename ObjType, typename NameItrType,
+          typename SetterReturn>
 inline void
 initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
                    SetterReturn (ObjType::*setter)(const OSGParamType&),
@@ -698,5 +671,5 @@ initFromParameters(Effect* effect, const SGPropertyNode* prop, ObjType* obj,
                                      nameItr, options);
 }
 extern const char* colorFields[];
-}
-}
+} // namespace effect
+} // namespace simgear

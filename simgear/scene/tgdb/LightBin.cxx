@@ -206,15 +206,15 @@ Effect* getLightEffect(double average_size, double average_intensity, const SGRe
     return makeEffect(effectProp, true, options);
 }
 
-osg::Drawable* createDrawable(LightBin& lightList, const osg::Matrix& transform) {
+osg::Drawable* createDrawable(LightBin& lightList, const vsg::mat4& transform) {
     if (lightList.getNumLights() <= 0)
         return 0;
 
-    osg::Vec3Array* vertices = new osg::Vec3Array;
+    vsg::vec3Array* vertices = new vsg::vec3Array;
     osg::Vec4Array* colors = new osg::Vec4Array;
-    osg::Vec3Array* light_params = new osg::Vec3Array;
+    vsg::vec3Array* light_params = new vsg::vec3Array;
     osg::Vec4Array* animation_params = new osg::Vec4Array;
-    osg::Vec3Array* direction_params_1 = new osg::Vec3Array;
+    vsg::vec3Array* direction_params_1 = new vsg::vec3Array;
     osg::Vec2Array* direction_params_2 = new osg::Vec2Array;
 
     for (unsigned int lightIdx = 0; lightIdx < lightList.getNumLights(); lightIdx++) {
@@ -227,14 +227,14 @@ osg::Drawable* createDrawable(LightBin& lightList, const osg::Matrix& transform)
         colors->push_back(toOsg(l.color));
     }
 
-    osg::Geometry* geometry = new osg::Geometry;
-    geometry->setDataVariance(osg::Object::STATIC);
+    vsg::Geometry* geometry = new vsg::Geometry;
+    geometry->setDataVariance(vsg::Object::STATIC);
     geometry->setVertexArray(vertices);
     geometry->setVertexAttribArray(LIGHT_ATTR1, light_params, osg::Array::BIND_PER_VERTEX);
     geometry->setVertexAttribArray(LIGHT_ATTR2, animation_params, osg::Array::BIND_PER_VERTEX);
     geometry->setVertexAttribArray(LIGHT_ATTR3, direction_params_1, osg::Array::BIND_PER_VERTEX);
     geometry->setVertexAttribArray(LIGHT_ATTR4, direction_params_2, osg::Array::BIND_PER_VERTEX);
-    geometry->setNormalBinding(osg::Geometry::BIND_OFF);
+    geometry->setNormalBinding(vsg::Geometry::BIND_OFF);
     geometry->setColorArray(colors, osg::Array::BIND_PER_VERTEX);
 
     geometry->setComputeBoundingBoxCallback(new SGEnlargeBoundingBox(1));
@@ -247,9 +247,9 @@ osg::Drawable* createDrawable(LightBin& lightList, const osg::Matrix& transform)
     return geometry;
 }
 
-osg::ref_ptr<simgear::EffectGeode> createLights(LightBin& lightList, const osg::Matrix& transform, const SGReaderWriterOptions* options) {
-    osg::ref_ptr<EffectGeode> geode = new EffectGeode;
-    osg::ref_ptr<Effect> lightEffect = getLightEffect(lightList.getAverageSize(), lightList.getAverageIntensity(), options);
+vsg::ref_ptr<simgear::EffectGeode> createLights(LightBin& lightList, const vsg::mat4& transform, const SGReaderWriterOptions* options) {
+    vsg::ref_ptr<EffectGeode> geode = new EffectGeode;
+    vsg::ref_ptr<Effect> lightEffect = getLightEffect(lightList.getAverageSize(), lightList.getAverageIntensity(), options);
     geode->setEffect(lightEffect);
     geode->addDrawable(createDrawable(lightList, transform));
 

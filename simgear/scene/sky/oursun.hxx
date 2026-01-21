@@ -1,9 +1,9 @@
 // oursun.hxx -- model earth's sun
 //
-// Written by Durk Talsma. Originally started October 1997, for distribution  
-// with the FlightGear project. Version 2 was written in August and 
-// September 1998. This code is based upon algorithms and data kindly 
-// provided by Mr. Paul Schlyter. (pausch@saaf.se). 
+// Written by Durk Talsma. Originally started October 1997, for distribution
+// with the FlightGear project. Version 2 was written in August and
+// September 1998. This code is based upon algorithms and data kindly
+// provided by Mr. Paul Schlyter. (pausch@saaf.se).
 //
 // Separated out rendering pieces and converted to ssg by Curt Olson,
 // March 2000
@@ -26,21 +26,25 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/MatrixTransform>
 
-#include <simgear/structure/SGReferenced.hxx>
 #include <simgear/props/propsfwd.hxx>
+#include <simgear/structure/SGReferenced.hxx>
+
 
 namespace simgear {
 class SGReaderWriterOptions;
 }
 
-class SGSun : public SGReferenced {
+class SGSun : public SGReferenced
+{
 public:
     SGSun() = default;
 
     // return the sun object
-    osg::Node* build(double sun_size, SGPropertyNode* property_tree_Node,
+    vsg::Node* build(double sun_size, SGPropertyNode* property_tree_Node,
                      const simgear::SGReaderWriterOptions* options);
 
     /*
@@ -54,6 +58,6 @@ public:
 
 private:
     double prev_sun_angle{-9999.0};
-    osg::ref_ptr<osg::MatrixTransform> sun_transform;
+    vsg::ref_ptr<osg::MatrixTransform> sun_transform;
     SGPropertyNode_ptr env_node;
 };

@@ -31,7 +31,7 @@
 
 #include "SGRotateTransform.hxx"
 
-void SGRotateTransform::set_rotation (osg::Matrix &matrix, double position_rad,
+void SGRotateTransform::set_rotation (vsg::mat4 &matrix, double position_rad,
                                       const SGVec3d &center,
                                       const SGVec3d &axis)
 {
@@ -83,7 +83,7 @@ SGRotateTransform::SGRotateTransform() :
 
 SGRotateTransform::SGRotateTransform(const SGRotateTransform& rot,
                                      const osg::CopyOp& copyop) :
-    osg::Transform(rot, copyop),
+    vsg::Transform(rot, copyop),
     _center(rot._center),
     _axis(rot._axis),
     _angleRad(rot._angleRad)
@@ -91,17 +91,17 @@ SGRotateTransform::SGRotateTransform(const SGRotateTransform& rot,
 }
 
 bool
-SGRotateTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
+SGRotateTransform::computeLocalToWorldMatrix(vsg::mat4& matrix,
                                              osg::NodeVisitor* nv) const
 {
   // This is the fast path, optimize a bit
   if (_referenceFrame == RELATIVE_RF) {
     // FIXME optimize
-    osg::Matrix tmp;
+    vsg::mat4 tmp;
     set_rotation(tmp, _angleRad, _center, _axis);
     matrix.preMult(tmp);
   } else {
-    osg::Matrix tmp;
+    vsg::mat4 tmp;
     set_rotation(tmp, _angleRad, _center, _axis);
     matrix = tmp;
   }
@@ -109,17 +109,17 @@ SGRotateTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
 }
 
 bool
-SGRotateTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
+SGRotateTransform::computeWorldToLocalMatrix(vsg::mat4& matrix,
                                              osg::NodeVisitor* nv) const
 {
   if (_referenceFrame == RELATIVE_RF) {
     // FIXME optimize
-    osg::Matrix tmp;
+    vsg::mat4 tmp;
     set_rotation(tmp, -_angleRad, _center, _axis);
     matrix.postMult(tmp);
   } else {
     // FIXME optimize
-    osg::Matrix tmp;
+    vsg::mat4 tmp;
     set_rotation(tmp, -_angleRad, _center, _axis);
     matrix = tmp;
   }
@@ -129,7 +129,7 @@ SGRotateTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
 osg::BoundingSphere
 SGRotateTransform::computeBound() const
 {
-  osg::BoundingSphere bs = osg::Group::computeBound();
+  osg::BoundingSphere bs = vsg::Group::computeBound();
   osg::BoundingSphere centerbs(toOsg(_center), bs.radius());
   centerbs.expandBy(bs);
   return centerbs;
@@ -139,12 +139,12 @@ SGRotateTransform::computeBound() const
 
 namespace {
 
-bool RotateTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
+bool RotateTransform_readLocalData(vsg::Object& obj, osgDB::Input& fr)
 {
     SGRotateTransform& rot = static_cast<SGRotateTransform&>(obj);
     if (fr[0].matchWord("center")) {
         ++fr;
-        osg::Vec3d center;
+        vsg::dvec3 center;
         if (fr.readSequence(center))
             fr += 3;
         else
@@ -153,7 +153,7 @@ bool RotateTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
     }
     if (fr[0].matchWord("axis")) {
         ++fr;
-        osg::Vec3d axis;
+        vsg::dvec3 axis;
         if (fr.readSequence(axis))
             fr += 3;
         else
@@ -172,7 +172,7 @@ bool RotateTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
     return true;
 }
 
-bool RotateTransform_writeLocalData(const osg::Object& obj, osgDB::Output& fw)
+bool RotateTransform_writeLocalData(const vsg::Object& obj, osgDB::Output& fw)
 {
     const SGRotateTransform& rot = static_cast<const SGRotateTransform&>(obj);
     const SGVec3d& center = rot.getCenter();

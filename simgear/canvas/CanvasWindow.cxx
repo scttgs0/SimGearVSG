@@ -97,7 +97,7 @@ namespace simgear::canvas
 
   //----------------------------------------------------------------------------
 
-  SGVec2<float> Window::toScreenPosition(const osg::Vec2f& pos) const
+  SGVec2<float> Window::toScreenPosition(const vsg::vec2& pos) const
   {
     const auto windowPos = getPosition();
     return windowPos + toSG(pos) + _contentOffset;
@@ -192,7 +192,7 @@ namespace simgear::canvas
 
   //----------------------------------------------------------------------------
   void Window::handleResize( uint8_t mode,
-                             const osg::Vec2f& offset )
+                             const vsg::vec2& offset )
   {
     if( mode == NONE )
     {

@@ -201,7 +201,7 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::BoundingBox Group::getTransformedBounds(const osg::Matrix& m) const
+  osg::BoundingBox Group::getTransformedBounds(const vsg::mat4& m) const
   {
     if( !_scene_group.valid() )
     {
@@ -321,7 +321,7 @@ namespace simgear::canvas
       return;
 
     // Keep reference to prevent deleting while removing and re-inserting later
-    osg::ref_ptr<osg::MatrixTransform> tf = child->getSceneGroup();
+    vsg::ref_ptr<osg::MatrixTransform> tf = child->getSceneGroup();
 
     size_t index = _scene_group->getChildIndex(tf),
            index_new = index;

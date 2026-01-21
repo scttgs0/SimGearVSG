@@ -52,7 +52,7 @@ SGStateAttributeVisitor::apply(osg::StateSet* stateSet)
 }
 
 void
-SGStateAttributeVisitor::apply(osg::Node& node)
+SGStateAttributeVisitor::apply(vsg::Node& node)
 {
   apply(node.getStateSet());
   traverse(node);

@@ -35,15 +35,15 @@ class SGInteractionAnimation::LineCollector : public osg::NodeVisitor {
     struct LinePrimitiveFunctor {
         LinePrimitiveFunctor() : _lineCollector(0)
         { }
-        void operator() (const osg::Vec3&, bool)
+        void operator() (const vsg::vec3&, bool)
         { }
-        void operator() (const osg::Vec3& v1, const osg::Vec3& v2, bool)
+        void operator() (const vsg::vec3& v1, const vsg::vec3& v2, bool)
         { if (_lineCollector) _lineCollector->addLine(v1, v2); }
-        void operator() (const osg::Vec3&, const osg::Vec3&, const osg::Vec3&,
+        void operator() (const vsg::vec3&, const vsg::vec3&, const vsg::vec3&,
                          bool)
         { }
-        void operator() (const osg::Vec3&, const osg::Vec3&, const osg::Vec3&,
-                         const osg::Vec3&, bool)
+        void operator() (const vsg::vec3&, const vsg::vec3&, const vsg::vec3&,
+                         const vsg::vec3&, bool)
         { }
         LineCollector* _lineCollector;
     };
@@ -61,13 +61,13 @@ public:
             geode.getDrawable(i)->accept(pf);
         }
     }
-    virtual void apply(osg::Node& node)
+    virtual void apply(vsg::Node& node)
     {
         traverse(node);
     }
-    virtual void apply(osg::Transform& transform)
+    virtual void apply(vsg::Transform& transform)
     {
-        osg::Matrix matrix = _matrix;
+        vsg::mat4 matrix = _matrix;
         if (transform.computeLocalToWorldMatrix(_matrix, this))
             traverse(transform);
         _matrix = matrix;
@@ -76,7 +76,7 @@ public:
     const std::vector<SGLineSegmentf>& getLineSegments() const
     { return _lineSegments; }
     
-    void addLine(const osg::Vec3& v1, const osg::Vec3& v2)
+    void addLine(const vsg::vec3& v1, const vsg::vec3& v2)
     {
         // Trick to get the ends in the right order.
         // Use the x axis in the original coordinate system. Choose the
@@ -89,7 +89,7 @@ public:
             _lineSegments.push_back(SGLineSegmentf(tv2, tv1));
     }
 
-    void addBVHElements(osg::Node& node, simgear::BVHLineGeometry::Type type)
+    void addBVHElements(vsg::Node& node, simgear::BVHLineGeometry::Type type)
     {
         if (_lineSegments.empty())
             return;
@@ -118,7 +118,7 @@ public:
     }
     
 private:
-    osg::Matrix _matrix;
+    vsg::mat4 _matrix;
     std::vector<SGLineSegmentf> _lineSegments;
 };
 
@@ -128,7 +128,7 @@ SGInteractionAnimation::SGInteractionAnimation(simgear::SGTransientModelData &mo
 }
 
 void
-SGInteractionAnimation::install(osg::Node& node)
+SGInteractionAnimation::install(vsg::Node& node)
 {
   SGAnimation::install(node);
 

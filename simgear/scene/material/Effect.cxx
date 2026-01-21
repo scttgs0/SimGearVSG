@@ -58,7 +58,6 @@
 #include <osg/Texture3D>
 #include <osg/TextureRectangle>
 #include <osg/Uniform>
-#include <osg/Vec4d>
 #include <osgUtil/CullVisitor>
 #include <osgDB/FileUtils>
 #include <osgDB/Input>
@@ -308,7 +307,7 @@ Effect::Effect()
 }
 
 Effect::Effect(const Effect& rhs, const CopyOp& copyop)
-    : osg::Object(rhs, copyop), root(rhs.root), parametersProp(rhs.parametersProp), _cache(0),
+    : vsg::Object(rhs, copyop), root(rhs.root), parametersProp(rhs.parametersProp), _cache(0),
       _isRealized(rhs._isRealized),
       _effectFilePath(rhs._effectFilePath)
 {
@@ -330,7 +329,7 @@ StateSet* Effect::getDefaultStateSet()
     if (techniques.empty())
         return 0;
     auto it = std::find_if(techniques.rbegin(), techniques.rend(),
-                           [](const osg::ref_ptr<Technique> &t) {
+                           [](const vsg::ref_ptr<Technique> &t) {
                                return t && t->getScheme().empty();
                            });
     if (it == techniques.rend())
@@ -368,7 +367,7 @@ void Effect::resizeGLObjectBuffers(unsigned int maxSize)
     }
 }
 
-void Effect::releaseGLObjects(osg::State* state) const
+void Effect::releaseGLObjects(vsg::State* state) const
 {
     for (const auto& technique : techniques) {
         technique->releaseGLObjects(state);
@@ -400,21 +399,21 @@ void buildPass(Effect* effect, Technique* tniq, const SGPropertyNode* prop,
     }
 }
 
-osg::Vec4f getColor(const SGPropertyNode* prop)
+vsg::vec4 getColor(const SGPropertyNode* prop)
 {
     if (prop->nChildren() == 0) {
         if (prop->getType() == props::VEC4D) {
-            return osg::Vec4f(toOsg(prop->getValue<SGVec4d>()));
+            return vsg::vec4(toOsg(prop->getValue<SGVec4d>()));
         } else if (prop->getType() == props::VEC3D) {
-            return osg::Vec4f(toOsg(prop->getValue<SGVec3d>()), 1.0f);
+            return vsg::vec4(toOsg(prop->getValue<SGVec3d>()), 1.0f);
         } else {
             SG_LOG(SG_INPUT, SG_ALERT,
                    "invalid color property " << prop->getNameString() << " "
                    << prop->getStringValue());
-            return osg::Vec4f(0.0f, 0.0f, 0.0f, 1.0f);
+            return vsg::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         }
     } else {
-        osg::Vec4f result;
+        vsg::vec4 result;
         static const char* colors[] = {"r", "g", "b"};
         for (int i = 0; i < 3; ++i) {
             const SGPropertyNode* componentProp = prop->getChild(colors[i]);
@@ -1205,7 +1204,7 @@ struct PointBuilder : public PassAttributeBuilder
         float minsize = 1.0;
         float maxsize = 1.0;
         float size    = 1.0;
-        osg::Vec3f attenuation = osg::Vec3f(1.0, 1.0, 1.0);
+        vsg::vec3 attenuation = vsg::vec3(1.0, 1.0, 1.0);
 
         const SGPropertyNode* realProp = getEffectPropertyNode(effect, prop);
         if (!realProp)
@@ -1227,7 +1226,7 @@ struct PointBuilder : public PassAttributeBuilder
         if (psize)
             size = psize->getFloatValue();
         if (pattenuation)
-            attenuation = osg::Vec3f(pattenuation->getChild("x")->getFloatValue(),
+            attenuation = vsg::vec3(pattenuation->getChild("x")->getFloatValue(),
                                      pattenuation->getChild("y")->getFloatValue(),
                                      pattenuation->getChild("z")->getFloatValue());
 
@@ -1451,7 +1450,7 @@ void Effect::addDeferredPropertyListener(DeferredPropertyListener* listener)
 	UniformFactory::instance()->addListener(listener);
 }
 
-void Effect::InitializeCallback::doUpdate(osg::Node* node, osg::NodeVisitor* nv)
+void Effect::InitializeCallback::doUpdate(vsg::Node* node, osg::NodeVisitor* nv)
 {
     EffectGeode* eg = dynamic_cast<EffectGeode*>(node);
     if (!eg)

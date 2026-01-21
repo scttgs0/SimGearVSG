@@ -21,19 +21,22 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/Geode>
-#include <osg/Node>
 #include <osg/NodeVisitor>
 #include <osg/StateSet>
 
-class SGTextureStateAttributeVisitor : public osg::NodeVisitor {
-public:
-  SGTextureStateAttributeVisitor();
 
-  virtual void apply(int textureUnit, osg::StateSet::RefAttributePair& refAttr);
-  virtual void apply(int textureUnit, osg::StateSet::AttributeList& attrList);
-  virtual void apply(osg::StateSet::TextureAttributeList& attrList);
-  virtual void apply(osg::StateSet* stateSet);
-  virtual void apply(osg::Node& node);
-  virtual void apply(osg::Geode& node);
+class SGTextureStateAttributeVisitor : public osg::NodeVisitor
+{
+public:
+    SGTextureStateAttributeVisitor();
+
+    virtual void apply(int textureUnit, osg::StateSet::RefAttributePair& refAttr);
+    virtual void apply(int textureUnit, osg::StateSet::AttributeList& attrList);
+    virtual void apply(osg::StateSet::TextureAttributeList& attrList);
+    virtual void apply(osg::StateSet* stateSet);
+    virtual void apply(vsg::Node& node);
+    virtual void apply(osg::Geode& node);
 };

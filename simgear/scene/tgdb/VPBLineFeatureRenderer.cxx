@@ -58,13 +58,13 @@
 using namespace osgTerrain;
 using namespace simgear;
 
-VPBLineFeatureRenderer::VPBLineFeatureRenderer(osg::ref_ptr<TerrainTile> tile)
+VPBLineFeatureRenderer::VPBLineFeatureRenderer(vsg::ref_ptr<TerrainTile> tile)
 {
     _tileLevel = tile->getTileID().level;
     _masterLocator = tile->getLocator();
 }
 
-void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, osg::ref_ptr<SGReaderWriterOptions> options, osg::ref_ptr<SGMaterialCache> matcache)
+void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, vsg::ref_ptr<SGReaderWriterOptions> options, vsg::ref_ptr<SGMaterialCache> matcache)
 {
     
     unsigned int line_features_lod_range = 6;
@@ -95,11 +95,11 @@ void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, osg::ref_ptr<
     Atlas* atlas = matcache->getAtlas();
     SGMaterial* mat = 0;
 
-    if (! buffer._lineFeatures) buffer._lineFeatures = new osg::Group();
+    if (! buffer._lineFeatures) buffer._lineFeatures = new vsg::Group();
 
     // Get all appropriate roads.  We assume that the VPB terrain tile is smaller than a Bucket size.
     LightBin lightbin;
-    const osg::Vec3d world = buffer._transform->getMatrix().getTrans();
+    const vsg::dvec3 world = buffer._transform->getMatrix().getTrans();
 
     const SGGeod loc = SGGeod::fromCart(toSG(world));
     const SGBucket bucket = SGBucket(loc);
@@ -123,11 +123,11 @@ void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, osg::ref_ptr<
             }    
 
             //  Generate a geometry for this set of roads.
-            osg::Vec3Array* v = new osg::Vec3Array;
+            vsg::vec3Array* v = new vsg::vec3Array;
             osg::Vec2Array* t = new osg::Vec2Array;
-            osg::Vec3Array* n = new osg::Vec3Array;
+            vsg::vec3Array* n = new vsg::vec3Array;
             osg::Vec4Array* c = new osg::Vec4Array;
-            std::vector<osg::Vec3f>* lights = new std::vector<osg::Vec3f>;
+            std::vector<vsg::vec3>* lights = new std::vector<vsg::vec3>;
             std::vector<float>* rotations = new std::vector<float>;
 
             auto lineFeatures = (*rb)->getLineFeatures();
@@ -146,9 +146,9 @@ void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, osg::ref_ptr<
                 continue;
             }
 
-            c->push_back(osg::Vec4d(1.0,1.0,1.0,1.0));
+            c->push_back(vsg::dvec4(1.0,1.0,1.0,1.0));
 
-            osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
+            vsg::ref_ptr<vsg::Geometry> geometry = new vsg::Geometry;
             geometry->setVertexArray(v);
             geometry->setTexCoordArray(0, t, osg::Array::BIND_PER_VERTEX);
             geometry->setTexCoordArray(1, t, osg::Array::BIND_PER_VERTEX);
@@ -167,7 +167,7 @@ void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, osg::ref_ptr<
             geode->setNodeMask( ~(simgear::CASTSHADOW_BIT | simgear::MODELLIGHT_BIT) );
 
             osg::StateSet* stateset = geode->getOrCreateStateSet();
-            stateset->addUniform(new osg::Uniform(VPBTechnique::MODEL_OFFSET, (osg::Vec3f) buffer._transform->getMatrix().getTrans()));
+            stateset->addUniform(new osg::Uniform(VPBTechnique::MODEL_OFFSET, (vsg::vec3) buffer._transform->getMatrix().getTrans()));
 
             atlas->addUniforms(stateset);
 
@@ -182,21 +182,21 @@ void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, osg::ref_ptr<
                 const std::string lampPostModel = mat->get_light_model();
 
                 // Assume street lights point down.
-                osg::Vec3d up = world;
+                vsg::dvec3 up = world;
                 up.normalize();
-                const SGVec3f direction = toSG(- (osg::Vec3f) up);
+                const SGVec3f direction = toSG(- (vsg::vec3) up);
 
                 std::for_each(lights->begin(), lights->end(), 
-                    [&, size, intensity, color, direction, horiz, vertical] (osg::Vec3f p) { lightbin.insert(toSG(p), size, intensity, 1, color, direction, horiz, vertical); } );
+                    [&, size, intensity, color, direction, horiz, vertical] (vsg::vec3 p) { lightbin.insert(toSG(p), size, intensity, 1, color, direction, horiz, vertical); } );
 
                 if (lampPostModel != "") {
                     
                     ObjectInstanceBin streetlampBin = ObjectInstanceBin(lampPostModel);
                     for (std::size_t idx = 0; idx < lights->size(); ++idx) {
-                        streetlampBin.insert(lights->at(idx), osg::Vec3f(rotations->at(idx), 0.0f, 0.0f));
+                        streetlampBin.insert(lights->at(idx), vsg::vec3(rotations->at(idx), 0.0f, 0.0f));
                     }
 
-                    if (streetlampBin.getNumInstances() > 0) buffer._transform->addChild(createObjectInstances(streetlampBin, osg::Matrix::identity(), options));
+                    if (streetlampBin.getNumInstances() > 0) buffer._transform->addChild(createObjectInstances(streetlampBin, vsg::mat4::identity(), options));
                 }
             }
             delete lights;
@@ -210,10 +210,10 @@ void VPBLineFeatureRenderer::applyLineFeatures(BufferData& buffer, osg::ref_ptr<
         buffer._transform->addChild(buffer._lineFeatures.get());
     }
 
-    if (lightbin.getNumLights() > 0) buffer._transform->addChild(createLights(lightbin, osg::Matrix::identity(), options));
+    if (lightbin.getNumLights() > 0) buffer._transform->addChild(createLights(lightbin, vsg::mat4::identity(), options));
 }
 
-void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeatureBin::LineFeature road, osg::Matrix localToWorldMatrix, osg::Vec3Array* v, osg::Vec2Array* t, osg::Vec3Array* n, std::vector<osg::Vec3f>* lights, std::vector<float>* rotations, SGMaterial* mat)
+void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeatureBin::LineFeature road, vsg::mat4 localToWorldMatrix, vsg::vec3Array* v, osg::Vec2Array* t, vsg::vec3Array* n, std::vector<vsg::vec3>* lights, std::vector<float>* rotations, SGMaterial* mat)
 {
     const unsigned int ysize = mat->get_ysize();
     const bool   light_edge_offset = mat->get_light_edge_offset();
@@ -225,17 +225,17 @@ void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeature
     const double x1 = mat->get_line_feature_tex_x1();
     const double elevation_offset_m = mat->get_line_feature_offset_m();
 
-    osg::Vec3d modelCenter = localToWorldMatrix.getTrans();
+    vsg::dvec3 modelCenter = localToWorldMatrix.getTrans();
 
     // We clip to the tile in a geocentric space, as that's what the road information
     // is in.
-    osg::Vec3d modelNormal = modelCenter;
+    vsg::dvec3 modelNormal = modelCenter;
     modelNormal.normalize();
     TileBounds tileBounds(buffer._masterLocator, modelNormal);
-    std::list<osg::Vec3d> nodes = tileBounds.clipToTile(road._nodes);
+    std::list<vsg::dvec3> nodes = tileBounds.clipToTile(road._nodes);
 
     // However the geometry is in Z-up space, so "up" is simply (0,0,1)
-    osg::Vec3d up = osg::Vec3d(0.0,0.0,1.0);
+    vsg::dvec3 up = vsg::dvec3(0.0,0.0,1.0);
 
     // Rotation from the geocentric coordinates to a Z-up coordinate system
     osg::Quat rot = localToWorldMatrix.getRotate().inverse();
@@ -243,8 +243,8 @@ void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeature
     // We need at least two node to make a road.
     if (nodes.size() < 2) return; 
 
-    osg::Vec3d ma, mb;
-    std::list<osg::Vec3d> roadPoints;
+    vsg::dvec3 ma, mb;
+    std::list<vsg::dvec3> roadPoints;
     auto road_iter = nodes.begin();
 
     ma = getMeshIntersection(buffer, rot * (*road_iter - modelCenter));
@@ -267,10 +267,10 @@ void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeature
     // We now have a series of points following the topography of the elevation mesh.
 
     auto iter = roadPoints.begin();
-    osg::Vec3d start = *iter;
+    vsg::dvec3 start = *iter;
     iter++;
 
-    osg::Vec3d last_spanwise =  (*iter - start)^ up;
+    vsg::dvec3 last_spanwise =  (*iter - start)^ up;
     last_spanwise.normalize();
 
     float yTexBaseA = 0.0f;
@@ -279,20 +279,20 @@ void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeature
 
     for (; iter != roadPoints.end(); iter++) {
 
-        osg::Vec3d end = *iter;
+        vsg::dvec3 end = *iter;
 
         // Ignore tiny segments - likely artifacts of the elevation slicer
         if ((end - start).length2() < 1.0) continue;
 
         // Find a spanwise vector
-        osg::Vec3d spanwise = ((end-start) ^ up);
+        vsg::dvec3 spanwise = ((end-start) ^ up);
         spanwise.normalize();
 
         // Define the road extents
-        const osg::Vec3d a = start - last_spanwise * road._width * 0.5 + up * elevation_offset_m;
-        const osg::Vec3d b = start + last_spanwise * road._width * 0.5 + up * elevation_offset_m;
-        const osg::Vec3d c = end   - spanwise * road._width * 0.5 + up * elevation_offset_m;
-        const osg::Vec3d d = end   + spanwise * road._width * 0.5 + up * elevation_offset_m;
+        const vsg::dvec3 a = start - last_spanwise * road._width * 0.5 + up * elevation_offset_m;
+        const vsg::dvec3 b = start + last_spanwise * road._width * 0.5 + up * elevation_offset_m;
+        const vsg::dvec3 c = end   - spanwise * road._width * 0.5 + up * elevation_offset_m;
+        const vsg::dvec3 d = end   + spanwise * road._width * 0.5 + up * elevation_offset_m;
 
         // Determine the x and y texture coordinates for the edges
         const float yTexA = yTexBaseA + (c-a).length() / ysize;
@@ -303,20 +303,20 @@ void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeature
         v->push_back(b);
         v->push_back(c);
 
-        t->push_back(osg::Vec2d(x0, yTexBaseA));
-        t->push_back(osg::Vec2d(x1, yTexBaseB));
-        t->push_back(osg::Vec2d(x0, yTexA));
+        t->push_back(vsg::dvec2(x0, yTexBaseA));
+        t->push_back(vsg::dvec2(x1, yTexBaseB));
+        t->push_back(vsg::dvec2(x0, yTexA));
 
         v->push_back(b);
         v->push_back(d);
         v->push_back(c);
 
-        t->push_back(osg::Vec2d(x1, yTexBaseB));
-        t->push_back(osg::Vec2d(x1, yTexB));
-        t->push_back(osg::Vec2d(x0, yTexA));
+        t->push_back(vsg::dvec2(x1, yTexBaseB));
+        t->push_back(vsg::dvec2(x1, yTexB));
+        t->push_back(vsg::dvec2(x0, yTexA));
 
         // Normal is straight from the quad
-        osg::Vec3d normal = -(end-start)^spanwise;
+        vsg::dvec3 normal = -(end-start)^spanwise;
         normal.normalize();
         for (unsigned int i = 0; i < 6; i++) n->push_back(normal);
 
@@ -324,7 +324,7 @@ void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeature
         // on a unit circle on the x-y plane.  acos returns in range 0-pi, 
         // so we need to adjust to cover the full -pi - pi range.  Fortunately
         // this is easy.
-        double theta = acos(spanwise * osg::Vec3d(1.0,0.0,0.0)) *180.0/M_PI;
+        double theta = acos(spanwise * vsg::dvec3(1.0,0.0,0.0)) *180.0/M_PI;
         if (spanwise.y() < 0.0f) {
             theta = - theta;
         }
@@ -343,23 +343,23 @@ void VPBLineFeatureRenderer::generateLineFeature(BufferData& buffer, LineFeature
             // Handle the case where lights are on alternate sides of the road rather than in pairs
             if (light_edge_offset) start_b = fmodf(start_b + light_edge_spacing * 0.5, light_edge_spacing);
 
-            osg::Vec3f p1 = (c-a);
+            vsg::vec3 p1 = (c-a);
             p1.normalize();
 
             if (light_edge_left) {
                 while (start_a < edge_length) {
-                    lights->push_back(a + (osg::Vec3f) p1 * start_a + up * (light_edge_height + 1.0));
+                    lights->push_back(a + (vsg::vec3) p1 * start_a + up * (light_edge_height + 1.0));
                     rotations->push_back(theta - 180.0); // Left side assumed to require rotation
                     start_a += light_edge_spacing;
                 }
             }
 
             if (light_edge_right) {
-                osg::Vec3f p2 = (d-b);
+                vsg::vec3 p2 = (d-b);
                 p2.normalize();
 
                 while (start_b < edge_length) {
-                    lights->push_back(b + (osg::Vec3f) p2 * start_b + up * (light_edge_height + 1.0));
+                    lights->push_back(b + (vsg::vec3) p2 * start_b + up * (light_edge_height + 1.0));
                     rotations->push_back(theta); //Right side assumed to not to require rotation.
                     start_b += light_edge_spacing;
                 }
@@ -404,10 +404,10 @@ void VPBLineFeatureRenderer::unloadFeatures(SGBucket bucket)
 }
 
 // Find the intersection of a given SGGeod with the terrain mesh
-osg::Vec3d VPBLineFeatureRenderer::getMeshIntersection(BufferData& buffer, osg::Vec3d pt) 
+vsg::dvec3 VPBLineFeatureRenderer::getMeshIntersection(BufferData& buffer, vsg::dvec3 pt) 
 {
-    osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
-    intersector = new osgUtil::LineSegmentIntersector(pt + osg::Vec3d(0.0, 0.0, -100.0), pt + osg::Vec3d(0.0, 0.0, 8000.0));
+    vsg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
+    intersector = new osgUtil::LineSegmentIntersector(pt + vsg::dvec3(0.0, 0.0, -100.0), pt + vsg::dvec3(0.0, 0.0, 8000.0));
     osgUtil::IntersectionVisitor visitor(intersector.get());
     buffer._landGeometry->accept(visitor);
 

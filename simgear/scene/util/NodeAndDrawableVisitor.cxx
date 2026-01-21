@@ -47,7 +47,7 @@ NodeAndDrawableVisitor::~NodeAndDrawableVisitor()
 {
 }
 
-void NodeAndDrawableVisitor::apply(osg::Node& node)
+void NodeAndDrawableVisitor::apply(vsg::Node& node)
 {
     traverse(node);
 }
@@ -56,7 +56,7 @@ void NodeAndDrawableVisitor::apply(osg::Drawable& Drawable)
 {
 }
 
-void NodeAndDrawableVisitor::traverse(osg::Node& node)
+void NodeAndDrawableVisitor::traverse(vsg::Node& node)
 {
     TraversalMode tm = getTraversalMode();
     if (tm == TRAVERSE_NONE) {

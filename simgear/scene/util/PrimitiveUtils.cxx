@@ -233,7 +233,7 @@ public:
 
     void vertex(const Vec2& vert)
     {
-        _vertexCache.push_back(osg::Vec3(vert[0],vert[1],0.0f));
+        _vertexCache.push_back(vsg::vec3(vert[0],vert[1],0.0f));
     }
     void vertex(const Vec3& vert)
     {
@@ -241,19 +241,19 @@ public:
     }
     void vertex(const Vec4& vert)
     {
-        _vertexCache.push_back(osg::Vec3(vert[0],vert[1],vert[2])/vert[3]);
+        _vertexCache.push_back(vsg::vec3(vert[0],vert[1],vert[2])/vert[3]);
     }
     void vertex(float x,float y)
     {
-        _vertexCache.push_back(osg::Vec3(x,y,0.0f));
+        _vertexCache.push_back(vsg::vec3(x,y,0.0f));
     }
     void vertex(float x,float y,float z)
     {
-        _vertexCache.push_back(osg::Vec3(x,y,z));
+        _vertexCache.push_back(vsg::vec3(x,y,z));
     }
     void vertex(float x,float y,float z,float w)
     {
-        _vertexCache.push_back(osg::Vec3(x,y,z)/w);
+        _vertexCache.push_back(vsg::vec3(x,y,z)/w);
     
     }
     

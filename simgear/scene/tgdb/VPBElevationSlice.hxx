@@ -33,25 +33,25 @@ class VPBElevationSlice
         VPBElevationSlice();
 
         /** Set the start point of the slice.*/
-        void setStartPoint(const osg::Vec3d& startPoint) { _startPoint = startPoint; }
+        void setStartPoint(const vsg::dvec3& startPoint) { _startPoint = startPoint; }
 
         /** Get the start point of the slice.*/
-        const osg::Vec3d& getStartPoint() const { return _startPoint; }
+        const vsg::dvec3& getStartPoint() const { return _startPoint; }
 
         /** Set the end point of the slice.*/
-        void setEndPoint(const osg::Vec3d& endPoint) { _endPoint = endPoint; }
+        void setEndPoint(const vsg::dvec3& endPoint) { _endPoint = endPoint; }
 
         /** Get the end point of the slice.*/
-        const osg::Vec3d& getEndPoint() const { return _endPoint; }
+        const vsg::dvec3& getEndPoint() const { return _endPoint; }
 
         /** Set the up Vector of the slice.*/
-        void setUpVector(const osg::Vec3d& upVector) { _upVector = upVector; }
+        void setUpVector(const vsg::dvec3& upVector) { _upVector = upVector; }
 
         /** Get the start point of the slice.*/
-        const osg::Vec3d& getUpVector() const { return _upVector; }
+        const vsg::dvec3& getUpVector() const { return _upVector; }
 
 
-        typedef std::vector<osg::Vec3d> Vec3dList;
+        typedef std::vector<vsg::dvec3> Vec3dList;
 
         /** Get the intersections in the form of a vector of Vec3d. */
         const Vec3dList& getIntersections() const  { return _intersections; }
@@ -67,15 +67,15 @@ class VPBElevationSlice
           * Note, if the topmost node is a CoordinateSystemNode then the input points are assumed to be geocentric,
           * with the up vector defined by the EllipsoidModel attached to the CoordinateSystemNode.
           * If the topmost node is not a CoordinateSystemNode then a local coordinates frame is assumed, with a local up vector. */
-        void computeIntersections(osg::Node* scene, osg::Node::NodeMask traversalMask=0xffffffff);
+        void computeIntersections(vsg::Node* scene, vsg::Node::NodeMask traversalMask=0xffffffff);
 
         /** Compute the vertical distance between the specified scene graph and a single HAT point.*/
-        static Vec3dList computeVPBElevationSlice(osg::Node* scene, const osg::Vec3d& startPoint, const osg::Vec3d& endPoint, const osg::Vec3d& upVector, osg::Node::NodeMask traversalMask=0xffffffff);
+        static Vec3dList computeVPBElevationSlice(vsg::Node* scene, const vsg::dvec3& startPoint, const vsg::dvec3& endPoint, const vsg::dvec3& upVector, vsg::Node::NodeMask traversalMask=0xffffffff);
 
     protected :
-        osg::Vec3d                              _startPoint;
-        osg::Vec3d                              _endPoint;
-        osg::Vec3d                              _upVector;
+        vsg::dvec3                              _startPoint;
+        vsg::dvec3                              _endPoint;
+        vsg::dvec3                              _upVector;
         Vec3dList                               _intersections;
         DistanceHeightList                      _distanceHeightIntersections;
 

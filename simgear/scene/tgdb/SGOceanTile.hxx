@@ -21,11 +21,12 @@
 
 #pragma once
 
-#include <osg/Node>
+#include <vsg/all.h>
+
 
 class SGBucket;
 class SGMaterialLib;
 
 // Generate an ocean tile
-osg::Node* SGOceanTile(double clat, double clon, double width, double height, SGMaterialLib *matlib, int latPoints = 5, int lonPoints = 5);
-osg::Node* SGOceanTile(const SGBucket& b, SGMaterialLib *matlib, int latPoints = 5, int lonPoints = 5);
+vsg::Node* SGOceanTile(double clat, double clon, double width, double height, SGMaterialLib* matlib, int latPoints = 5, int lonPoints = 5);
+vsg::Node* SGOceanTile(const SGBucket& b, SGMaterialLib* matlib, int latPoints = 5, int lonPoints = 5);

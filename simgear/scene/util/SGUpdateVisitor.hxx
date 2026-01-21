@@ -107,7 +107,7 @@ public:
   double getSunAngleDeg() const
   { return mSunAngleDeg; }
 
-  virtual void apply(osg::Node& node)
+  virtual void apply(vsg::Node& node)
   {
     if (!needToEnterNode(node))
       return;
@@ -126,35 +126,35 @@ public:
   }
   // To be able to traverse correctly only the active children, we need to
   // track the model view matrices during update.
-  virtual void apply(osg::Transform& transform)
+  virtual void apply(vsg::Transform& transform)
   {
     if (!needToEnterNode(transform))
       return;
-    osg::Matrix matrix = _matrix;
+    vsg::mat4 matrix = _matrix;
     transform.computeLocalToWorldMatrix(_matrix, this);
     osgUtil::UpdateVisitor::apply(transform);
     _matrix = matrix;
   }
-  virtual void apply(osg::Camera& camera)
+  virtual void apply(vsg::Camera& camera)
   {
     if (!needToEnterNode(camera))
       return;
-    if (camera.getReferenceFrame() == osg::Camera::ABSOLUTE_RF) {
-      osg::Vec3d currentEyePos = _currentEyePos;
-      _currentEyePos = osg::Vec3d(0, 0, 0);
-      apply(static_cast<osg::Transform&>(camera));
+    if (camera.getReferenceFrame() == vsg::Camera::ABSOLUTE_RF) {
+      vsg::dvec3 currentEyePos = _currentEyePos;
+      _currentEyePos = vsg::dvec3(0, 0, 0);
+      apply(static_cast<vsg::Transform&>(camera));
       _currentEyePos = currentEyePos;
     } else {
-      apply(static_cast<osg::Transform&>(camera));
+      apply(static_cast<vsg::Transform&>(camera));
     }
   }
   // Function to make the LOD traversal only enter that children that
   // are visible on the screen.
-  virtual float getDistanceToViewPoint(const osg::Vec3& pos, bool) const
-  { return (_currentEyePos - _matrix.preMult(osg::Vec3d(pos))).length(); }
+  virtual float getDistanceToViewPoint(const vsg::vec3& pos, bool) const
+  { return (_currentEyePos - _matrix.preMult(vsg::dvec3(pos))).length(); }
 
 protected:
-  bool needToEnterNode(const osg::Node& node) const
+  bool needToEnterNode(const vsg::Node& node) const
   {
     if (!node.isCullingActive())
       return true;
@@ -165,13 +165,13 @@ protected:
     if (!sphere.valid())
       return false;
     float maxDist = mVisibility + sphere._radius;
-    osg::Vec3d center = _matrix.preMult(osg::Vec3d(sphere._center));
+    vsg::dvec3 center = _matrix.preMult(vsg::dvec3(sphere._center));
     return (_currentEyePos - center).length2() <= maxDist*maxDist;
   }
     
 private:
-  osg::Matrix _matrix;
-  osg::Vec3d _currentEyePos;
+  vsg::mat4 _matrix;
+  vsg::dvec3 _currentEyePos;
 
   SGGeod mGlobalGeodEyePos;
   SGVec3d mGlobalEyePos;

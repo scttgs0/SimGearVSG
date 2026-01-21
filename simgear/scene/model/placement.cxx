@@ -33,12 +33,12 @@ SGModelPlacement::SGModelPlacement () :
 SGModelPlacement::~SGModelPlacement ()
 {
     if (_selector && (_selector->getNumParents() > 0)) {
-        SG_LOG(SG_OSG, SG_DEV_WARN, "Destroying model placement with still-attached scene-node.");
+        SG_LOG(SG_VSG, SG_DEV_WARN, "Destroying model placement with still-attached scene-node.");
     }
 }
 
 void
-SGModelPlacement::init( osg::Node * model )
+SGModelPlacement::init( vsg::Node * model )
 {
   // remove previous models (in case of reinit)
   _transform->removeChild(0, _transform->getNumChildren());
@@ -48,14 +48,14 @@ SGModelPlacement::init( osg::Node * model )
   _selector->setValue(0, 1);
 }
 
-osg::ref_ptr<osg::Node> SGModelPlacement::getSceneGraph() const
+vsg::ref_ptr<vsg::Node> SGModelPlacement::getSceneGraph() const
 {
     return _selector;
 }
 
 
 void
-SGModelPlacement::add( osg::Node* model )
+SGModelPlacement::add( vsg::Node* model )
 {
     if (model != 0) {
         _transform->addChild(model);

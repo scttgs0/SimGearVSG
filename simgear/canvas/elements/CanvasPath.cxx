@@ -219,9 +219,9 @@ namespace simgear::canvas
 
       const char* className() const override
       { return "PathDrawable"; }
-      osg::Object* cloneType() const override
+      vsg::Object* cloneType() const override
       { return new PathDrawable(_path_element); }
-      osg::Object* clone(const osg::CopyOp&) const override
+      vsg::Object* clone(const osg::CopyOp&) const override
       { return new PathDrawable(_path_element); }
 
       /**
@@ -378,7 +378,7 @@ namespace simgear::canvas
         if( _attributes_dirty & PATH )
           return;
 
-        osg::State* state = renderInfo.getState();
+        vsg::State* state = renderInfo.getState();
         assert(state);
         osg::GLExtensions* extensions = state->get<osg::GLExtensions>();
         assert(extensions);
@@ -390,7 +390,7 @@ namespace simgear::canvas
           state->getLastAppliedAttribute(osg::StateAttribute::BLENDFUNC);
 
         // Set the model view projection matrix
-        osg::Matrixf mvp = state->getModelViewMatrix() * state->getProjectionMatrix();
+        vsg::mat4 mvp = state->getModelViewMatrix() * state->getProjectionMatrix();
         vgSetModelViewProjectionMatSH(mvp.ptr());
 
         // Setup paint
@@ -455,11 +455,11 @@ namespace simgear::canvas
         extensions->glUseProgram(0);
       }
 
-      osg::BoundingBox getTransformedBounds(const osg::Matrix& mat) const
+      osg::BoundingBox getTransformedBounds(const vsg::mat4& mat) const
       {
         osg::BoundingBox bb;
 
-        osg::Vec2f cur(0, 0), // VG "Current point" (in local coordinates)
+        vsg::vec2 cur(0, 0), // VG "Current point" (in local coordinates)
                    sub(0, 0); // beginning of current sub path
         VGubyte cmd_index = 0;
         for( size_t i = 0,              ci = 0;
@@ -474,7 +474,7 @@ namespace simgear::canvas
             return osg::BoundingBox();
 
           const VGubyte max_coords = 3;
-          osg::Vec2f points[max_coords];
+          vsg::vec2 points[max_coords];
           VGubyte num_coords = 0;
 
           switch( cmd )
@@ -593,20 +593,20 @@ namespace simgear::canvas
       CoordList _coords;
 
       VGbitfield            _mode {0};
-      osg::Vec4f            _fill_color;
+      vsg::vec4            _fill_color;
       uint8_t               _fill_opacity {255};
       VGFillRule            _fill_rule {VG_EVEN_ODD};
-      osg::Vec4f            _stroke_color;
+      vsg::vec4            _stroke_color;
       uint8_t               _stroke_opacity {255};
       VGfloat               _stroke_width {1};
       std::vector<VGfloat>  _stroke_dash;
       VGCapStyle            _stroke_linecap {VG_CAP_BUTT};
       VGJoinStyle           _stroke_linejoin {VG_JOIN_MITER};
 
-      osg::Vec3f transformPoint( const osg::Matrix& m,
-                                 osg::Vec2f pos ) const
+      vsg::vec3 transformPoint( const vsg::mat4& m,
+                                 vsg::vec2 pos ) const
       {
-        return osg::Vec3
+        return vsg::vec3
         (
           m(0, 0) * pos[0] + m(1, 0) * pos[1] + m(3, 0),
           m(0, 1) * pos[0] + m(1, 1) * pos[1] + m(3, 1),
@@ -710,7 +710,7 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::BoundingBox Path::getTransformedBounds(const osg::Matrix& m) const
+  osg::BoundingBox Path::getTransformedBounds(const vsg::mat4& m) const
   {
     return _path->getTransformedBounds(m);
   }

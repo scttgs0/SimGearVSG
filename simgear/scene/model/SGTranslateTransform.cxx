@@ -40,14 +40,14 @@ SGTranslateTransform::SGTranslateTransform() :
 
 SGTranslateTransform::SGTranslateTransform(const SGTranslateTransform& trans,
                                            const osg::CopyOp& copyop) :
-  osg::Transform(trans, copyop),
+  vsg::Transform(trans, copyop),
   _axis(trans._axis),
   _value(trans._value)
 {
 }
 
 bool
-SGTranslateTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
+SGTranslateTransform::computeLocalToWorldMatrix(vsg::mat4& matrix,
                                                 osg::NodeVisitor* nv) const 
 {
   if (_referenceFrame == RELATIVE_RF) {
@@ -59,7 +59,7 @@ SGTranslateTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
 }
 
 bool
-SGTranslateTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
+SGTranslateTransform::computeWorldToLocalMatrix(vsg::mat4& matrix,
                                                 osg::NodeVisitor* nv) const
 {
   if (_referenceFrame == RELATIVE_RF) {
@@ -73,20 +73,20 @@ SGTranslateTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
 osg::BoundingSphere
 SGTranslateTransform::computeBound() const
 {
-  osg::BoundingSphere bs = osg::Group::computeBound();
+  osg::BoundingSphere bs = vsg::Group::computeBound();
   bs._center += toOsg(_axis)*_value;
   return bs;
 }
 
 namespace {
 
-bool TranslateTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
+bool TranslateTransform_readLocalData(vsg::Object& obj, osgDB::Input& fr)
 {
     SGTranslateTransform& trans = static_cast<SGTranslateTransform&>(obj);
 
     if (fr[0].matchWord("axis")) {
         ++fr;
-        osg::Vec3d axis;
+        vsg::dvec3 axis;
         if (fr.readSequence(axis))
             fr += 3;
         else
@@ -105,7 +105,7 @@ bool TranslateTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
     return true;
 }
 
-bool TranslateTransform_writeLocalData(const osg::Object& obj,
+bool TranslateTransform_writeLocalData(const vsg::Object& obj,
                                        osgDB::Output& fw)
 {
     const SGTranslateTransform& trans

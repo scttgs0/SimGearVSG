@@ -39,9 +39,9 @@ const float ringDelta = domeAngle / (numRings + 1);
 // the array that holds its location.
 struct GridIndex
 {
-    VectorArrayAdapter<osg::Vec3Array> gridAdapter;
-    osg::Vec3Array& grid;
-    GridIndex(osg::Vec3Array& array, int rowStride, int baseOffset) :
+    VectorArrayAdapter<vsg::vec3Array> gridAdapter;
+    vsg::vec3Array& grid;
+    GridIndex(vsg::vec3Array& array, int rowStride, int baseOffset) :
         gridAdapter(array, rowStride, baseOffset), grid(array)
     {
     }
@@ -54,7 +54,7 @@ struct GridIndex
 } // anonymous namespace
 
 
-osg::Node* SGSkyDome::build(double hscale, double vscale,
+vsg::Node* SGSkyDome::build(double hscale, double vscale,
                             const SGReaderWriterOptions* options)
 {
     EffectGeode* geode = new EffectGeode;
@@ -66,12 +66,12 @@ osg::Node* SGSkyDome::build(double hscale, double vscale,
         geode->setEffect(effect);
     }
 
-    dome_vl = new osg::Vec3Array(2 + numRings * numBands);
+    dome_vl = new vsg::vec3Array(2 + numRings * numBands);
 
     // generate the raw vertex data
     (*dome_vl)[0].set(0.0, 0.0,  center_elev * vscale);
     (*dome_vl)[1].set(0.0, 0.0, -center_elev * vscale);
-    simgear::VectorArrayAdapter<osg::Vec3Array> vertices(*dome_vl, numBands, 2);
+    simgear::VectorArrayAdapter<vsg::vec3Array> vertices(*dome_vl, numBands, 2);
 
     for (int i = 0; i < numBands; ++i) {
         double theta = (i * bandDelta) * SGD_DEGREES_TO_RADIANS;
@@ -84,11 +84,11 @@ osg::Node* SGSkyDome::build(double hscale, double vscale,
         }
     }
 
-    osg::ref_ptr<osg::DrawElementsUShort> domeElements =
+    vsg::ref_ptr<osg::DrawElementsUShort> domeElements =
         new osg::DrawElementsUShort(GL_TRIANGLES);
     makeDome(numRings, numBands, *domeElements);
 
-    osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
+    vsg::ref_ptr<vsg::Geometry> geom = new vsg::Geometry;
     geom->setName("Dome Elements");
     geom->setUseVertexBufferObjects(true);
     geom->setVertexArray(dome_vl);
@@ -108,13 +108,13 @@ bool SGSkyDome::reposition(const SGVec3f& p, double _asl,
 {
     asl = _asl;
 
-    osg::Matrix T, LON, LAT, SPIN;
+    vsg::mat4 T, LON, LAT, SPIN;
     // Translate to view position
     T.makeTranslate(toOsg(p));
     // Rotate to proper orientation
-    LON.makeRotate(lon, osg::Vec3(0, 0, 1));
-    LAT.makeRotate(90.0 * SGD_DEGREES_TO_RADIANS - lat, osg::Vec3(0, 1, 0));
-    SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
+    LON.makeRotate(lon, vsg::vec3(0, 0, 1));
+    LAT.makeRotate(90.0 * SGD_DEGREES_TO_RADIANS - lat, vsg::vec3(0, 1, 0));
+    SPIN.makeRotate(spin, vsg::vec3(0, 0, 1));
 
     dome_transform->setMatrix(SPIN * LAT * LON * T);
     return true;

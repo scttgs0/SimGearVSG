@@ -59,7 +59,7 @@ namespace simgear {
 struct GLTFBuilder {
     const tinygltf::Model &model;
     const SGReaderWriterOptions* opts;
-    std::vector<osg::ref_ptr<osg::Array>> arrays;
+    std::vector<vsg::ref_ptr<osg::Array>> arrays;
 
     GLTFBuilder(const tinygltf::Model& model_,
                 const SGReaderWriterOptions* opts_) :
@@ -69,14 +69,14 @@ struct GLTFBuilder {
         extractArrays();
     }
 
-    osg::Node* makeModel() const
+    vsg::Node* makeModel() const
     {
-        osg::Group* group = new osg::Group;
+        vsg::Group* group = new vsg::Group;
         // Load all glTF nodes contained in every glTF scene and add them to the
-        // same osg::Group.
+        // same vsg::Group.
         for (const auto& scene : model.scenes) {
             for (const int nodeIndex : scene.nodes) {
-                osg::Node* node = makeNode(model.nodes[nodeIndex]);
+                vsg::Node* node = makeNode(model.nodes[nodeIndex]);
                 if (node) {
                     group->addChild(node);
                 }
@@ -85,11 +85,11 @@ struct GLTFBuilder {
         return group;
     }
 
-    osg::Node* makeNode(const tinygltf::Node& node) const
+    vsg::Node* makeNode(const tinygltf::Node& node) const
     {
-        // We need to create a named osg::Group for animations. Naming the
+        // We need to create a named vsg::Group for animations. Naming the
         // MatrixTransform directly does not work.
-        osg::Group* group = new osg::Group;
+        vsg::Group* group = new vsg::Group;
         group->setName(node.name);
 
         // Assume that the glTF node has a single mesh
@@ -99,7 +99,7 @@ struct GLTFBuilder {
 
         // Add all children by recursively reading referenced nodes
         for (const int nodeIndex : node.children) {
-            osg::Node* child = makeNode(model.nodes[nodeIndex]);
+            vsg::Node* child = makeNode(model.nodes[nodeIndex]);
             if (child) {
                 group->addChild(child);
             }
@@ -109,15 +109,15 @@ struct GLTFBuilder {
         mt->addChild(group);
 
         if (node.matrix.size() == 16) {
-            osg::Matrixd mat;
+            vsg::dmat4 mat;
             mat.set(node.matrix.data());
             mt->setMatrix(mat);
         }
 
         if (mt->getMatrix().isIdentity()) {
-            osg::Matrixd scale, translation, rotation;
+            vsg::dmat4 scale, translation, rotation;
             if (node.scale.size() == 3) {
-                scale = osg::Matrixd::scale(node.scale[0],
+                scale = vsg::dmat4::scale(node.scale[0],
                                             node.scale[1],
                                             node.scale[2]);
             }
@@ -129,7 +129,7 @@ struct GLTFBuilder {
                 rotation.makeRotate(quat);
             }
             if (node.translation.size() == 3) {
-                translation = osg::Matrixd::translate(node.translation[0],
+                translation = vsg::dmat4::translate(node.translation[0],
                                                       node.translation[1],
                                                       node.translation[2]);
             }
@@ -139,7 +139,7 @@ struct GLTFBuilder {
         return mt;
     }
 
-    void makeMesh(osg::Group* parent, const tinygltf::Mesh& mesh) const
+    void makeMesh(vsg::Group* parent, const tinygltf::Mesh& mesh) const
     {
         // A glTF mesh can contain several primitives
         for (const auto& primitive : mesh.primitives) {
@@ -165,9 +165,9 @@ struct GLTFBuilder {
                 eg->setEffectPropTree(effectRoot);
             }
 
-            osg::Geometry* geom = new osg::Geometry;
+            vsg::Geometry* geom = new vsg::Geometry;
             eg->addDrawable(geom);
-            geom->setDataVariance(osg::Object::STATIC);
+            geom->setDataVariance(vsg::Object::STATIC);
             geom->setUseDisplayList(false);
             geom->setUseVertexBufferObjects(true);
 
@@ -412,7 +412,7 @@ struct GLTFBuilder {
             const auto &bufferView = model.bufferViews[accessor.bufferView];
             const auto &buffer = model.buffers[bufferView.buffer];
 
-            osg::ref_ptr<osg::Array> osgArray;
+            vsg::ref_ptr<osg::Array> osgArray;
 
             switch (accessor.componentType) {
             case TINYGLTF_COMPONENT_TYPE_BYTE:
@@ -584,7 +584,7 @@ struct GLTFBuilder {
                                             TINYGLTF_TYPE_VEC2>::makeArray(buffer, bufferView, accessor);
                     break;
                 case TINYGLTF_TYPE_VEC3:
-                    osgArray = ArrayBuilder<osg::Vec3Array,
+                    osgArray = ArrayBuilder<vsg::vec3Array,
                                             TINYGLTF_COMPONENT_TYPE_FLOAT,
                                             TINYGLTF_TYPE_VEC3>::makeArray(buffer, bufferView, accessor);
                     break;

@@ -5,19 +5,15 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifdef HAVE_CONFIG_H
 #include <simgear_config.h>
-#endif
 
 #include "BVHPageNodeOSG.hxx"
 
 #include "../../bvh/BVHPageRequest.hxx"
 #include "../../bvh/BVHPager.hxx"
 
-#include <osg/Camera>
 #include <osg/Drawable>
 #include <osg/Geode>
-#include <osg/Group>
 #include <osg/PagedLOD>
 #include <osg/ProxyNode>
 #include <osg/Transform>
@@ -37,6 +33,7 @@
 
 #include "PrimitiveCollector.hxx"
 
+
 namespace simgear {
 
 class BVHPageNodeOSG::_NodeVisitor : public osg::NodeVisitor
@@ -49,13 +46,13 @@ public:
         virtual ~_PrimitiveCollector()
         {
         }
-        virtual void addPoint(const osg::Vec3d& v1)
+        virtual void addPoint(const vsg::dvec3& v1)
         {
         }
-        virtual void addLine(const osg::Vec3d& v1, const osg::Vec3d& v2)
+        virtual void addLine(const vsg::dvec3& v1, const vsg::dvec3& v2)
         {
         }
-        virtual void addTriangle(const osg::Vec3d& v1, const osg::Vec3d& v2, const osg::Vec3d& v3)
+        virtual void addTriangle(const vsg::dvec3& v1, const vsg::dvec3& v2, const vsg::dvec3& v3)
         {
             _nodeVisitor.addTriangle(v1, v2, v3);
         }
@@ -65,7 +62,7 @@ public:
     };
 
     struct _NodeBin {
-        SGSharedPtr<BVHNode> getNode(const osg::Matrix& matrix)
+        SGSharedPtr<BVHNode> getNode(const vsg::mat4& matrix)
         {
             if (_nodeVector.empty())
                 return SGSharedPtr<BVHNode>();
@@ -108,10 +105,10 @@ public:
         _NodeVector _nodeVector;
     };
 
-    _NodeVisitor(bool flatten, const osg::Matrix& localToWorldMatrix = osg::Matrix()) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ACTIVE_CHILDREN),
-                                                                                        _localToWorldMatrix(localToWorldMatrix),
-                                                                                        _geometryBuilder(new BVHStaticGeometryBuilder),
-                                                                                        _flatten(flatten)
+    _NodeVisitor(bool flatten, const vsg::mat4& localToWorldMatrix = vsg::mat4()) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ACTIVE_CHILDREN),
+                                                                                    _localToWorldMatrix(localToWorldMatrix),
+                                                                                    _geometryBuilder(new BVHStaticGeometryBuilder),
+                                                                                    _flatten(flatten)
     {
         setTraversalMask(SG_NODEMASK_TERRAIN_BIT);
     }
@@ -119,14 +116,14 @@ public:
     {
     }
 
-    void addTriangle(const osg::Vec3d& v1, const osg::Vec3d& v2, const osg::Vec3d& v3)
+    void addTriangle(const vsg::dvec3& v1, const vsg::dvec3& v2, const vsg::dvec3& v3)
     {
         _geometryBuilder->addTriangle(toVec3f(toSG(_localToWorldMatrix.preMult(v1))),
                                       toVec3f(toSG(_localToWorldMatrix.preMult(v2))),
                                       toVec3f(toSG(_localToWorldMatrix.preMult(v3))));
     }
 
-    void setCenter(const osg::Vec3& center)
+    void setCenter(const vsg::vec3& center)
     {
         _centerMatrix.preMultTranslate(center);
         _localToWorldMatrix.postMultTranslate(-center);
@@ -151,20 +148,20 @@ public:
         _geometryBuilder->setCurrentMaterial(oldMaterial);
     }
 
-    virtual void apply(osg::Node& node)
+    virtual void apply(vsg::Node& node)
     {
         if (_flatten) {
             traverse(node);
         } else {
             _NodeVisitor nodeVisitor(_flatten, _localToWorldMatrix);
             nodeVisitor.traverse(node);
-            _nodeBin.addNode(nodeVisitor.getNode(osg::Matrix::identity()));
+            _nodeBin.addNode(nodeVisitor.getNode(vsg::mat4::identity()));
         }
     }
 
-    virtual void apply(osg::Transform& transform)
+    virtual void apply(vsg::Transform& transform)
     {
-        if (transform.getReferenceFrame() != osg::Transform::RELATIVE_RF)
+        if (transform.getReferenceFrame() != vsg::Transform::RELATIVE_RF)
             return;
 
         // FIXME identify and handle dynamic transforms
@@ -174,7 +171,7 @@ public:
             // build a flat leaf tree as far as possible
 
             // save away and accumulate the localToWorldMatrix
-            osg::Matrix localToWorldMatrix = _localToWorldMatrix;
+            vsg::mat4 localToWorldMatrix = _localToWorldMatrix;
             if (!transform.computeLocalToWorldMatrix(_localToWorldMatrix, this))
                 return;
 
@@ -183,7 +180,7 @@ public:
             _localToWorldMatrix = localToWorldMatrix;
         } else {
             // accumulate the localToWorldMatrix
-            osg::Matrix localToWorldMatrix = _localToWorldMatrix;
+            vsg::mat4 localToWorldMatrix = _localToWorldMatrix;
             if (!transform.computeLocalToWorldMatrix(localToWorldMatrix, this))
                 return;
 
@@ -194,11 +191,11 @@ public:
         }
     }
 
-    virtual void apply(osg::Camera& camera)
+    virtual void apply(vsg::Camera& camera)
     {
-        if (camera.getRenderOrder() != osg::Camera::NESTED_RENDER)
+        if (camera.getRenderOrder() != vsg::Camera::NESTED_RENDER)
             return;
-        apply(static_cast<osg::Transform&>(camera));
+        apply(static_cast<vsg::Transform&>(camera));
     }
 
     virtual void apply(osg::PagedLOD& pagedLOD)
@@ -209,14 +206,14 @@ public:
             for (unsigned i = 0; i < numFileNames; ++i) {
                 if (i < pagedLOD.getNumChildren() && pagedLOD.getChild(i))
                     continue;
-                osg::ref_ptr<osg::Node> node;
+                vsg::ref_ptr<vsg::Node> node;
                 if (pagedLOD.getMinRange(i) <= 0) {
-                    osg::ref_ptr<const osgDB::Options> options;
+                    vsg::ref_ptr<const osgDB::Options> options;
                     options = getOptions(pagedLOD.getDatabaseOptions(), pagedLOD.getDatabasePath());
                     node = osgDB::readRefNodeFile(pagedLOD.getDatabasePath() + pagedLOD.getFileName(i), options.get());
                 }
                 if (!node.valid())
-                    node = new osg::Group;
+                    node = new vsg::Group;
                 if (i < pagedLOD.getNumChildren())
                     pagedLOD.setChild(i, node);
                 else
@@ -233,7 +230,7 @@ public:
 
             _NodeBin nodeBin;
             if (!nameList.empty()) {
-                osg::ref_ptr<const osgDB::Options> options;
+                vsg::ref_ptr<const osgDB::Options> options;
                 options = getOptions(pagedLOD.getDatabaseOptions(), pagedLOD.getDatabasePath());
                 SGSphered boundingSphere(toVec3d(toSG(pagedLOD.getBound().center())), pagedLOD.getBound().radius());
                 nodeBin.addNode(new BVHPageNodeOSG(nameList, boundingSphere, options.get()));
@@ -251,22 +248,22 @@ public:
         for (unsigned i = 0; i < numFileNames; ++i) {
             if (i < proxyNode.getNumChildren() && proxyNode.getChild(i))
                 continue;
-            osg::ref_ptr<const osgDB::Options> options;
+            vsg::ref_ptr<const osgDB::Options> options;
             options = getOptions(proxyNode.getDatabaseOptions(), proxyNode.getDatabasePath());
-            osg::ref_ptr<osg::Node> node;
+            vsg::ref_ptr<vsg::Node> node;
             node = osgDB::readRefNodeFile(proxyNode.getFileName(i), options.get());
             if (!node.valid())
-                node = new osg::Group;
+                node = new vsg::Group;
             if (i < proxyNode.getNumChildren())
                 proxyNode.setChild(i, node);
             else
                 proxyNode.addChild(node);
         }
 
-        apply(static_cast<osg::Group&>(proxyNode));
+        apply(static_cast<vsg::Group&>(proxyNode));
     }
 
-    virtual void apply(osg::Group& group)
+    virtual void apply(vsg::Group& group)
     {
         osgTerrain::TerrainTile* tile = dynamic_cast<osgTerrain::TerrainTile*>(&group);
 
@@ -274,22 +271,22 @@ public:
             BVHTerrainTile* bvhTerrainTile = new BVHTerrainTile(tile);
             _NodeVisitor nodeVisitor(_flatten, _localToWorldMatrix);
             nodeVisitor.traverse(*tile);
-            bvhTerrainTile->addChild(nodeVisitor.getNode(osg::Matrix::identity()));
+            bvhTerrainTile->addChild(nodeVisitor.getNode(vsg::mat4::identity()));
             _nodeBin.addNode(bvhTerrainTile);
         } else {
-            apply(static_cast<osg::Node&>(group));
+            apply(static_cast<vsg::Node&>(group));
         }
     }
 
-    static osg::ref_ptr<const osgDB::Options>
+    static vsg::ref_ptr<const osgDB::Options>
     getOptions(const osg::Referenced* referenced, const std::string& databasePath)
     {
-        osg::ref_ptr<const osgDB::Options> options = dynamic_cast<const osgDB::Options*>(referenced);
+        vsg::ref_ptr<const osgDB::Options> options = dynamic_cast<const osgDB::Options*>(referenced);
         if (!options.valid())
             options = osgDB::Registry::instance()->getOptions();
         if (databasePath.empty())
             return options;
-        osg::ref_ptr<osgDB::Options> writable;
+        vsg::ref_ptr<osgDB::Options> writable;
         if (options.valid())
             writable = static_cast<osgDB::Options*>(options->clone(osg::CopyOp()));
         else
@@ -298,7 +295,7 @@ public:
         return writable;
     }
 
-    SGSharedPtr<BVHNode> getNode(const osg::Matrix& matrix = osg::Matrix())
+    SGSharedPtr<BVHNode> getNode(const vsg::mat4& matrix = vsg::mat4())
     {
         // Flush any pending leaf nodes
         if (_geometryBuilder.valid()) {
@@ -312,9 +309,9 @@ public:
 private:
     // The part of the accumulated model view matrix that
     // is put into a BVHTransform node.
-    osg::Matrix _localToWorldMatrix;
+    vsg::mat4 _localToWorldMatrix;
     // The matrix that centers and aligns the leaf.
-    osg::Matrix _centerMatrix;
+    vsg::mat4 _centerMatrix;
 
     // The current pending nodes.
     _NodeBin _nodeBin;
@@ -363,15 +360,15 @@ private:
 };
 
 SGSharedPtr<BVHNode>
-BVHPageNodeOSG::load(const string_list nameList, const osg::ref_ptr<const osg::Referenced>& options, bool forceFlatten)
+BVHPageNodeOSG::load(const string_list nameList, const vsg::ref_ptr<const osg::Referenced>& options, bool forceFlatten)
 {
     auto opt = dynamic_cast<const osgDB::Options*>(options.get());
 
     // Simple Group node to collect all the loaded files.
-    const osg::ref_ptr<osg::Group> group = new osg::Group();
+    const vsg::ref_ptr<vsg::Group> group = new vsg::Group();
 
     for (auto n : nameList) {
-        const osg::ref_ptr<osg::Node> node = osgDB::readRefNodeFile(n, opt);
+        const vsg::ref_ptr<vsg::Node> node = osgDB::readRefNodeFile(n, opt);
 
         if (node.valid()) {
             group->addChild(node);
@@ -387,9 +384,9 @@ BVHPageNodeOSG::load(const string_list nameList, const osg::ref_ptr<const osg::R
 }
 
 SGSharedPtr<BVHNode>
-BVHPageNodeOSG::load(const std::string& name, const osg::ref_ptr<const osg::Referenced>& options, bool forceFlatten)
+BVHPageNodeOSG::load(const std::string& name, const vsg::ref_ptr<const osg::Referenced>& options, bool forceFlatten)
 {
-    osg::ref_ptr<osg::Node> node;
+    vsg::ref_ptr<vsg::Node> node;
     node = osgDB::readRefNodeFile(name, dynamic_cast<const osgDB::Options*>(options.get()));
 
     if (!node.valid())
@@ -405,7 +402,7 @@ BVHPageNodeOSG::load(const std::string& name, const osg::ref_ptr<const osg::Refe
 
 BVHPageNodeOSG::BVHPageNodeOSG(const std::string& name,
                                const SGSphered& boundingSphere,
-                               const osg::ref_ptr<const osg::Referenced>& options) : _boundingSphere(boundingSphere),
+                               const vsg::ref_ptr<const osg::Referenced>& options) : _boundingSphere(boundingSphere),
                                                                                      _options(options)
 {
     _modelList.push_back(name);
@@ -413,7 +410,7 @@ BVHPageNodeOSG::BVHPageNodeOSG(const std::string& name,
 
 BVHPageNodeOSG::BVHPageNodeOSG(const std::vector<std::string>& nameList,
                                const SGSphered& boundingSphere,
-                               const osg::ref_ptr<const osg::Referenced>& options) : _modelList(nameList),
+                               const vsg::ref_ptr<const osg::Referenced>& options) : _modelList(nameList),
                                                                                      _boundingSphere(boundingSphere),
                                                                                      _options(options)
 {

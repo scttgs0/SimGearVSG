@@ -17,29 +17,31 @@
 
 #pragma once
 
-#include <simgear/props/condition.hxx>
-#include <osg/Group>
+#include <vsg/all.h>
 
-namespace simgear
-{
+#include <simgear/props/condition.hxx>
+
+
+namespace simgear {
 /**
  * If the condition is true, traverse the first child; otherwise,
  * traverse the second if it exists.
  */
-class ConditionNode : public osg::Group
+class ConditionNode : public vsg::Group
 {
 public:
     ConditionNode();
     ConditionNode(const ConditionNode& rhs,
-              const osg::CopyOp& op = osg::CopyOp::SHALLOW_COPY);
-    META_Node(simgear,ConditionNode);
+                  const osg::CopyOp& op = osg::CopyOp::SHALLOW_COPY);
+    META_Node(simgear, ConditionNode);
     virtual ~ConditionNode();
     const SGCondition* getCondition() const { return _condition.ptr(); }
     void setCondition(const SGCondition* condition) { _condition = condition; }
 
     virtual void traverse(osg::NodeVisitor& nv);
+
 protected:
     SGSharedPtr<SGCondition const> _condition;
 };
 
-}
+} // namespace simgear

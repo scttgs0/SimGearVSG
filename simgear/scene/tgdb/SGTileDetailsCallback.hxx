@@ -53,7 +53,7 @@ using namespace simgear;
 using ReadResult = osgDB::ReaderWriter::ReadResult;
 
 // QuadTreeBuilder is used by Random Objects Generator
-typedef std::pair<osg::Node*, int> ModelLOD;
+typedef std::pair<vsg::Node*, int> ModelLOD;
 struct MakeQuadLeaf {
     osg::LOD* operator() () const { return new osg::LOD; }
 };
@@ -67,7 +67,7 @@ struct GetModelLODCoord {
     GetModelLODCoord() {}
     GetModelLODCoord(const GetModelLODCoord& rhs)
     {}
-    osg::Vec3 operator() (const ModelLOD& mlod) const
+    vsg::vec3 operator() (const ModelLOD& mlod) const
     {
         return mlod.first->getBound().center();
     }
@@ -93,16 +93,16 @@ public:
     
     ReadResult readNode(const std::string&, const osgDB::Options*) override
     {
-        osg::ref_ptr<osg::Group> group;
+        vsg::ref_ptr<vsg::Group> group;
         simgear::ErrorReportContext ec{"btg", _path};
 
         try {
-            group = new osg::Group;
+            group = new vsg::Group;
             SGMaterialLibPtr matlib;
-            osg::ref_ptr<SGMaterialCache> matcache; 
+            vsg::ref_ptr<SGMaterialCache> matcache; 
             
             group->setName("TileDetails_Group_" + _path);
-            group->setDataVariance(osg::Object::STATIC);
+            group->setDataVariance(vsg::Object::STATIC);
 
             // generate textured triangle list
             std::vector<SGTriangleInfo> matTris;
@@ -435,7 +435,7 @@ public:
                                         
                                         // Check this random point against the object mask
                                         // blue (for buildings) channel.
-                                        osg::Image* img = object_mask->getImage();
+                                        vsg::Image* img = object_mask->getImage();
                                         unsigned int x = (int) (img->s() * texCoord.x()) % img->s();
                                         unsigned int y = (int) (img->t() * texCoord.y()) % img->t();
                                         
@@ -536,7 +536,7 @@ public:
                         
                         if (object_mask != NULL) {
                             SGVec2f texCoord = torigin + a*t0 + b*t1;
-                            osg::Image* img = object_mask->getImage();
+                            vsg::Image* img = object_mask->getImage();
                             int x = (int) (img->s() * texCoord.x()) % img->s();
                             int y = (int) (img->t() * texCoord.y()) % img->t();
                             
@@ -561,9 +561,9 @@ public:
                         
                         // Determine the actual center of the building, by shifting from the
                         // center of the front face to the true center.
-                        osg::Matrix rotationMat = osg::Matrix::rotate(- rotation * M_PI * 2,
-                                                                      osg::Vec3f(0.0, 0.0, 1.0));
-                        SGVec3f buildingCenter = randomPoint + toSG(osg::Vec3f(-0.5 * bin->getBuildingMaxDepth(buildingtype), 0.0, 0.0) * rotationMat);
+                        vsg::mat4 rotationMat = vsg::mat4::rotate(- rotation * M_PI * 2,
+                                                                      vsg::vec3(0.0, 0.0, 1.0));
+                        SGVec3f buildingCenter = randomPoint + toSG(vsg::vec3(-0.5 * bin->getBuildingMaxDepth(buildingtype), 0.0, 0.0) * rotationMat);
                         
                         SGVec3f p = buildingCenter - vorigin;
 #if 1
@@ -756,15 +756,15 @@ public:
       SGLightBin randomTileLights;
       computeRandomSurfaceLights(matTris, randomTileLights);
       
-      osg::ref_ptr<osg::Group> lightGroup = new SGOffsetTransform(0.94);
+      vsg::ref_ptr<vsg::Group> lightGroup = new SGOffsetTransform(0.94);
       SGVec3f up(0, 0, 1);
 
       if (tileLights.getNumLights() > 0 || randomTileLights.getNumLights() > 0) {
-        osg::ref_ptr<osg::Group> groundLights0 = new osg::Group;
+        vsg::ref_ptr<vsg::Group> groundLights0 = new vsg::Group;
         groundLights0->setNodeMask(GROUNDLIGHTS0_BIT);
 
-        osg::ref_ptr<EffectGeode> geode = new EffectGeode;        
-        osg::ref_ptr<Effect> lightEffect = getLightEffect(24, osg::Vec3(1, 0.001, 0.00001), 1, 8, false, _options);
+        vsg::ref_ptr<EffectGeode> geode = new EffectGeode;        
+        vsg::ref_ptr<Effect> lightEffect = getLightEffect(24, vsg::vec3(1, 0.001, 0.00001), 1, 8, false, _options);
         
         geode->setEffect(lightEffect);                
         geode->addDrawable(SGLightFactory::getLights(tileLights));
@@ -774,21 +774,21 @@ public:
       }
 
       if (randomTileLights.getNumLights() > 0) {
-        osg::ref_ptr<osg::Group> groundLights1 = new osg::Group;
+        vsg::ref_ptr<vsg::Group> groundLights1 = new vsg::Group;
         groundLights1->setNodeMask(GROUNDLIGHTS1_BIT);
         
-        osg::ref_ptr<osg::Group> groundLights2 = new osg::Group;
+        vsg::ref_ptr<vsg::Group> groundLights2 = new vsg::Group;
         groundLights2->setNodeMask(GROUNDLIGHTS2_BIT);
 
-        osg::ref_ptr<EffectGeode> geode1 = new EffectGeode;
+        vsg::ref_ptr<EffectGeode> geode1 = new EffectGeode;
         
-        osg::ref_ptr<Effect> lightEffect = getLightEffect(24, osg::Vec3(1, 0.001, 0.00001), 1, 8, false, _options);        
+        vsg::ref_ptr<Effect> lightEffect = getLightEffect(24, vsg::vec3(1, 0.001, 0.00001), 1, 8, false, _options);        
         geode1->setEffect(lightEffect);        
         geode1->addDrawable(SGLightFactory::getLights(randomTileLights, 2, -0.15f));
         groundLights1->addChild(geode1);
         lightGroup->addChild(groundLights1);
         
-        osg::ref_ptr<EffectGeode> geode2 = new EffectGeode;
+        vsg::ref_ptr<EffectGeode> geode2 = new EffectGeode;
         
         geode2->setEffect(lightEffect);
         geode2->addDrawable(SGLightFactory::getLights(randomTileLights));
@@ -798,7 +798,7 @@ public:
 
       if (! vasiLights.empty()) {
         EffectGeode* vasiGeode = new EffectGeode;        
-        Effect* vasiEffect = getLightEffect(24, osg::Vec3(1, 0.0001, 0.000001), 1, 24, true, _options);
+        Effect* vasiEffect = getLightEffect(24, vsg::vec3(1, 0.0001, 0.000001), 1, 24, true, _options);
         vasiGeode->setEffect(vasiEffect);
         SGVec4f red(1, 0, 0, 1);
         SGMaterial* mat = 0;
@@ -826,7 +826,7 @@ public:
 
       Effect* runwayEffect = 0;
       if (runwayLights.getNumLights() > 0 || taxiLights.getNumLights() > 0) {
-          runwayEffect = getLightEffect(16, osg::Vec3(1, 0.001, 0.0002), 1, 16, true, _options);
+          runwayEffect = getLightEffect(16, vsg::vec3(1, 0.001, 0.0002), 1, 16, true, _options);
       }
 
       if (runwayLights.getNumLights() > 0
@@ -836,7 +836,7 @@ public:
           || !holdshortLights.empty()
           || !guardLights.empty()) {
 
-        osg::Group* rwyLightsGroup = new osg::Group;
+        vsg::Group* rwyLightsGroup = new vsg::Group;
         rwyLightsGroup->setNodeMask(RUNWAYLIGHTS_BIT);
 
         SGDirectionalLightListBin::const_iterator i;
@@ -859,7 +859,7 @@ public:
         }
 
         if (runwayLights.getNumLights() > 0) {
-          osg::ref_ptr<EffectGeode> geode = new EffectGeode;
+          vsg::ref_ptr<EffectGeode> geode = new EffectGeode;
           geode->setEffect(runwayEffect);
           geode->addDrawable(SGLightFactory::getLights(runwayLights));
           rwyLightsGroup->addChild(geode);
@@ -869,7 +869,7 @@ public:
       }
 
       if (taxiLights.getNumLights() > 0) {
-        osg::Group* taxiLightsGroup = new osg::Group;
+        vsg::Group* taxiLightsGroup = new vsg::Group;
         taxiLightsGroup->setNodeMask(RUNWAYLIGHTS_BIT);
         EffectGeode* geode = new EffectGeode;
         geode->setEffect(runwayEffect);
@@ -901,9 +901,9 @@ public:
       float building_density = 1.0f;
       float object_range = SG_OBJECT_RANGE_ROUGH;
 
-      osg::ref_ptr<osg::Group> randomObjects;
-      osg::ref_ptr<osg::Group> forestNode;
-      osg::ref_ptr<osg::Group> buildingNode;
+      vsg::ref_ptr<vsg::Group> randomObjects;
+      vsg::ref_ptr<vsg::Group> forestNode;
+      vsg::ref_ptr<vsg::Group> buildingNode;
 
       if (_options) {
         matlib = _options->getMaterialLib();
@@ -954,26 +954,26 @@ public:
           SGMatModelBin::MatModel obj = randomModels.getMatModel(i);
 
           SGPropertyNode* root = _options->getPropertyNode()->getRootNode();
-          osg::Node* node = obj.model->get_random_model(root, &seed);
+          vsg::Node* node = obj.model->get_random_model(root, &seed);
 
           // Create a matrix to place the object in the correct
           // location, and then apply the rotation matrix created
           // above, with an additional random (or taken from
           // the object mask) heading rotation if appropriate.
-          osg::Matrix transformMat;
-          transformMat = osg::Matrix::translate(toOsg(obj.position));
+          vsg::mat4 transformMat;
+          transformMat = vsg::mat4::translate(toOsg(obj.position));
           if (obj.model->get_heading_type() == SGMatModel::HEADING_RANDOM) {
             // Rotate the object around the z axis.
             double hdg = mt_rand(&seed) * M_PI * 2;
-            transformMat.preMult(osg::Matrix::rotate(hdg,
-                                                     osg::Vec3d(0.0, 0.0, 1.0)));
+            transformMat.preMult(vsg::mat4::rotate(hdg,
+                                                     vsg::dvec3(0.0, 0.0, 1.0)));
           }
 
           if (obj.model->get_heading_type() == SGMatModel::HEADING_MASK) {
             // Rotate the object around the z axis.
             double hdg =  - obj.rotation * M_PI * 2;
-            transformMat.preMult(osg::Matrix::rotate(hdg,
-                                                     osg::Vec3d(0.0, 0.0, 1.0)));
+            transformMat.preMult(vsg::mat4::rotate(hdg,
+                                                     vsg::dvec3(0.0, 0.0, 1.0)));
           }
 
           osg::MatrixTransform* position =
@@ -989,7 +989,7 @@ public:
       }
 
       if (!randomBuildings.empty()) {
-        buildingNode = createRandomBuildings(randomBuildings, osg::Matrix::identity(), _options);
+        buildingNode = createRandomBuildings(randomBuildings, vsg::mat4::identity(), _options);
         buildingNode->setName("Random buildings");
 
         std::for_each(randomBuildings.begin(), randomBuildings.end(), [](simgear::SGBuildingBin* bb) {
@@ -1037,9 +1037,9 @@ public:
     }
 
     /// The original options to use for this bunch of models
-    osg::ref_ptr<SGReaderWriterOptions>     _options;
+    vsg::ref_ptr<SGReaderWriterOptions>     _options;
     string                                  _path;
-    osg::ref_ptr<osg::Node>                 _rootNode;
+    vsg::ref_ptr<vsg::Node>                 _rootNode;
     SGVec3d                                 _gbs_center;
     bool                                    _randomSurfaceLightsComputed;
     bool                                    _tileRandomObjectsComputed;

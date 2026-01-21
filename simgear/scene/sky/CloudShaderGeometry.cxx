@@ -50,7 +50,7 @@ void CloudShaderGeometry::drawImplementation(RenderInfo& renderInfo) const
 {
     if (_cloudsprites.empty()) return;
     
-    osg::State& state = *renderInfo.getState();
+    vsg::State& state = *renderInfo.getState();
     
     int frameNumber = state.getFrameStamp()->getFrameNumber();
     unsigned int contextID = state.getContextID();    
@@ -62,7 +62,7 @@ void CloudShaderGeometry::drawImplementation(RenderInfo& renderInfo) const
     // sorted after that period, then we can wait for a longer period before
     // checking again. In this way, only clouds that are changing regularly
     // are sorted.        
-    osg::Vec3Array* v = dynamic_cast<osg::Vec3Array*>(g->getVertexArray());
+    vsg::vec3Array* v = dynamic_cast<vsg::vec3Array*>(g->getVertexArray());
     if ((v->size() > 6) &&
         (frameNumber - sortData.skip_limit >= sortData.frameSorted)) {
         Matrix mvp = state.getModelViewMatrix() * state.getProjectionMatrix();
@@ -156,12 +156,12 @@ void CloudShaderGeometry::generateGeometry()
     
     // Create front and back polygons so we don't need to screw around
     // with two-sided lighting in the shader.
-    osg::ref_ptr<osg::Vec3Array> v = new osg::Vec3Array;
-    osg::ref_ptr<osg::Vec4Array> c = new osg::Vec4Array;
-    osg::ref_ptr<osg::Vec2Array> t = new osg::Vec2Array;
-    v->setDataVariance(osg::Object::DYNAMIC);
-    c->setDataVariance(osg::Object::DYNAMIC);
-    t->setDataVariance(osg::Object::DYNAMIC);
+    vsg::ref_ptr<vsg::vec3Array> v = new vsg::vec3Array;
+    vsg::ref_ptr<osg::Vec4Array> c = new osg::Vec4Array;
+    vsg::ref_ptr<osg::Vec2Array> t = new osg::Vec2Array;
+    v->setDataVariance(vsg::Object::DYNAMIC);
+    c->setDataVariance(vsg::Object::DYNAMIC);
+    t->setDataVariance(vsg::Object::DYNAMIC);
     // We need 2 triangles (6 vertices) per sprite
     v->reserve(numsprites * 6);
     c->reserve(numsprites * 6);
@@ -175,10 +175,10 @@ void CloudShaderGeometry::generateGeometry()
         float ch = 0.5f * iter->height;        
         
         // Create the vertices
-        osg::Vec3 v0(0.0f, -cw, -ch);
-        osg::Vec3 v1(0.0f,  cw, -ch);
-        osg::Vec3 v2(0.0f,  cw,  ch);
-        osg::Vec3 v3(0.0f, -cw,  ch);
+        vsg::vec3 v0(0.0f, -cw, -ch);
+        vsg::vec3 v1(0.0f,  cw, -ch);
+        vsg::vec3 v2(0.0f,  cw,  ch);
+        vsg::vec3 v3(0.0f, -cw,  ch);
         v->push_back(v0); v->push_back(v1); v->push_back(v2); // 1st triangle
         v->push_back(v0); v->push_back(v2); v->push_back(v3); // 2nd triangle
 
@@ -188,35 +188,35 @@ void CloudShaderGeometry::generateGeometry()
         int x = iter->texture_index_x;
         int y = iter->texture_index_y;
 
-        osg::Vec2 t0( (float) x       / varieties_x, (float) y / varieties_y);
-        osg::Vec2 t1( (float) (x + 1) / varieties_x, (float) y / varieties_y);
-        osg::Vec2 t2( (float) (x + 1) / varieties_x, (float) (y + 1) / varieties_y);
-        osg::Vec2 t3( (float) x       / varieties_x, (float) (y + 1) / varieties_y);
+        vsg::vec2 t0( (float) x       / varieties_x, (float) y / varieties_y);
+        vsg::vec2 t1( (float) (x + 1) / varieties_x, (float) y / varieties_y);
+        vsg::vec2 t2( (float) (x + 1) / varieties_x, (float) (y + 1) / varieties_y);
+        vsg::vec2 t3( (float) x       / varieties_x, (float) (y + 1) / varieties_y);
         t->push_back(t0); t->push_back(t1); t->push_back(t2); // 1st triangle
         t->push_back(t0); t->push_back(t2); t->push_back(t3); // 2nd triangle
         
         // The color isn't actually used in lighting, but instead to indicate
         // the center of rotation, and is shared across the sprite.
-        osg::Vec4 c0(iter->position.x(), iter->position.y(), iter->position.z(), zscale);
+        vsg::vec4 c0(iter->position.x(), iter->position.y(), iter->position.z(), zscale);
         for (int i = 0; i < 6; ++i) {
             c->push_back(c0);
         }
     }
 
-    osg::ref_ptr<osg::Vec3Array> ua1 = new osg::Vec3Array(1);
-    (*ua1)[0] = osg::Vec3(alpha_factor, shade_factor, cloud_height);
-    osg::ref_ptr<osg::Vec3Array> ua2 = new osg::Vec3Array(1);
-    (*ua2)[0] = osg::Vec3(bottom_factor, middle_factor, top_factor);
+    vsg::ref_ptr<vsg::vec3Array> ua1 = new vsg::vec3Array(1);
+    (*ua1)[0] = vsg::vec3(alpha_factor, shade_factor, cloud_height);
+    vsg::ref_ptr<vsg::vec3Array> ua2 = new vsg::vec3Array(1);
+    (*ua2)[0] = vsg::vec3(bottom_factor, middle_factor, top_factor);
 
     // Quads now created, add it to the geometry.
     // GLcore: We could use glDrawElements instead of glDrawArrays so that the
     // triangles that form the quad share one edge (2 vertices). In practice,
     // glDrawArrays still performs better in most cases.
-    osg::Geometry* geom = new osg::Geometry;
+    vsg::Geometry* geom = new vsg::Geometry;
     geom->setUseVertexBufferObjects(true);
     // Set the data variance to DYNAMIC because we will be modifying the vertex
     // data later when ordering the sprites.
-    geom->setDataVariance(osg::Object::DYNAMIC);
+    geom->setDataVariance(vsg::Object::DYNAMIC);
     geom->setVertexArray(v);
     geom->setTexCoordArray(0, t, osg::Array::BIND_PER_VERTEX);
     geom->setColorArray(c, osg::Array::BIND_PER_VERTEX);

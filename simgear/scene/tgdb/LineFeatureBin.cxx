@@ -72,7 +72,7 @@ LineFeatureBin::LineFeatureBin(const SGPath& absoluteFileName, const std::string
         float w = 0.0f;
         int attributes = 0;
         float a=0, b=0, c=0, d=0;
-        std::list<osg::Vec3d> nodes;
+        std::list<vsg::dvec3> nodes;
 
         in >> w >> attributes >> a >> b >> c >> d;
 

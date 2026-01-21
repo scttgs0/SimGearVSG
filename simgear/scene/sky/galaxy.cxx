@@ -17,9 +17,9 @@
 
 using namespace simgear;
 
-osg::Node* SGGalaxy::build(double galaxy_size, const SGReaderWriterOptions* options)
+vsg::Node* SGGalaxy::build(double galaxy_size, const SGReaderWriterOptions* options)
 {
-    osg::ref_ptr<EffectGeode> orb = SGMakeSphere(galaxy_size, 32, 16);
+    vsg::ref_ptr<EffectGeode> orb = SGMakeSphere(galaxy_size, 32, 16);
     orb->setName("Galaxy");
 
     Effect* effect = makeEffect("Effects/galaxy", true, options);
@@ -27,7 +27,7 @@ osg::Node* SGGalaxy::build(double galaxy_size, const SGReaderWriterOptions* opti
         orb->setEffect(effect);
     }
 
-    osg::ref_ptr<osg::MatrixTransform> galaxy_transform = new osg::MatrixTransform;
+    vsg::ref_ptr<osg::MatrixTransform> galaxy_transform = new osg::MatrixTransform;
     galaxy_transform->addChild(orb);
 
     // reposition the Galaxy's texture, which is in galactic
@@ -44,15 +44,15 @@ osg::Node* SGGalaxy::build(double galaxy_size, const SGReaderWriterOptions* opti
     const double galactic_north_pole_DEC = 27.12825;
     const double equatorial_north_pole_THETA = 122.93192;
    
-    osg::Matrix RA, DEC, THETA;
+    vsg::mat4 RA, DEC, THETA;
 
     // RA origin at 90 degrees
-    RA.makeRotate((galactic_north_pole_RA-90.0)*SGD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
+    RA.makeRotate((galactic_north_pole_RA-90.0)*SGD_DEGREES_TO_RADIANS, vsg::vec3(0, 0, 1));
     // Rotate along rotated x-axis by -(90-DEC)
-    DEC.makeRotate((galactic_north_pole_DEC-90.0)*SGD_DEGREES_TO_RADIANS, osg::Vec3(1, 0, 0));
+    DEC.makeRotate((galactic_north_pole_DEC-90.0)*SGD_DEGREES_TO_RADIANS, vsg::vec3(1, 0, 0));
     // Set the origin of the galactic longitude in Sagittarius, rotate
     // along rotated z-axis by -theta
-    THETA.makeRotate(-equatorial_north_pole_THETA*SGD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
+    THETA.makeRotate(-equatorial_north_pole_THETA*SGD_DEGREES_TO_RADIANS, vsg::vec3(0, 0, 1));
 
     galaxy_transform->setMatrix(THETA*DEC*RA);
   

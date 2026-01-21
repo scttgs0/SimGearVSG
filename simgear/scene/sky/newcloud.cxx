@@ -24,11 +24,12 @@
 #  include <simgear_config.h>
 #endif
 
+#include <vsg/all.h>
+
 #include <osg/AlphaFunc>
 #include <osg/Depth>
 #include <osg/Program>
 #include <osg/Uniform>
-#include <osg/ref_ptr>
 #include <osg/Texture2D>
 #include <osg/NodeVisitor>
 #include <osg/PositionAttitudeTransform>
@@ -140,9 +141,9 @@ static float Rnd(float n) {
 }
 #endif
 
-osg::ref_ptr<EffectGeode> SGNewCloud::genCloud() {
+vsg::ref_ptr<EffectGeode> SGNewCloud::genCloud() {
     
-    osg::ref_ptr<EffectGeode> geode = new EffectGeode;
+    vsg::ref_ptr<EffectGeode> geode = new EffectGeode;
         
     // Determine how big this specific cloud instance is. Note that we subtract
     // the sprite size because the width/height is used to define the limits of

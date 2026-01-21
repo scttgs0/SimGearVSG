@@ -8,43 +8,41 @@
 
 #pragma once
 
-#include "canvas_fwd.hxx"
+#include <vsg/all.h>
+
 #include "CanvasEventManager.hxx"
+#include "canvas_fwd.hxx"
 
-namespace simgear::canvas
+
+namespace simgear::canvas {
+
+class EventVisitor
 {
-
-  class EventVisitor
-  {
-    public:
-
-      enum TraverseMode
-      {
+public:
+    enum TraverseMode {
         TRAVERSE_UP,
         TRAVERSE_DOWN
-      };
+    };
 
-      /**
+    /**
        *
        * @param mode
        * @param pos     Mouse position
        * @param root    Element to dispatch events to if no element is hit
        */
-      EventVisitor( TraverseMode mode,
-                    const osg::Vec2f& pos,
-                    const ElementPtr& root = ElementPtr() );
-      virtual ~EventVisitor();
-      virtual bool traverse(Element& el);
-      virtual bool apply(Element& el);
+    EventVisitor(TraverseMode mode,
+                 const vsg::vec2& pos,
+                 const ElementPtr& root = ElementPtr());
+    virtual ~EventVisitor();
+    virtual bool traverse(Element& el);
+    virtual bool apply(Element& el);
 
-      const EventPropagationPath& getPropagationPath() const;
+    const EventPropagationPath& getPropagationPath() const;
 
-    protected:
-
-      TraverseMode          _traverse_mode;
-      EventPropagationPath  _target_path;
-      ElementPtr            _root;
-
-  };
+protected:
+    TraverseMode _traverse_mode;
+    EventPropagationPath _target_path;
+    ElementPtr _root;
+};
 
 } // namespace simgear::canvas

@@ -4,7 +4,7 @@
 variables:
   BUILD_DIR: "$CI_PROJECT_DIR/build"
   PREFIX_DIR: "$CI_PROJECT_DIR/simgear-dist"
-  # create a root dir *above* the Simgear checkout, otherwise CMake
+  # create a root dir *above* the SimGear checkout, otherwise CMake
   # complains about INTERFACE_INCLUDE_DIRECTORIES being the source dir
   WIN_FG_DIR: $CI_BUILDS_DIR\flightgear
   MAC_IMAGE: macos-14-xcode-15
@@ -80,8 +80,8 @@ linux-build:
     paths:
       - $BUILD_DIR
 
-# even though Simgear doesn't use Qt5, we make some other changes in this image,
-# such as using a different C-Ares version, which mean we need a distinct Simgear build,
+# even though SimGear doesn't use Qt5, we make some other changes in this image,
+# such as using a different C-Ares version, which mean we need a distinct SimGear build,
 # to match the FlighGear build
 linux-qt5-build:
   image: ${CI_REGISTRY}/flightgear/flightgear-ci-docker/flightgear-qt5:latest

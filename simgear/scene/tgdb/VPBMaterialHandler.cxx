@@ -40,17 +40,17 @@ using namespace osgTerrain;
 namespace simgear {
 // Common VPBMaterialHandler functions
 bool VPBMaterialHandler::checkAgainstObjectMask(
-    osg::Image *objectMaskImage, ImageChannel channel, double sampleProbability,
-    double x, double y, float x_scale, float y_scale, const osg::Vec2d t_0,
-    osg::Vec2d t_x, osg::Vec2d t_y) {
+    vsg::Image *objectMaskImage, ImageChannel channel, double sampleProbability,
+    double x, double y, float x_scale, float y_scale, const vsg::dvec2 t_0,
+    vsg::dvec2 t_x, vsg::dvec2 t_y) {
 
-    osg::Vec2 t = osg::Vec2(t_0 + t_x * x + t_y * y);
+    vsg::vec2 t = vsg::vec2(t_0 + t_x * x + t_y * y);
     return checkAgainstObjectMask(objectMaskImage, channel, sampleProbability, x_scale, y_scale, t);
 }
 
 bool VPBMaterialHandler::checkAgainstObjectMask(
-    osg::Image *objectMaskImage, ImageChannel channel, double sampleProbability,
-    float x_scale, float y_scale, osg::Vec2d t) {
+    vsg::Image *objectMaskImage, ImageChannel channel, double sampleProbability,
+    float x_scale, float y_scale, vsg::dvec2 t) {
     if (objectMaskImage != nullptr) {
         const unsigned int x =
             (unsigned int)(objectMaskImage->s() * t.x() * x_scale) %
@@ -67,12 +67,12 @@ bool VPBMaterialHandler::checkAgainstObjectMask(
 
 /** VegetationHandler implementation
  * The code has been ported as-is from the following source:
- * Simgear commit 6d71ab75:
+ * SimGear commit 6d71ab75:
  *  simgear/scene/tgdb/VPBTechnique.cxx : applyTrees()
  */
-bool VegetationHandler::initialize(osg::ref_ptr<SGReaderWriterOptions> options,
-                                   osg::ref_ptr<TerrainTile> terrainTile,
-                                   osg::ref_ptr<SGMaterialCache> matcache) {
+bool VegetationHandler::initialize(vsg::ref_ptr<SGReaderWriterOptions> options,
+                                   vsg::ref_ptr<TerrainTile> terrainTile,
+                                   vsg::ref_ptr<SGMaterialCache> matcache) {
     bool use_random_vegetation = false;
     int vegetation_lod_level = 6;
     vegetation_density = 1.0;
@@ -109,7 +109,7 @@ bool VegetationHandler::initialize(osg::ref_ptr<SGReaderWriterOptions> options,
         return false;
     }
 
-    osg::Image* image = colorLayer->getImage();
+    vsg::Image* image = colorLayer->getImage();
     if (!image || ! image->valid()) {
         SG_LOG(SG_TERRAIN, SG_ALERT, "No landclass image for " << terrainTile->getTileID().x << " " << terrainTile->getTileID().y << " " << terrainTile->getTileID().level);
         return false;
@@ -121,7 +121,7 @@ bool VegetationHandler::initialize(osg::ref_ptr<SGReaderWriterOptions> options,
     std::set <int>lcSet;
     for (int t = 0; t < image->t(); ++t) {
         for (int s = 0; s < image->s(); ++s) {
-            const osg::Vec4 tc = image->getColor(s, t);
+            const vsg::vec4 tc = image->getColor(s, t);
             const int lc = int(std::round(tc.x() * 255.0));
             lcSet.insert(lc);
         }
@@ -204,8 +204,8 @@ bool VegetationHandler::handleNewMaterial(SGMaterial *mat) {
 }
    
 bool VegetationHandler::handleIteration(
-    SGMaterial* mat, osg::Image* objectMaskImage,
-    osg::Vec2d p, const double rand1, const double rand2,
+    SGMaterial* mat, vsg::Image* objectMaskImage,
+    vsg::dvec2 p, const double rand1, const double rand2,
     float x_scale, float y_scale)
 {
     if (mat->get_wood_coverage() <= 0)
@@ -223,12 +223,12 @@ bool VegetationHandler::handleIteration(
 }
 
 
-void VegetationHandler::placeObject(const osg::Vec3 vp) {
+void VegetationHandler::placeObject(const vsg::vec3 vp) {
     bin->insert(vp);
 }
 
-void VegetationHandler::finish(osg::ref_ptr<SGReaderWriterOptions> options,
-                               osg::ref_ptr<osg::MatrixTransform> transform,
+void VegetationHandler::finish(vsg::ref_ptr<SGReaderWriterOptions> options,
+                               vsg::ref_ptr<osg::MatrixTransform> transform,
                                const SGGeod loc) {
     if (randomForest.size() > 0) {
         SG_LOG(SG_TERRAIN, SG_DEBUG,
@@ -240,7 +240,7 @@ void VegetationHandler::finish(osg::ref_ptr<SGReaderWriterOptions> options,
                    "  " << treeBin->texture << " " << treeBin->getNumTrees());
         }
 
-        osg::Group *trees = createForest(randomForest, options);
+        vsg::Group *trees = createForest(randomForest, options);
         trees->setNodeMask(SG_NODEMASK_TERRAIN_BIT);
         transform->addChild(trees);
 
@@ -255,9 +255,9 @@ void VegetationHandler::finish(osg::ref_ptr<SGReaderWriterOptions> options,
 
 /** RandomLightsHandler implementation */
 bool RandomLightsHandler::initialize(
-    osg::ref_ptr<SGReaderWriterOptions> options,
-    osg::ref_ptr<TerrainTile> terrainTile,
-    osg::ref_ptr<SGMaterialCache> matcache) {
+    vsg::ref_ptr<SGReaderWriterOptions> options,
+    vsg::ref_ptr<TerrainTile> terrainTile,
+    vsg::ref_ptr<SGMaterialCache> matcache) {
     SGPropertyNode *propertyNode = options->getPropertyNode().get();
 
     int lightLODLevel = 6;
@@ -297,8 +297,8 @@ bool RandomLightsHandler::handleNewMaterial(SGMaterial *mat) {
 }
 
 bool RandomLightsHandler::handleIteration(
-    SGMaterial* mat, osg::Image* objectMaskImage,
-    osg::Vec2d p, const double rand1, const double rand2,
+    SGMaterial* mat, vsg::Image* objectMaskImage,
+    vsg::dvec2 p, const double rand1, const double rand2,
     float x_scale, float y_scale)
 {
     if (mat->get_light_coverage() <= 0)
@@ -322,7 +322,7 @@ bool RandomLightsHandler::handleIteration(
     return true;
 }
 
-void RandomLightsHandler::placeObject(const osg::Vec3 vp)
+void RandomLightsHandler::placeObject(const vsg::vec3 vp)
 {
     const float zombie = pc_map_rand(vp.x(), vp.y() + vp.z(), 6);
     float factor = pc_map_rand(vp.x(), vp.y() + vp.z(), 7);
@@ -362,15 +362,15 @@ void RandomLightsHandler::placeObject(const osg::Vec3 vp)
         size, intensity, onPeriod, color);
 }
 
-void RandomLightsHandler::finish(osg::ref_ptr<SGReaderWriterOptions> options,
-                                 osg::ref_ptr<osg::MatrixTransform> transform,
+void RandomLightsHandler::finish(vsg::ref_ptr<SGReaderWriterOptions> options,
+                                 vsg::ref_ptr<osg::MatrixTransform> transform,
                                  const SGGeod loc) {
     if (bin != nullptr && bin->getNumLights() > 0) {
         SG_LOG(SG_TERRAIN, SG_DEBUG,
                "Adding Random Lights " << bin->getNumLights());
 
         transform->addChild(
-            createLights(*bin, osg::Matrix::identity(), options));
+            createLights(*bin, vsg::mat4::identity(), options));
     }
 }
 };

@@ -8,8 +8,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "ReaderWriterAC3D.hxx"
-
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -19,19 +17,19 @@
 #include <osg/CullFace>
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <osg/Group>
 #include <osg/Math>
 #include <osg/Notify>
 #include <osg/StateSet>
 #include <osg/Texture2D>
-
+#include <osgDB/FileNameUtils>
+#include <osgDB/FileUtils>
+#include <osgDB/ReadFile>
+#include <osgDB/Registry>
+#include <osgDB/fstream>
 #include <osgUtil/Tessellator>
 
-#include <osgDB/FileNameUtils>
-#include <osgDB/Registry>
-#include <osgDB/ReadFile>
-#include <osgDB/FileUtils>
-#include <osgDB/fstream>
+#include "ReaderWriterAC3D.hxx"
+
 
 namespace ac3d {
 
@@ -44,8 +42,8 @@ enum {
     SurfaceTypeLineLoop = 1,
     SurfaceTypeLineStrip = 2,
 
-    SurfaceShaded = 1<<4,
-    SurfaceTwoSided = 1<<5
+    SurfaceShaded = 1 << 4,
+    SurfaceTwoSided = 1 << 5
 };
 
 /// Returns a possibly quoted string given in the end of the current line in the stream
@@ -74,13 +72,13 @@ readString(std::istream& stream)
 }
 
 // Just a container to store an ac3d material
-class MaterialData {
+class MaterialData
+{
 public:
-    MaterialData() :
-        mColorArray(new osg::Vec4Array(1)),
-        mTranslucent(false)
+    MaterialData() : mColorArray(new osg::Vec4Array(1)),
+                     mTranslucent(false)
     {
-        mColorArray->setDataVariance(osg::Object::STATIC);
+        mColorArray->setDataVariance(vsg::Object::STATIC);
     }
 
     void readMaterial(std::istream& stream)
@@ -93,19 +91,19 @@ public:
         // mMaterial->setName(name);
         std::string tmp;
         stream >> tmp;
-        osg::Vec4 diffuse;
+        vsg::vec4 diffuse;
         stream >> diffuse[0] >> diffuse[1] >> diffuse[2];
         // mMaterial->setDiffuse(osg::Material::FRONT_AND_BACK, diffuse);
         stream >> tmp;
-        osg::Vec4 ambient;
+        vsg::vec4 ambient;
         stream >> ambient[0] >> ambient[1] >> ambient[2];
         // mMaterial->setAmbient(osg::Material::FRONT_AND_BACK, ambient);
         stream >> tmp;
-        osg::Vec4 emmissive;
+        vsg::vec4 emmissive;
         stream >> emmissive[0] >> emmissive[1] >> emmissive[2];
         // mMaterial->setEmission(osg::Material::FRONT_AND_BACK, emmissive);
         stream >> tmp;
-        osg::Vec4 specular;
+        vsg::vec4 specular;
         stream >> specular[0] >> specular[1] >> specular[2];
         // mMaterial->setSpecular(osg::Material::FRONT_AND_BACK, specular);
         stream >> tmp;
@@ -135,27 +133,27 @@ public:
     }
 
 private:
-    osg::ref_ptr<osg::Vec4Array> mColorArray;
+    vsg::ref_ptr<osg::Vec4Array> mColorArray;
     bool mTranslucent;
 };
 
-class TextureData {
+class TextureData
+{
 public:
-    TextureData() :
-        mTranslucent(false),
-        mRepeat(true)
+    TextureData() : mTranslucent(false),
+                    mRepeat(true)
     {
     }
 
     bool setTexture(const std::string& name, const osgDB::ReaderWriter::Options* options)
     {
         mTexture2DRepeat = new osg::Texture2D;
-        mTexture2DRepeat->setDataVariance(osg::Object::STATIC);
+        mTexture2DRepeat->setDataVariance(vsg::Object::STATIC);
         mTexture2DRepeat->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::REPEAT);
         mTexture2DRepeat->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::REPEAT);
 
         mTexture2DClamp = new osg::Texture2D;
-        mTexture2DClamp->setDataVariance(osg::Object::STATIC);
+        mTexture2DClamp->setDataVariance(vsg::Object::STATIC);
         mTexture2DClamp->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::CLAMP_TO_EDGE);
         mTexture2DClamp->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::CLAMP_TO_EDGE);
 
@@ -207,18 +205,19 @@ public:
         // if (mTranslucent)
         //     setTranslucent(stateSet);
     }
+
 private:
-    osg::ref_ptr<osg::Texture2D> mTexture2DClamp;
-    osg::ref_ptr<osg::Texture2D> mTexture2DRepeat;
-    osg::ref_ptr<osg::Image> mImage;
+    vsg::ref_ptr<osg::Texture2D> mTexture2DClamp;
+    vsg::ref_ptr<osg::Texture2D> mTexture2DRepeat;
+    vsg::ref_ptr<vsg::Image> mImage;
     bool mTranslucent;
     bool mRepeat;
 };
 
-class FileData {
+class FileData
+{
 public:
-    FileData(const osgDB::ReaderWriter::Options* options) :
-        mOptions(options)
+    FileData(const osgDB::ReaderWriter::Options* options) : mOptions(options)
     {
     }
 
@@ -262,7 +261,7 @@ public:
 
 private:
     /// Stores the ac3d file reader options, only used for reading texture files
-    osg::ref_ptr<osgDB::ReaderWriter::Options const> mOptions;
+    vsg::ref_ptr<osgDB::ReaderWriter::Options const> mOptions;
 
     /// The list of ac3d MATERIALS
     std::vector<MaterialData> mMaterials;
@@ -274,24 +273,24 @@ private:
 };
 
 struct RefData {
-    RefData(const osg::Vec3& _weightedNormal, const osg::Vec2& _texCoord, bool _smooth) :
-        weightedFlatNormal(_weightedNormal),
-        weightedFlatNormalLength(_weightedNormal.length()),
-        texCoord(_texCoord),
-        smooth(_smooth)
-    { }
+    RefData(const vsg::vec3& _weightedNormal, const vsg::vec2& _texCoord, bool _smooth) : weightedFlatNormal(_weightedNormal),
+                                                                                          weightedFlatNormalLength(_weightedNormal.length()),
+                                                                                          texCoord(_texCoord),
+                                                                                          smooth(_smooth)
+    {
+    }
     // weighted flat surface normal
-    osg::Vec3 weightedFlatNormal;
+    vsg::vec3 weightedFlatNormal;
     float weightedFlatNormalLength;
-    osg::Vec2 texCoord;
+    vsg::vec2 texCoord;
     // resulting vertex normal
-    osg::Vec3 finalNormal;
+    vsg::vec3 finalNormal;
     // if zero no need to smooth
     unsigned smooth;
 };
 
 struct VertexData {
-    VertexData(const osg::Vec3& vertex) : _vertex(vertex) {}
+    VertexData(const vsg::vec3& vertex) : _vertex(vertex) {}
     unsigned addRefData(const RefData& refData)
     {
         unsigned index = _refs.size();
@@ -302,14 +301,11 @@ struct VertexData {
     void collect(float cosCreaseAngle, const RefData& ref)
     {
         unsigned size = _refs.size();
-        for (unsigned i = 0; i < size; ++i)
-        {
-            if (_refs[i].smooth == ~0u)
-            {
-                float dot = _refs[i].weightedFlatNormal*ref.weightedFlatNormal;
-                float lengths = _refs[i].weightedFlatNormalLength*ref.weightedFlatNormalLength;
-                if (cosCreaseAngle*lengths <= dot)
-                {
+        for (unsigned i = 0; i < size; ++i) {
+            if (_refs[i].smooth == ~0u) {
+                float dot = _refs[i].weightedFlatNormal * ref.weightedFlatNormal;
+                float lengths = _refs[i].weightedFlatNormalLength * ref.weightedFlatNormalLength;
+                if (cosCreaseAngle * lengths <= dot) {
                     // Ok put that into the current set
                     _refs[i].smooth = ref.smooth;
                     collect(cosCreaseAngle, _refs[i]);
@@ -324,71 +320,61 @@ struct VertexData {
         // if smooth is zero we do not need to smooth
         // in a first pass mark all refs not yet in a set to ~0u
         unsigned size = _refs.size();
-        for (unsigned i = 0; i < size; ++i)
-        {
-            if (_refs[i].smooth)
-            {
+        for (unsigned i = 0; i < size; ++i) {
+            if (_refs[i].smooth) {
                 _refs[i].smooth = ~0u;
             }
         }
         // Now collect the sets
         unsigned currentSet = 1;
-        for (unsigned i = 0; i < size; ++i)
-        {
-            if (_refs[i].smooth == ~0u)
-            {
+        for (unsigned i = 0; i < size; ++i) {
+            if (_refs[i].smooth == ~0u) {
                 _refs[i].smooth = currentSet++;
                 collect(cosCreaseAngle, _refs[i]);
             }
         }
         // smooth and normalize the sets
-        for (--currentSet; 0 < currentSet; --currentSet)
-        {
-            osg::Vec3 normal(0, 0, 0);
-            for (unsigned i = 0; i < size; ++i)
-            {
-                if (_refs[i].smooth == currentSet)
-                {
+        for (--currentSet; 0 < currentSet; --currentSet) {
+            vsg::vec3 normal(0, 0, 0);
+            for (unsigned i = 0; i < size; ++i) {
+                if (_refs[i].smooth == currentSet) {
                     normal += _refs[i].weightedFlatNormal;
                 }
             }
             normal.normalize();
-            for (unsigned i = 0; i < size; ++i)
-            {
-                if (_refs[i].smooth == currentSet)
-                {
+            for (unsigned i = 0; i < size; ++i) {
+                if (_refs[i].smooth == currentSet) {
                     _refs[i].finalNormal = normal;
                 }
             }
         }
 
         // normalize the ones which do not need smoothing
-        for (unsigned i = 0; i < size; ++i)
-        {
-            if (_refs[i].smooth == 0)
-            {
+        for (unsigned i = 0; i < size; ++i) {
+            if (_refs[i].smooth == 0) {
                 _refs[i].finalNormal = _refs[i].weightedFlatNormal;
                 _refs[i].finalNormal.normalize();
             }
         }
     }
-    osg::Vec3 _vertex;
+    vsg::vec3 _vertex;
     std::vector<RefData> _refs;
 };
 struct VertexIndex {
-    VertexIndex(unsigned _vertexIndex = 0, unsigned _refIndex = 0) :
-        vertexIndex(_vertexIndex), refIndex(_refIndex)
-    { }
+    VertexIndex(unsigned _vertexIndex = 0, unsigned _refIndex = 0) : vertexIndex(_vertexIndex), refIndex(_refIndex)
+    {
+    }
     unsigned vertexIndex;
     unsigned refIndex;
 };
 
-class VertexSet : public osg::Referenced {
+class VertexSet : public osg::Referenced
+{
 public:
-    VertexSet() :
-        _cosCreaseAngle(1.0f),
-        _dirty(true)
-    { }
+    VertexSet() : _cosCreaseAngle(1.0f),
+                  _dirty(true)
+    {
+    }
     void reserve(unsigned n)
     {
         _vertices.reserve(n);
@@ -407,34 +393,33 @@ public:
         else
             _cosCreaseAngle = cosf(osg::DegreesToRadians(crease));
     }
-    void addVertex(const osg::Vec3& vertex)
+    void addVertex(const vsg::vec3& vertex)
     {
         _dirty = true;
         _vertices.push_back(vertex);
     }
-    const osg::Vec3& getVertex(unsigned index)
+    const vsg::vec3& getVertex(unsigned index)
     {
         return _vertices[index]._vertex;
     }
-    const osg::Vec3& getVertex(const VertexIndex& vertexIndex)
+    const vsg::vec3& getVertex(const VertexIndex& vertexIndex)
     {
         return _vertices[vertexIndex.vertexIndex]._vertex;
     }
-    const osg::Vec3& getNormal(const VertexIndex& vertexIndex)
+    const vsg::vec3& getNormal(const VertexIndex& vertexIndex)
     {
         if (_dirty)
             smoothNormals();
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].finalNormal;
     }
-    const osg::Vec2& getTexCoord(const VertexIndex& vertexIndex)
+    const vsg::vec2& getTexCoord(const VertexIndex& vertexIndex)
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].texCoord;
     }
 
     VertexIndex addRefData(unsigned i, const RefData& refData)
     {
-        if (_vertices.size() <= i)
-        {
+        if (_vertices.size() <= i) {
             OSG_FATAL << "osgDB ac3d reader: internal error, got invalid vertex index!" << std::endl;
             return VertexIndex(0, 0);
         }
@@ -446,8 +431,7 @@ private:
     void smoothNormals()
     {
         std::vector<VertexData>::iterator i;
-        for (i = _vertices.begin(); i != _vertices.end(); ++i)
-        {
+        for (i = _vertices.begin(); i != _vertices.end(); ++i) {
             i->smoothNormals(_cosCreaseAngle);
         }
         _dirty = false;
@@ -459,18 +443,18 @@ private:
 };
 
 
-class PrimitiveBin : public osg::Referenced {
+class PrimitiveBin : public osg::Referenced
+{
 public:
-    PrimitiveBin(unsigned flags, VertexSet* vertexSet) :
-        _geode(new osg::Geode),
-        _vertexSet(vertexSet),
-        _flags(flags)
+    PrimitiveBin(unsigned flags, VertexSet* vertexSet) : _geode(new osg::Geode),
+                                                         _vertexSet(vertexSet),
+                                                         _flags(flags)
     {
-        _geode->setDataVariance(osg::Object::STATIC);
+        _geode->setDataVariance(vsg::Object::STATIC);
     }
 
     virtual bool beginPrimitive(unsigned nRefs) = 0;
-    virtual bool vertex(unsigned vertexIndex, const osg::Vec2& texCoord) = 0;
+    virtual bool vertex(unsigned vertexIndex, const vsg::vec2& texCoord) = 0;
     virtual bool endPrimitive() = 0;
 
     virtual osg::Geode* finalize(const MaterialData& material, const TextureData& textureData) = 0;
@@ -478,49 +462,49 @@ public:
 protected:
     bool isLineLoop() const
     {
-        return (_flags & SurfaceTypeLineLoop)!=0;
+        return (_flags & SurfaceTypeLineLoop) != 0;
     }
     bool isLineStrip() const
     {
-        return (_flags & SurfaceTypeLineStrip)!=0;
+        return (_flags & SurfaceTypeLineStrip) != 0;
     }
     bool isTwoSided() const
     {
-        return (_flags & SurfaceTwoSided)!=0;
+        return (_flags & SurfaceTwoSided) != 0;
     }
     bool isSmooth() const
     {
-        return (_flags & SurfaceShaded)!=0;
+        return (_flags & SurfaceShaded) != 0;
     }
 
-    osg::ref_ptr<osg::Geode> _geode;
-    osg::ref_ptr<VertexSet> _vertexSet;
+    vsg::ref_ptr<osg::Geode> _geode;
+    vsg::ref_ptr<VertexSet> _vertexSet;
 
 private:
     unsigned _flags;
 };
 
-class LineBin : public PrimitiveBin {
+class LineBin : public PrimitiveBin
+{
 private:
-    osg::ref_ptr<osg::Geometry> _geometry;
-    osg::ref_ptr<osg::Vec3Array> _vertices;
-    osg::ref_ptr<osg::Vec2Array> _texCoords;
+    vsg::ref_ptr<vsg::Geometry> _geometry;
+    vsg::ref_ptr<vsg::vec3Array> _vertices;
+    vsg::ref_ptr<osg::Vec2Array> _texCoords;
     struct Ref {
-        osg::Vec2 texCoord;
+        vsg::vec2 texCoord;
         unsigned index;
     };
     std::vector<Ref> _refs;
 
 public:
-    LineBin(unsigned flags, VertexSet* vertexSet) :
-        PrimitiveBin(flags, vertexSet),
-        _geometry(new osg::Geometry),
-        _vertices(new osg::Vec3Array),
-        _texCoords(new osg::Vec2Array)
+    LineBin(unsigned flags, VertexSet* vertexSet) : PrimitiveBin(flags, vertexSet),
+                                                    _geometry(new vsg::Geometry),
+                                                    _vertices(new vsg::vec3Array),
+                                                    _texCoords(new osg::Vec2Array)
     {
-        _geometry->setDataVariance(osg::Object::STATIC);
-        _vertices->setDataVariance(osg::Object::STATIC);
-        _texCoords->setDataVariance(osg::Object::STATIC);
+        _geometry->setDataVariance(vsg::Object::STATIC);
+        _vertices->setDataVariance(vsg::Object::STATIC);
+        _texCoords->setDataVariance(vsg::Object::STATIC);
         _geometry->setVertexArray(_vertices.get());
         _geometry->setTexCoordArray(0, _texCoords.get());
     }
@@ -537,7 +521,7 @@ public:
         _refs.resize(0);
         return true;
     }
-    virtual bool vertex(unsigned vertexIndex, const osg::Vec2& texCoord)
+    virtual bool vertex(unsigned vertexIndex, const vsg::vec2& texCoord)
     {
         Ref ref;
         ref.index = vertexIndex;
@@ -559,7 +543,7 @@ public:
         unsigned nRefs = _refs.size();
         unsigned start = _vertices->size();
         for (unsigned i = 0; i < nRefs; ++i) {
-            osg::Vec3 vertex = _vertexSet->getVertex(_refs[i].index);
+            vsg::vec3 vertex = _vertexSet->getVertex(_refs[i].index);
             _vertices->push_back(vertex);
             _texCoords->push_back(_refs[i].texCoord);
         }
@@ -578,10 +562,11 @@ public:
     }
 };
 
-class SurfaceBin : public PrimitiveBin {
+class SurfaceBin : public PrimitiveBin
+{
 private:
     struct Ref {
-        osg::Vec2 texCoord;
+        vsg::vec2 texCoord;
         unsigned index;
     };
     std::vector<Ref> _refs;
@@ -602,15 +587,15 @@ private:
     std::vector<PolygonData> _polygons;
     std::vector<PolygonData> _toTessellatePolygons;
 
-    typedef std::pair<osg::Vec3, osg::Vec3> VertexNormalPair;
-    typedef std::pair<VertexNormalPair, osg::Vec2> VertexNormalTexTuple;
+    typedef std::pair<vsg::vec3, vsg::vec3> VertexNormalPair;
+    typedef std::pair<VertexNormalPair, vsg::vec2> VertexNormalTexTuple;
     typedef std::map<VertexNormalTexTuple, unsigned> VertexIndexMap;
     VertexIndexMap _vertexIndexMap;
 
 public:
-    SurfaceBin(unsigned flags, VertexSet *vertexSet) :
-        PrimitiveBin(flags, vertexSet)
-    { }
+    SurfaceBin(unsigned flags, VertexSet* vertexSet) : PrimitiveBin(flags, vertexSet)
+    {
+    }
 
     virtual bool beginPrimitive(unsigned nRefs)
     {
@@ -624,7 +609,7 @@ public:
         }
         return true;
     }
-    virtual bool vertex(unsigned vertexIndex, const osg::Vec2& texCoord)
+    virtual bool vertex(unsigned vertexIndex, const vsg::vec2& texCoord)
     {
         Ref ref;
         ref.index = vertexIndex;
@@ -639,24 +624,24 @@ public:
         // Compute the normal times the enclosed area.
         // During that check if the surface is convex. If so, put in the surface as such.
         bool needTessellation = false;
-        osg::Vec3 prevEdgeNormal;
-        osg::Vec3 weightedNormal(0, 0, 0);
-        osg::Vec3 v0 = _vertexSet->getVertex(_refs[0].index);
+        vsg::vec3 prevEdgeNormal;
+        vsg::vec3 weightedNormal(0, 0, 0);
+        vsg::vec3 v0 = _vertexSet->getVertex(_refs[0].index);
         for (unsigned i = 2; i < nRefs; ++i) {
-            osg::Vec3 side1 = _vertexSet->getVertex(_refs[i-1].index) - v0;
-            osg::Vec3 side2 = _vertexSet->getVertex(_refs[i].index) - v0;
-            osg::Vec3 newNormal = side1^side2;
+            vsg::vec3 side1 = _vertexSet->getVertex(_refs[i - 1].index) - v0;
+            vsg::vec3 side2 = _vertexSet->getVertex(_refs[i].index) - v0;
+            vsg::vec3 newNormal = side1 ^ side2;
             if (!needTessellation) {
-                if (3 < nRefs && newNormal*weightedNormal < 0) {
+                if (3 < nRefs && newNormal * weightedNormal < 0) {
                     needTessellation = true;
                 }
                 if (i < 3) {
                     prevEdgeNormal = newNormal;
                 } else { // if (3 <= i) // due to the for loop
-                    osg::Vec3 sideim1 = _vertexSet->getVertex(_refs[i-1].index) - _vertexSet->getVertex(_refs[i-2].index);
-                    osg::Vec3 sidei = _vertexSet->getVertex(_refs[i].index) - _vertexSet->getVertex(_refs[i-2].index);
-                    osg::Vec3 edgeNormal = sideim1^sidei;
-                    if (edgeNormal*prevEdgeNormal < 0) {
+                    vsg::vec3 sideim1 = _vertexSet->getVertex(_refs[i - 1].index) - _vertexSet->getVertex(_refs[i - 2].index);
+                    vsg::vec3 sidei = _vertexSet->getVertex(_refs[i].index) - _vertexSet->getVertex(_refs[i - 2].index);
+                    vsg::vec3 edgeNormal = sideim1 ^ sidei;
+                    if (edgeNormal * prevEdgeNormal < 0) {
                         needTessellation = true;
                     }
                     prevEdgeNormal = edgeNormal;
@@ -702,8 +687,8 @@ public:
         return true;
     }
 
-    unsigned pushVertex(const VertexIndex& vertexIndex, osg::Vec3Array* vertexArray,
-                        osg::Vec3Array* normalArray, osg::Vec2Array* texcoordArray)
+    unsigned pushVertex(const VertexIndex& vertexIndex, vsg::vec3Array* vertexArray,
+                        vsg::vec3Array* normalArray, osg::Vec2Array* texcoordArray)
     {
         VertexNormalTexTuple vertexNormalTexTuple;
         vertexNormalTexTuple.first.first = _vertexSet->getVertex(vertexIndex);
@@ -711,7 +696,7 @@ public:
         if (texcoordArray)
             vertexNormalTexTuple.second = _vertexSet->getTexCoord(vertexIndex);
         else
-            vertexNormalTexTuple.second = osg::Vec2(0, 0);
+            vertexNormalTexTuple.second = vsg::vec2(0, 0);
 
         VertexIndexMap::iterator i = _vertexIndexMap.find(vertexNormalTexTuple);
         if (i != _vertexIndexMap.end())
@@ -765,21 +750,21 @@ public:
             stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
         } else {
             osg::CullFace* cullFace = new osg::CullFace;
-            cullFace->setDataVariance(osg::Object::STATIC);
+            cullFace->setDataVariance(vsg::Object::STATIC);
             cullFace->setMode(osg::CullFace::BACK);
             stateSet->setAttribute(cullFace);
             stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
         }
 
         // Set up the arrays, always store texture coords, may be we need them later ...
-        osg::Geometry* geometry = new osg::Geometry;
+        vsg::Geometry* geometry = new vsg::Geometry;
         _geode->addDrawable(geometry);
-        geometry->setDataVariance(osg::Object::STATIC);
+        geometry->setDataVariance(vsg::Object::STATIC);
         geometry->setUseVertexBufferObjects(true);
         geometry->setColorArray(material.getColorArray(), osg::Array::BIND_OVERALL);
-        osg::Vec3Array* normalArray = new osg::Vec3Array;
+        vsg::vec3Array* normalArray = new vsg::vec3Array;
         geometry->setNormalArray(normalArray, osg::Array::BIND_PER_VERTEX);
-        osg::Vec3Array* vertexArray = new osg::Vec3Array;
+        vsg::vec3Array* vertexArray = new vsg::vec3Array;
         geometry->setVertexArray(vertexArray);
         osg::Vec2Array* texcoordArray = 0;
         if (textureData.valid()) {
@@ -790,7 +775,7 @@ public:
         // At first handle the polygons to tessellate, fix them and append the other polygons later
         if (!_toTessellatePolygons.empty()) {
             for (unsigned i = 0; i < _toTessellatePolygons.size(); ++i) {
-                osg::ref_ptr<osg::DrawElementsUInt> drawElements = new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON);
+                vsg::ref_ptr<osg::DrawElementsUInt> drawElements = new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON);
                 for (unsigned j = 0; j < _toTessellatePolygons[i].index.size(); ++j) {
                     unsigned index = pushVertex(_toTessellatePolygons[i].index[j], vertexArray, normalArray, texcoordArray);
                     drawElements->addElement(index);
@@ -804,7 +789,7 @@ public:
             Tessellator.retessellatePolygons(*geometry);
         }
 
-        osg::ref_ptr<osg::DrawElementsUInt> drawElements = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES);
+        vsg::ref_ptr<osg::DrawElementsUInt> drawElements = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES);
 
         // handle triangles
         if (!_triangles.empty()) {
@@ -846,7 +831,7 @@ public:
                 }
                 for (size_t j = 2; j < polygon_vertex_count; ++j) {
                     drawElements->addElement(indices[0]);
-                    drawElements->addElement(indices[j-1]);
+                    drawElements->addElement(indices[j - 1]);
                     drawElements->addElement(indices[j]);
                 }
             }
@@ -893,7 +878,7 @@ struct Bins {
         }
     }
 
-    void finalize(osg::Group* group, const MaterialData& material, const TextureData& textureData)
+    void finalize(vsg::Group* group, const MaterialData& material, const TextureData& textureData)
     {
         if (lineBin.valid()) {
             group->addChild(lineBin->finalize(material, textureData));
@@ -913,26 +898,26 @@ struct Bins {
     }
 
 private:
-    osg::ref_ptr<LineBin> lineBin;
-    osg::ref_ptr<SurfaceBin> flatDoubleSurfaceBin;
-    osg::ref_ptr<SurfaceBin> flatSingleSurfaceBin;
-    osg::ref_ptr<SurfaceBin> smoothDoubleSurfaceBin;
-    osg::ref_ptr<SurfaceBin> smoothSingleSurfaceBin;
+    vsg::ref_ptr<LineBin> lineBin;
+    vsg::ref_ptr<SurfaceBin> flatDoubleSurfaceBin;
+    vsg::ref_ptr<SurfaceBin> flatSingleSurfaceBin;
+    vsg::ref_ptr<SurfaceBin> smoothDoubleSurfaceBin;
+    vsg::ref_ptr<SurfaceBin> smoothSingleSurfaceBin;
 };
 
-osg::Node*
-readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTransform, TextureData textureData)
+vsg::Node*
+readObject(std::istream& stream, FileData& fileData, const vsg::mat4& parentTransform, TextureData textureData)
 {
     // most of this logic came from Andy Colebourne (developer of the AC3D editor) so it had better be right!
 
     // The transform configured in this current object level
-    osg::Matrix transform;
+    vsg::mat4 transform;
     // The vertex pool in this object
-    osg::ref_ptr<VertexSet> vertexSet = new VertexSet;
-    osg::ref_ptr<osg::Group> group = new osg::Group;
-    group->setDataVariance(osg::Object::STATIC);
-    osg::Vec2 textureOffset(0, 0);
-    osg::Vec2 textureRepeat(1, 1);
+    vsg::ref_ptr<VertexSet> vertexSet = new VertexSet;
+    vsg::ref_ptr<vsg::Group> group = new vsg::Group;
+    group->setDataVariance(vsg::Object::STATIC);
+    vsg::vec2 textureOffset(0, 0);
+    vsg::vec2 textureRepeat(1, 1);
     float creaseAngle = 61;
     unsigned objectType = ObjectTypeGroup;
 
@@ -944,8 +929,7 @@ readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTr
             MaterialData mat;
             mat.readMaterial(stream);
             fileData.addMaterial(mat);
-        }
-        else if (token == "OBJECT") {
+        } else if (token == "OBJECT") {
             std::string type;
             stream >> type;
 
@@ -957,53 +941,43 @@ readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTr
                 objectType = ObjectTypeGroup;
             else
                 objectType = ObjectTypeNormal;
-        }
-        else if (token == "crease") {
+        } else if (token == "crease") {
             stream >> creaseAngle;
-        }
-        else if (token == "data") {
+        } else if (token == "data") {
             int len;
             stream >> len;
             std::vector<char> tmp(len);
             stream.read(&(tmp[0]), len);
-        }
-        else if (token == "name") {
+        } else if (token == "name") {
             group->setName(readString(stream));
-        }
-        else if (token == "texture") {
+        } else if (token == "texture") {
             // read the texture name
             textureData = fileData.toTextureData(readString(stream));
-        }
-        else if (token == "texrep") {
+        } else if (token == "texrep") {
             stream >> textureRepeat[0] >> textureRepeat[1];
-//             if (textureRepeat[0] == 0.0f && textureRepeat[1] == 0.0f)
-//                 textureData.setRepeat(false);
-//             else
-//                 textureData.setRepeat(true);
-        }
-        else if (token == "texoff") {
+            //             if (textureRepeat[0] == 0.0f && textureRepeat[1] == 0.0f)
+            //                 textureData.setRepeat(false);
+            //             else
+            //                 textureData.setRepeat(true);
+        } else if (token == "texoff") {
             stream >> textureOffset[0] >> textureOffset[1];
-        }
-        else if (token == "rot") {
+        } else if (token == "rot") {
             for (unsigned n = 0; n < 3; ++n)
                 for (unsigned m = 0; m < 3; ++m)
 #if 1
                     stream >> transform(n, m);
 #else
-            stream >> transform(m, n);
+                    stream >> transform(m, n);
 #endif
-        }
-        else if (token == "loc") {
+        } else if (token == "loc") {
             for (unsigned n = 0; n < 3; ++n)
                 stream >> transform(3, n);
-        }
-        else if (token == "url") {
+        } else if (token == "url") {
             std::string url;
             stream >> url;
             group->addDescription(url);
-        }
-        else if (token == "numvert") {
-            osg::Matrix currentTransform = transform*parentTransform;
+        } else if (token == "numvert") {
+            vsg::mat4 currentTransform = transform * parentTransform;
 
             unsigned num;
             stream >> num;
@@ -1011,13 +985,12 @@ readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTr
                 vertexSet->reserve(num);
 
                 for (unsigned n = 0; n < num; ++n) {
-                    osg::Vec3 p;
+                    vsg::vec3 p;
                     stream >> p[0] >> p[1] >> p[2];
                     vertexSet->addVertex(currentTransform.preMult(p));
                 }
             }
-        }
-        else if (token == "numsurf") {
+        } else if (token == "numsurf") {
             unsigned num;
             stream >> num;
             if (0 < num) {
@@ -1086,15 +1059,14 @@ readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTr
                         // Read the vertex index
                         unsigned index;
                         stream >> index;
-                        if (vertexSet->size() <= index)
-                        {
+                        if (vertexSet->size() <= index) {
                             OSG_FATAL << "osgDB ac3d reader: invalid ref vertex index while reading object \""
                                       << group->getName() << "\"" << std::endl;
                             return group.release();
                         }
 
                         // Read the texture coordinates
-                        osg::Vec2 texCoord;
+                        vsg::vec2 texCoord;
                         stream >> texCoord[0] >> texCoord[1];
                         if (!stream) {
                             OSG_WARN << "osgDB ac3d reader: could not parse texture coords while reading object \""
@@ -1104,21 +1076,17 @@ readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTr
                             std::getline(stream, dummy);
                         }
 
-                        if (acceptPrimitive)
-                        {
-                            texCoord[0] = textureOffset[0] + texCoord[0]*textureRepeat[0];
-                            texCoord[1] = textureOffset[1] + texCoord[1]*textureRepeat[1];
+                        if (acceptPrimitive) {
+                            texCoord[0] = textureOffset[0] + texCoord[0] * textureRepeat[0];
+                            texCoord[1] = textureOffset[1] + texCoord[1] * textureRepeat[1];
 
-                            if (!primitiveBin->vertex(index, texCoord))
-                            {
+                            if (!primitiveBin->vertex(index, texCoord)) {
                                 return group.release();
                             }
                         }
                     }
-                    if (acceptPrimitive)
-                    {
-                        if (!primitiveBin->endPrimitive())
-                        {
+                    if (acceptPrimitive) {
+                        if (!primitiveBin->endPrimitive()) {
                             return group.release();
                         }
                     }
@@ -1127,18 +1095,16 @@ readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTr
                 for (unsigned i = 0; i < primitiveBins.size(); ++i)
                     primitiveBins[i].finalize(group.get(), fileData.getMaterial(i), textureData);
             }
-        }
-        else if (token == "kids") {
+        } else if (token == "kids") {
             unsigned num;
             stream >> num;
             if (num != 0) {
                 for (unsigned n = 0; n < num; n++) {
-                    osg::Node *k = readObject(stream, fileData, transform*parentTransform, textureData);
+                    vsg::Node* k = readObject(stream, fileData, transform * parentTransform, textureData);
                     if (k == 0) {
                         OSG_FATAL << "osgDB ac3d reader: error reading child object" << std::endl;
                         return group.release();
-                    }
-                    else {
+                    } else {
                         group->addChild(k);
                     }
                 }
@@ -1153,12 +1119,12 @@ readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTr
     return group.release();
 }
 
-osg::Node*
+vsg::Node*
 readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options)
 {
     FileData fileData(options);
-    osg::Matrix identityTransform;
-    osg::Node* node = readObject(stream, fileData, identityTransform, TextureData());
+    vsg::mat4 identityTransform;
+    vsg::Node* node = readObject(stream, fileData, identityTransform, TextureData());
     if (node)
         node->setName("World");
     return node;
@@ -1192,7 +1158,7 @@ ReaderWriterAC3D::readNode(const std::string& location, const Options* options) 
     if (!acceptsExtension(ext)) return ReadResult::FILE_NOT_HANDLED;
 
     // GWM added Dec 2003 - get full path name (change in osgDB handling of files).
-    std::string filename = osgDB::findDataFile( location, options );
+    std::string filename = osgDB::findDataFile(location, options);
     OSG_INFO << "osgDB ac3d reader: starting reading \"" << filename << "\"" << std::endl;
 
     // Anders Backmann - correct return if path not found
@@ -1205,7 +1171,7 @@ ReaderWriterAC3D::readNode(const std::string& location, const Options* options) 
 
     // code for setting up the database path so that internally referenced file are
     // searched for on relative paths.
-    osg::ref_ptr<Options> local_opt;
+    vsg::ref_ptr<Options> local_opt;
     if (options)
         local_opt = static_cast<Options*>(options->clone(osg::CopyOp::DEEP_COPY_ALL));
     else

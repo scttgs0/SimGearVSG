@@ -110,7 +110,7 @@ buildBuffer(Compositor *compositor, const SGPropertyNode *node,
         return 0;
     }
 
-    osg::ref_ptr<Buffer> buffer = new Buffer;
+    vsg::ref_ptr<Buffer> buffer = new Buffer;
     osg::Texture *texture = nullptr;
 
     int width = 0;
@@ -244,7 +244,7 @@ buildBuffer(Compositor *compositor, const SGPropertyNode *node,
     float anis = node->getFloatValue("anisotropy", 1.0f);
     texture->setMaxAnisotropy(anis);
 
-    osg::Vec4f border_color(0.0f, 0.0f, 0.0f, 0.0f);
+    vsg::vec4 border_color(0.0f, 0.0f, 0.0f, 0.0f);
     const SGPropertyNode *p_border_color = node->getChild("border-color");
     if (p_border_color)
         border_color = toOsg(p_border_color->getValue<SGVec4d>());

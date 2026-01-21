@@ -25,8 +25,8 @@ namespace simgear::canvas
   {
     public:
 
-      typedef osg::ref_ptr<osg::Group> GroupPtr;
-      typedef osg::ref_ptr<osg::Material> MaterialPtr;
+      typedef vsg::ref_ptr<vsg::Group> GroupPtr;
+      typedef vsg::ref_ptr<osg::Material> MaterialPtr;
 
       ObjectPlacement( SGPropertyNode* node,
                        const GroupPtr& group,
@@ -47,7 +47,7 @@ namespace simgear::canvas
 
     protected:
       typedef SGSharedPtr<SGPickCallback> PickCallbackPtr;
-      typedef osg::ref_ptr<SGSceneUserData> SGSceneUserDataPtr;
+      typedef vsg::ref_ptr<SGSceneUserData> SGSceneUserDataPtr;
 
       GroupPtr            _group;
       MaterialPtr         _material;

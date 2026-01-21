@@ -19,13 +19,17 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osgDB/ReaderWriter>
+
 
 namespace simgear {
 
 class BucketBox;
 
-class ReaderWriterPGT : public osgDB::ReaderWriter {
+class ReaderWriterPGT : public osgDB::ReaderWriter
+{
 public:
     ReaderWriterPGT();
     virtual ~ReaderWriterPGT();
@@ -38,10 +42,10 @@ public:
 protected:
     struct LocalOptions;
 
-    osg::ref_ptr<osg::Node> createTree(const BucketBox& bucketBox, const LocalOptions& options, bool topLevel) const;
-    osg::ref_ptr<osg::Node> createPagedLOD(const BucketBox& bucketBox, const LocalOptions& options) const;
-    osg::ref_ptr<osg::Node> createTileMesh(const BucketBox& bucketBox, const LocalOptions& options) const;
-    osg::ref_ptr<osg::StateSet> getLowLODStateSet(const LocalOptions& options) const;
+    vsg::ref_ptr<vsg::Node> createTree(const BucketBox& bucketBox, const LocalOptions& options, bool topLevel) const;
+    vsg::ref_ptr<vsg::Node> createPagedLOD(const BucketBox& bucketBox, const LocalOptions& options) const;
+    vsg::ref_ptr<vsg::Node> createTileMesh(const BucketBox& bucketBox, const LocalOptions& options) const;
+    vsg::ref_ptr<osg::StateSet> getLowLODStateSet(const LocalOptions& options) const;
 
 private:
     struct CullCallback;

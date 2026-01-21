@@ -16,9 +16,12 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/Program>
 
 #include <simgear/misc/sg_path.hxx>
+
 
 /**
  * @brief wrapper around osg::Program to allow detecting shader/link
@@ -34,7 +37,7 @@ public:
 
     META_StateAttribute(simgear, SGProgram, PROGRAM);
 
-    void apply(osg::State& state) const override;
+    void apply(vsg::State& state) const override;
 
     enum ErrorCheckState {
         NotApplied,

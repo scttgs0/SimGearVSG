@@ -16,48 +16,48 @@
 
 #pragma once
 
-#include "EffectGeode.hxx"
+#include <map>
+#include <string>
+#include <vector>
+
+#include <vsg/all.h>
+
+#include <OpenThreads/Mutex>
+#include <osg/Geode>
+#include <osg/GraphicsThread>
+#include <osg/Object>
+#include <osg/buffered_value>
+
 
 #include <simgear/structure/SGAtomic.hxx>
 #include <simgear/structure/SGExpression.hxx>
 
-#include <map>
-#include <vector>
-#include <string>
+#include "EffectGeode.hxx"
 
-#include <OpenThreads/Mutex>
-#include <osg/buffered_value>
-#include <osg/Geode>
-#include <osg/Object>
-#include <osg/GraphicsThread>
 
-namespace osg
-{
+namespace osg {
 class CopyOp;
 class Drawable;
 class RenderInfo;
 class StateSet;
-}
+} // namespace osg
 
-namespace osgUtil
-{
+namespace osgUtil {
 class CullVisitor;
 }
 
-namespace simgear
-{
+namespace simgear {
 class Pass;
 
-class Technique : public osg::Object
+class Technique : public vsg::Object
 {
 public:
-    META_Object(simgear,Technique);
+    //!!META_Object(simgear, Technique);
     Technique(bool alwaysValid = false);
     Technique(const Technique& rhs,
               const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY);
     virtual ~Technique();
-    enum Status
-    {
+    enum Status {
         UNKNOWN,
         QUERY_IN_PROGRESS,
         INVALID,
@@ -81,7 +81,7 @@ public:
                      const EffectGeode::DrawablesIterator& end,
                      osgUtil::CullVisitor* cv,
                      bool isCullingActive);
-    std::vector<osg::ref_ptr<Pass> > passes;
+    std::vector<vsg::ref_ptr<Pass>> passes;
     osg::StateSet* getShadowingStateSet() { return _shadowingStateSet.get(); }
     const osg::StateSet* getShadowingStateSet() const
     {
@@ -89,7 +89,7 @@ public:
     }
     void setShadowingStateSet(osg::StateSet* ss) { _shadowingStateSet = ss; }
     virtual void resizeGLObjectBuffers(unsigned int maxSize);
-    virtual void releaseGLObjects(osg::State* state = 0) const;
+    virtual void releaseGLObjects(vsg::State* state = 0) const;
     bool getAlwaysValid() const { return _alwaysValid; }
     void setAlwaysValid(bool val) { _alwaysValid = val; }
     void setValidExpression(SGExpressionb* exp,
@@ -97,12 +97,12 @@ public:
     void setGLExtensionsPred(float glVersion,
                              const std::vector<std::string>& extensions);
     void refreshValidity();
-    const std::string &getScheme() const { return _scheme; }
-    void setScheme(const std::string &scheme) { _scheme = scheme; }
+    const std::string& getScheme() const { return _scheme; }
+    void setScheme(const std::string& scheme) { _scheme = scheme; }
+
 protected:
     // Validity of technique in a graphics context.
-    struct ContextInfo : public osg::Referenced
-    {
+    struct ContextInfo : public osg::Referenced {
         ContextInfo() : valid(UNKNOWN) {}
         ContextInfo(const ContextInfo& rhs) : osg::Referenced(rhs), valid(rhs.valid()) {}
         ContextInfo& operator=(const ContextInfo& rhs)
@@ -115,7 +115,7 @@ protected:
     typedef osg::buffered_object<ContextInfo> ContextMap;
     mutable ContextMap _contextMap;
     bool _alwaysValid;
-    osg::ref_ptr<osg::StateSet> _shadowingStateSet;
+    vsg::ref_ptr<osg::StateSet> _shadowingStateSet;
     SGSharedPtr<SGExpressionb> _validExpression;
     int _contextIdLocation;
     std::string _scheme;
@@ -126,10 +126,10 @@ class TechniquePredParser : public expression::ExpressionParser
 public:
     void setTechnique(Technique* tniq) { _tniq = tniq; }
     Technique* getTechnique() { return _tniq.get(); }
-//    void setEffect(Effect* effect) { _effect = effect; }
-//    Effect* getEffect() { return _effect.get(); }
+    //    void setEffect(Effect* effect) { _effect = effect; }
+    //    Effect* getEffect() { return _effect.get(); }
 protected:
-    osg::ref_ptr<Technique> _tniq;
-    // osg::ref_ptr<Effect> _effect;
+    vsg::ref_ptr<Technique> _tniq;
+    // vsg::ref_ptr<Effect> _effect;
 };
-}
+} // namespace simgear

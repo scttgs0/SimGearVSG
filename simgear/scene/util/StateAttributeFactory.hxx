@@ -3,14 +3,16 @@
 
 #pragma once
 
-#include <OpenThreads/Mutex>
-#include <osg/ref_ptr>
-#include <osg/Array>
 #include <map>
 #include <mutex>
 
-namespace osg
-{
+#include <vsg/all.h>
+
+#include <OpenThreads/Mutex>
+#include <osg/Array>
+
+
+namespace osg {
 class AlphaFunc;
 class BlendFunc;
 class CullFace;
@@ -19,14 +21,14 @@ class ShadeModel;
 class Texture2D;
 class Texture3D;
 class TexEnv;
-}
+} // namespace osg
 
 #include <simgear/scene/util/OsgSingleton.hxx>
 
 // Return read-only instances of common OSG state attributes.
-namespace simgear
+namespace simgear {
+class StateAttributeFactory : public ReferencedSingleton<StateAttributeFactory>
 {
-class StateAttributeFactory : public ReferencedSingleton<StateAttributeFactory> {
 public:
     virtual ~StateAttributeFactory();
 
@@ -49,19 +51,20 @@ public:
     osg::Depth* getStandardDepthWritesDisabled() { return _standardDepthWritesDisabled.get(); }
     osg::Texture3D* getNoiseTexture(int size);
 
-    StateAttributeFactory();    
-protected:
-    osg::ref_ptr<osg::BlendFunc> _standardBlendFunc;
-    osg::ref_ptr<osg::Vec4Array> _white;
-    osg::ref_ptr<osg::Texture2D> _whiteTexture;
-    osg::ref_ptr<osg::Texture2D> _transparentTexture;
-    osg::ref_ptr<osg::Texture2D> _nullNormalmapTexture;
-    osg::ref_ptr<osg::CullFace> _cullFaceFront;
-    osg::ref_ptr<osg::CullFace> _cullFaceBack;
-    osg::ref_ptr<osg::Depth> _standardDepth;
-    osg::ref_ptr<osg::Depth> _standardDepthWritesDisabled;
+    StateAttributeFactory();
 
-    typedef std::map<int, osg::ref_ptr<osg::Texture3D>> NoiseMap;
+protected:
+    vsg::ref_ptr<osg::BlendFunc> _standardBlendFunc;
+    vsg::ref_ptr<osg::Vec4Array> _white;
+    vsg::ref_ptr<osg::Texture2D> _whiteTexture;
+    vsg::ref_ptr<osg::Texture2D> _transparentTexture;
+    vsg::ref_ptr<osg::Texture2D> _nullNormalmapTexture;
+    vsg::ref_ptr<osg::CullFace> _cullFaceFront;
+    vsg::ref_ptr<osg::CullFace> _cullFaceBack;
+    vsg::ref_ptr<osg::Depth> _standardDepth;
+    vsg::ref_ptr<osg::Depth> _standardDepthWritesDisabled;
+
+    typedef std::map<int, vsg::ref_ptr<osg::Texture3D>> NoiseMap;
     NoiseMap _noises;
     inline static std::mutex _noise_mutex; // Protects the NoiseMap _noises for mult-threaded access
 };

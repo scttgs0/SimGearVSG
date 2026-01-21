@@ -17,44 +17,47 @@
 
 #pragma once
 
-#include <osg/Matrix>
+#include <vsg/all.h>
+
 #include <osg/PrimitiveSet>
+
 
 namespace simgear {
 
-class PrimitiveCollector : public osg::PrimitiveFunctor {
+class PrimitiveCollector : public osg::PrimitiveFunctor
+{
 public:
     PrimitiveCollector();
     virtual ~PrimitiveCollector();
-    
+
     void swap(PrimitiveCollector& primitiveFunctor);
 
-    virtual void setVertexArray(unsigned int count, const osg::Vec2* vertices);
-    virtual void setVertexArray(unsigned int count, const osg::Vec3* vertices);
-    virtual void setVertexArray(unsigned int count, const osg::Vec4* vertices);
-    virtual void setVertexArray(unsigned int count, const osg::Vec2d* vertices);
-    virtual void setVertexArray(unsigned int count, const osg::Vec3d* vertices);
-    virtual void setVertexArray(unsigned int count, const osg::Vec4d* vertices);
+    virtual void setVertexArray(unsigned int count, const vsg::vec2* vertices);
+    virtual void setVertexArray(unsigned int count, const vsg::vec3* vertices);
+    virtual void setVertexArray(unsigned int count, const vsg::vec4* vertices);
+    virtual void setVertexArray(unsigned int count, const vsg::dvec2* vertices);
+    virtual void setVertexArray(unsigned int count, const vsg::dvec3* vertices);
+    virtual void setVertexArray(unsigned int count, const vsg::dvec4* vertices);
 
     virtual void drawArrays(GLenum mode, GLint first, GLsizei count);
-  
-    template<typename index_type>
+
+    template <typename index_type>
     void drawElementsTemplate(GLenum mode, GLsizei count, const index_type* indices);
     virtual void drawElements(GLenum mode, GLsizei count, const GLubyte* indices);
     virtual void drawElements(GLenum mode, GLsizei count, const GLushort* indices);
     virtual void drawElements(GLenum mode, GLsizei count, const GLuint* indices);
 
     virtual void begin(GLenum mode);
-    virtual void vertex(const osg::Vec2& v);
-    virtual void vertex(const osg::Vec3& v);
-    virtual void vertex(const osg::Vec4& v);
+    virtual void vertex(const vsg::vec2& v);
+    virtual void vertex(const vsg::vec3& v);
+    virtual void vertex(const vsg::vec4& v);
     virtual void vertex(float x, float y);
     virtual void vertex(float x, float y, float z);
     virtual void vertex(float x, float y, float z, float w);
     virtual void end();
 
-    void addVertex(const osg::Vec3d& v);
-    void addVertex(const osg::Vec4d& v);
+    void addVertex(const vsg::dvec3& v);
+    void addVertex(const vsg::dvec4& v);
 
     void addPoint(unsigned i1);
     void addLine(unsigned i1, unsigned i2);
@@ -62,13 +65,13 @@ public:
     void addQuad(unsigned i1, unsigned i2, unsigned i3, unsigned i4);
 
     /// The callback functions that are called on an apropriate primitive
-    virtual void addPoint(const osg::Vec3d& v1) = 0;
-    virtual void addLine(const osg::Vec3d& v1, const osg::Vec3d& v2) = 0;
-    virtual void addTriangle(const osg::Vec3d& v1, const osg::Vec3d& v2, const osg::Vec3d& v3) = 0;
+    virtual void addPoint(const vsg::dvec3& v1) = 0;
+    virtual void addLine(const vsg::dvec3& v1, const vsg::dvec3& v2) = 0;
+    virtual void addTriangle(const vsg::dvec3& v1, const vsg::dvec3& v2, const vsg::dvec3& v3) = 0;
 
 private:
-    std::vector<osg::Vec3d> _vertices;
+    std::vector<vsg::dvec3> _vertices;
     GLenum _mode;
 };
 
-}
+} // namespace simgear

@@ -8,12 +8,13 @@
 #include <simgear_config.h>
 #include <simgear/compiler.h>
 
+#include <list>
 #include <iostream>
 
 #include <simgear/threads/SGThread.hxx>
 #include <simgear/emesary/Emesary.hxx>
-#include <list>
 #include <simgear/misc/test_macros.hxx>
+
 
 using std::cout;
 using std::cerr;

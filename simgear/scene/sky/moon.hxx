@@ -10,7 +10,8 @@
 
 #pragma once
 
-#include <osg/ref_ptr>
+#include <vsg/all.h>
+
 #include <osg/MatrixTransform>
 
 #include <simgear/math/SGMath.hxx>
@@ -20,11 +21,12 @@ namespace simgear {
 class SGReaderWriterOptions;
 }
 
-class SGMoon : public SGReferenced {
+class SGMoon : public SGReferenced
+{
 public:
     SGMoon() = default;
 
-    osg::Node* build(double moon_size, const simgear::SGReaderWriterOptions* options);
+    vsg::Node* build(double moon_size, const simgear::SGReaderWriterOptions* options);
 
     /*
      * Reposition the moon at the specified right ascension and declination, at
@@ -37,5 +39,5 @@ public:
                     double lst, double lat, double alt);
 
 private:
-    osg::ref_ptr<osg::MatrixTransform> moon_transform;
+    vsg::ref_ptr<osg::MatrixTransform> moon_transform;
 };

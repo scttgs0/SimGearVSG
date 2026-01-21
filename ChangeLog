@@ -2825,7 +2825,7 @@
 2009-01-28 08:09  timoore
 
 	* simgear/scene/tgdb/: ShaderGeometry.cxx, ShaderGeometry.hxx: Use
-	  osg::Geometry code to draw trees ourselves.
+	  vsg::Geometry code to draw trees ourselves.
 
 	  This reverts back in the direction of Yon's original patch: the
 	  model is drawn within ShaderGeometry::drawImplementation. This
@@ -3271,13 +3271,13 @@
 	  the osg idiosyncracy to store transposed matrices...so the
 	  intuitive
 
-		 osg::Vec4f p = vm *
-	  osg::Vec4f(_cloudsprites[i]->position.osg(), 1.0f);
+		 vsg::vec4 p = vm *
+	  vsg::vec4(_cloudsprites[i]->position.osg(), 1.0f);
 
 	  needs to be replaced with...
 
-		 osg::Vec4f p =
-	  vm.preMult(osg::Vec4f(_cloudsprites[i]->position.osg(), 1.0f);
+		 vsg::vec4 p =
+	  vm.preMult(vsg::vec4(_cloudsprites[i]->position.osg(), 1.0f);
 
 	  The patch also optimizes the distance calculation - it evaluates
 	  the distances in model space instead of eye space, which reduces
@@ -3699,7 +3699,7 @@
 	* simgear/: compiler.h, debug/logstream.hxx, misc/sg_path.cxx,
 	  misc/sgstream.cxx, misc/zfstream.cxx, screen/colors.hxx,
 	  timing/lowleveltime.cxx, timing/timestamp.cxx:
-	  Patch to remove macintosh and MWERKS from Simgear.
+	  Patch to remove macintosh and MWERKS from SimGear.
 
 2008-07-19 18:01  timoore
 
@@ -4030,7 +4030,7 @@
 
 2008-03-15 17:32  curt
 
-	* configure.ac: Simgear also enforces plib-1.8.5 in order to build.
+	* configure.ac: SimGear also enforces plib-1.8.5 in order to build.
 
 2008-03-11 14:44  timoore
 
@@ -4738,9 +4738,9 @@
 2007-09-30 21:51  timoore
 
 	* simgear/scene/tgdb/SGOceanTile.cxx: ocean state set in
-	  osg::Geometry
+	  vsg::Geometry
 
-	  Put the ocean tile state set in osg::Geometry, not the
+	  Put the ocean tile state set in vsg::Geometry, not the
 	  osg::Geode, so that is readily available during intersection
 	  testing and can be used to find the corresponding SGMaterial.
 
@@ -7724,7 +7724,7 @@
 	  Mathias Fr�hlich:
 
 	  I guess the most important memory leaks are plugged now.  Just by
-	  inspection: An other memory leak in Simgear.
+	  inspection: An other memory leak in SimGear.
 
 2005-10-27 10:21  ehofman
 
@@ -8124,7 +8124,7 @@
 	* simgear/screen/: Makefile.am, extensions.hxx, shader.cpp,
 	  shader.h: Harald JOHNSEN:
 
-	  This is the low level shader class for Simgear.  It's the code
+	  This is the low level shader class for SimGear.  It's the code
 	  from Roman Grigoriev with a few adaptations.
 
 2005-07-27 10:02  ehofman
@@ -9419,7 +9419,7 @@
 	* simgear/route/: waypoint.cxx, waypoint.hxx: Roy Vegard Ovesen:
 
 	  I'm working on a route manager in the GPS module. So I've added a
-	  name parameter to the waypoint class in Simgear. I use the
+	  name parameter to the waypoint class in SimGear. I use the
 	  existing ID parameter to store the ID, for example KLAX, and the
 	  name parameter to store the name, San Francisco Intl.
 
@@ -11938,7 +11938,7 @@
 
 	* configure.ac: James Turner:
 
-	  I've had to hack Simgear's configure.ac quite a bit [for Mac OS
+	  I've had to hack SimGear's configure.ac quite a bit [for Mac OS
 	  X], using the Plib one as a reference.  The basic construct (a
 	  big switch statement based on the target type) is nice, I think,
 	  since it moves lots of IRIX / cygwin / OS-X specialties out of
@@ -12239,5 +12239,5 @@
 	  simgear/xml/xmlrole.c, simgear/xml/xmlrole.h,
 	  simgear/xml/xmltok.c, simgear/xml/xmltok.h,
 	  simgear/xml/xmltok_impl.c, simgear/xml/xmltok_impl.h,
-	  simgear/xml/xmltok_ns.c: Initial revsion of Simgear-0.3.0
+	  simgear/xml/xmltok_ns.c: Initial revsion of SimGear-0.3.0
 

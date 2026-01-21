@@ -18,13 +18,14 @@
 
 #pragma once
 
-#include <osg/Vec4>
+#include <vsg/all.h>
+
 #include <string>
 
-namespace simgear
-{
 
-  /**
+namespace simgear {
+
+/**
    * Parse a (CSS) color
    *
    * @param str     Text to parse
@@ -32,6 +33,6 @@ namespace simgear
    *
    * @return Whether str contained a valid color (and result has been modified)
    */
-  bool parseColor(std::string str, osg::Vec4& result);
+bool parseColor(std::string str, vsg::vec4& result);
 
 } // namespace simgear

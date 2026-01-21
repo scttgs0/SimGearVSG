@@ -5,10 +5,12 @@
 #include <memory>
 #include <string>
 
+#include <vsg/all.h>
+
 #include <osg/GraphicsContext>
 
-namespace simgear
-{
+
+namespace simgear {
 
 /* Compressed video encoder.
 
@@ -16,8 +18,7 @@ Generated video contains information about frame times, and also copes with
 changes to the width and/or height of the frames.
 
 So replay will replicate variable frame rates and window resizing. */
-struct VideoEncoder final
-{
+struct VideoEncoder final {
     /* Constructor; sets things up to write compressed video to file <path>.
     
     Args:
@@ -43,25 +44,24 @@ struct VideoEncoder final
     called.
     */
     VideoEncoder(
-            const std::string& path,
-            const std::string& codec,
-            double quality,
-            double speed,
-            int bitrate,
-            bool log_sws_scale_stats=false
-            );
-    
+        const std::string& path,
+        const std::string& codec,
+        double quality,
+        double speed,
+        int bitrate,
+        bool log_sws_scale_stats = false);
+
     /* Appends gc's current bitmap to compressed video. Works by scheduling a
     callback with gc->add(). <dt> must be non-zero.
     
     Throws exception if error has occurred previously - for example sometimes a
     configuration doesn't fail until we start sending frames. */
     void encode(double dt, osg::GraphicsContext* gc);
-    
-    ~VideoEncoder();    // non-virtual intentional
-    
-    private:
-    osg::ref_ptr<struct VideoEncoderInternal>   m_internal;
+
+    ~VideoEncoder(); // non-virtual intentional
+
+private:
+    vsg::ref_ptr<struct VideoEncoderInternal> m_internal;
 };
 
-}
+} // namespace simgear

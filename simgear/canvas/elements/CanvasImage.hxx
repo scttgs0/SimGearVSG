@@ -48,10 +48,10 @@ namespace canvas
       void setSrcCanvas(CanvasPtr canvas);
       CanvasWeakPtr getSrcCanvas() const;
 
-      void setImage(osg::ref_ptr<osg::Image> img);
+      void setImage(vsg::ref_ptr<vsg::Image> img);
       void setOpacity(float opacity);
       void setFill(const std::string& fill);
-      void setFill(const osg::Vec4& color);
+      void setFill(const vsg::vec4& color);
 
       void setSize(const SGVec2f& sz);
 
@@ -101,18 +101,18 @@ namespace canvas
       /**
        * fill the specified rectangle of the image, with an RGB value
        */
-      void fillRect(const SGRect<int>& rect, const osg::Vec4& color);
+      void fillRect(const SGRect<int>& rect, const vsg::vec4& color);
 
       void setPixel(int x, int y, const std::string& color);
 
-      void setPixel(int x, int y, const osg::Vec4& color);
+      void setPixel(int x, int y, const vsg::vec4& color);
 
       /**
         * mark the image pixels as modified, so the canvas is re-painted
        */
       void dirtyPixels();
 
-      osg::ref_ptr<osg::Image> getImage() const;
+      vsg::ref_ptr<vsg::Image> getImage() const;
 
     //  void setRow(int row, int offset, )
     protected:
@@ -141,18 +141,18 @@ namespace canvas
 
       void allocateImage();
 
-      static osg::ref_ptr<SGProgram> _program;
+      static vsg::ref_ptr<SGProgram> _program;
 
-      osg::ref_ptr<osg::Texture2D> _texture;
+      vsg::ref_ptr<osg::Texture2D> _texture;
       // TODO optionally forward events to canvas
       CanvasWeakPtr _src_canvas;
       HTTP::Request_ptr _http_request;
 
-      osg::ref_ptr<osg::Geometry>  _geom;
-      osg::ref_ptr<osg::DrawArrays>_prim;
-      osg::ref_ptr<osg::Vec3Array> _vertices;
-      osg::ref_ptr<osg::Vec2Array> _texCoords;
-      osg::ref_ptr<osg::Vec4Array> _colors;
+      vsg::ref_ptr<vsg::Geometry>  _geom;
+      vsg::ref_ptr<osg::DrawArrays>_prim;
+      vsg::ref_ptr<vsg::vec3Array> _vertices;
+      vsg::ref_ptr<osg::Vec2Array> _texCoords;
+      vsg::ref_ptr<osg::Vec4Array> _colors;
 
       SGPropertyNode *_node_src_rect = nullptr;
       SGRect<float>   _src_rect {0, 0},

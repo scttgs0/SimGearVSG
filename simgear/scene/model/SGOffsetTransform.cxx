@@ -37,19 +37,19 @@ SGOffsetTransform::SGOffsetTransform(double scaleFactor) :
 
 SGOffsetTransform::SGOffsetTransform(const SGOffsetTransform& offset,
                                      const osg::CopyOp& copyop) :
-    osg::Transform(offset, copyop),
+    vsg::Transform(offset, copyop),
     _scaleFactor(offset._scaleFactor),
     _rScaleFactor(offset._rScaleFactor)
 {
 }
 
 bool
-SGOffsetTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
+SGOffsetTransform::computeLocalToWorldMatrix(vsg::mat4& matrix,
                                              osg::NodeVisitor* nv) const
 {
   if (nv && nv->getVisitorType() == osg::NodeVisitor::CULL_VISITOR) {
-    osg::Vec3 center = nv->getEyePoint();
-    osg::Matrix transform;
+    vsg::vec3 center = nv->getEyePoint();
+    vsg::mat4 transform;
     transform(0,0) = _scaleFactor;
     transform(1,1) = _scaleFactor;
     transform(2,2) = _scaleFactor;
@@ -62,12 +62,12 @@ SGOffsetTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
 }
 
 bool
-SGOffsetTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
+SGOffsetTransform::computeWorldToLocalMatrix(vsg::mat4& matrix,
                                              osg::NodeVisitor* nv) const
 {
   if (nv && nv->getVisitorType() == osg::NodeVisitor::CULL_VISITOR) {
-    osg::Vec3 center = nv->getEyePoint();
-    osg::Matrix transform;
+    vsg::vec3 center = nv->getEyePoint();
+    vsg::mat4 transform;
     transform(0,0) = _rScaleFactor;
     transform(1,1) = _rScaleFactor;
     transform(2,2) = _rScaleFactor;
@@ -81,7 +81,7 @@ SGOffsetTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
 
 namespace {
 
-bool OffsetTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
+bool OffsetTransform_readLocalData(vsg::Object& obj, osgDB::Input& fr)
 {
     SGOffsetTransform& offset = static_cast<SGOffsetTransform&>(obj);
     if (fr[0].matchWord("scaleFactor")) {
@@ -96,7 +96,7 @@ bool OffsetTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
     return true;
 }
 
-bool OffsetTransform_writeLocalData(const osg::Object& obj, osgDB::Output& fw)
+bool OffsetTransform_writeLocalData(const vsg::Object& obj, osgDB::Output& fw)
 {
     const SGOffsetTransform& offset
         = static_cast<const SGOffsetTransform&>(obj);

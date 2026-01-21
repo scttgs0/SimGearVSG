@@ -7,26 +7,27 @@
 
 #pragma once
 
-#include <string>
 #include <map>
-#include <stack>
 #include <memory>
-
-#include <osg/ref_ptr>
-#include <osg/Referenced>
+#include <stack>
+#include <string>
 
 #include "easyxml.hxx"
 
-namespace simgear
-{
+#include <vsg/all.h>
 
-template <typename Element> class XMLStaticParser;
+#include <osg/Referenced>
+
+
+namespace simgear {
+
+template <typename Element>
+class XMLStaticParser;
 
 // Parser object. Instantiated for each new element encountered.
 
-template<typename Element>
-struct ElementBuilder : public osg::Referenced
-{
+template <typename Element>
+struct ElementBuilder : public osg::Referenced {
     ElementBuilder(XMLStaticParser<Element>* builder) {}
     ElementBuilder(const ElementBuilder& rhs) const {}
     virtual ~ElementBuilder() {}
@@ -38,12 +39,11 @@ struct ElementBuilder : public osg::Referenced
     virtual ElementBuilder* clone() const = 0;
 };
 
-template<typename Element>
-struct BuilderFactory : public osg::Referenced
-{
+template <typename Element>
+struct BuilderFactory : public osg::Referenced {
     typedef ElementBuilder<Element> builder_type;
-    typedef std::map<std::string, osg::ref_ptr<const ElementBuilder> >
-    BuilderMap;
+    typedef std::map<std::string, vsg::ref_ptr<const ElementBuilder>>
+        BuilderMap;
     BuilderMap builderMap;
     virtual ~BuilderFactory() {}
     static void registerBuilder(const std::string& name,
@@ -59,10 +59,7 @@ template <typename Element>
 class XMLStaticParser : public XMLVisitor
 {
 public:
-
-
-    static osg::ref_ptr<BuilderFactory> builderFactory;
-
+    static vsg::ref_ptr<BuilderFactory> builderFactory;
 
 
     static ElementBuilder* makeBuilder(const std::string& name)
@@ -73,7 +70,7 @@ public:
         return iter->second->clone();
     }
 
-    typedef std::stack<osg::ref_ptr<ElementBuilder> > BuilderStack;
+    typedef std::stack<vsg::ref_ptr<ElementBuilder>> BuilderStack;
     BuilderStack builderStack;
 
     Element* result;
@@ -114,8 +111,7 @@ public:
         builderStack.top()->processData(s, length);
     }
 
-    struct RegisterBuilderProxy
-    {
+    struct RegisterBuilderProxy {
         RegisterBuilderProxy(const char* name, ElementBuilder* builder)
         {
             registerBuilder(name, builder);
@@ -124,5 +120,5 @@ public:
 };
 
 template <typename E>
-static osg::ref_ptr<BuilderFactory<E> > builderFactory;
-}
+static vsg::ref_ptr<BuilderFactory<E>> builderFactory;
+} // namespace simgear

@@ -380,7 +380,7 @@ public:
         unsigned y1 = y0 + _size[1];
 
         SGSpheref sphere = getBoundingSphere();
-        osg::Matrixd transform;
+        vsg::dmat4 transform;
         transform.makeTranslate(toOsg(-sphere.getCenter()));
 
         // create a mesh of this dimension

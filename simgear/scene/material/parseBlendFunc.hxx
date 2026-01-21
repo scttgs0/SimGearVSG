@@ -19,13 +19,16 @@
 
 #pragma once
 
-#include <simgear/props/propsfwd.hxx>
+#include <vsg/all.h>
+
 #include <osg/StateSet>
 
-namespace simgear
-{
+#include <simgear/props/propsfwd.hxx>
 
-  /**
+
+namespace simgear {
+
+/**
    * Parse a blend function from the given property nodes and apply it to the
    * given osg::StateSet.
    *
@@ -37,12 +40,12 @@ namespace simgear
    * @param src_alpha
    * @param dest_alpha
    */
-  bool parseBlendFunc( osg::StateSet* ss,
-                       const SGPropertyNode* src = 0,
-                       const SGPropertyNode* dest = 0,
-                       const SGPropertyNode* src_rgb = 0,
-                       const SGPropertyNode* dest_rgb = 0,
-                       const SGPropertyNode* src_alpha = 0,
-                       const SGPropertyNode* dest_alpha = 0 );
+bool parseBlendFunc(osg::StateSet* ss,
+                    const SGPropertyNode* src = 0,
+                    const SGPropertyNode* dest = 0,
+                    const SGPropertyNode* src_rgb = 0,
+                    const SGPropertyNode* dest_rgb = 0,
+                    const SGPropertyNode* src_alpha = 0,
+                    const SGPropertyNode* dest_alpha = 0);
 
 } // namespace simgear

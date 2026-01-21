@@ -95,7 +95,7 @@ namespace simgear::canvas
         handleEvent(event);
       }
 
-      virtual bool hover( const osg::Vec2d& windowPos,
+      virtual bool hover( const vsg::dvec2& windowPos,
                           const Info& info )
       {
         // TODO somehow get more info about event (time, modifiers, pressed
@@ -108,7 +108,7 @@ namespace simgear::canvas
         return handleEvent(event);
       }
 
-      virtual void mouseLeave( const osg::Vec2d& windowPos )
+      virtual void mouseLeave( const vsg::dvec2& windowPos )
       {
         MouseEventPtr event(new MouseEvent);
         event->type = Event::MOUSE_LEAVE;
@@ -119,7 +119,7 @@ namespace simgear::canvas
 
     protected:
       CanvasWeakPtr _canvas;
-      osg::Vec2f    _last_pos,
+      vsg::vec2    _last_pos,
                     _last_delta;
 
       void updatePosFromUV(const MouseEventPtr& event, const SGVec2d& uv)
@@ -128,7 +128,7 @@ namespace simgear::canvas
         if( !canvas )
           return;
 
-        osg::Vec2d pos( uv.x() * canvas->getViewWidth(),
+        vsg::dvec2 pos( uv.x() * canvas->getViewWidth(),
                         (1 - uv.y()) * canvas->getViewHeight() );
 
         _last_delta = pos - _last_pos;
@@ -167,11 +167,11 @@ namespace simgear::canvas
   ObjectPlacement::~ObjectPlacement()
   {
     assert( _group->getNumChildren() == 1 );
-    osg::Node *child = _group->getChild(0);
+    vsg::Node *child = _group->getChild(0);
 
     if( _group->getNumParents() )
     {
-      osg::Group *parent = _group->getParent(0);
+      vsg::Group *parent = _group->getParent(0);
       parent->addChild(child);
       parent->removeChild(_group);
     }
@@ -188,7 +188,7 @@ namespace simgear::canvas
     {
       _material = new osg::Material;
       _material->setColorMode(osg::Material::OFF);
-      _material->setDataVariance(osg::Object::DYNAMIC);
+      _material->setDataVariance(vsg::Object::DYNAMIC);
       _group->getOrCreateStateSet()
             ->setAttribute(_material, ( osg::StateAttribute::ON
                                       | osg::StateAttribute::OVERRIDE ) );
@@ -196,7 +196,7 @@ namespace simgear::canvas
 
     _material->setEmission(
       osg::Material::FRONT_AND_BACK,
-      osg::Vec4(emit, emit, emit, emit)
+      vsg::vec4(emit, emit, emit, emit)
     );
   }
 

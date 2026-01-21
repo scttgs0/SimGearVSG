@@ -86,7 +86,7 @@ public:
         }
     }
 
-    void operator()(osg::Node* node, osg::NodeVisitor* nv) override
+    void operator()(vsg::Node* node, osg::NodeVisitor* nv) override
     {
         osg::StateSet* ss = node->getOrCreateStateSet();
 
@@ -159,10 +159,10 @@ private:
     std::vector<TextureEntry> _textures;
     osgDB::FilePathList _texture_path_list;
 
-    osg::ref_ptr<osg::Uniform> _base_color_factor_uniform;
-    osg::ref_ptr<osg::Uniform> _metallic_factor_uniform;
-    osg::ref_ptr<osg::Uniform> _roughness_factor_uniform;
-    osg::ref_ptr<osg::Uniform> _emissive_factor_uniform;
+    vsg::ref_ptr<osg::Uniform> _base_color_factor_uniform;
+    vsg::ref_ptr<osg::Uniform> _metallic_factor_uniform;
+    vsg::ref_ptr<osg::Uniform> _roughness_factor_uniform;
+    vsg::ref_ptr<osg::Uniform> _emissive_factor_uniform;
 
     simgear::RGBAColorValue_ptr _base_color_factor_value;
     simgear::Value_ptr _metallic_factor_value;
@@ -182,9 +182,9 @@ SGPBRAnimation::SGPBRAnimation(simgear::SGTransientModelData& modelData) :
 
 SGPBRAnimation::~SGPBRAnimation() = default;
 
-osg::Group* SGPBRAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group* SGPBRAnimation::createAnimationGroup(vsg::Group& parent)
 {
-    osg::Group* group = new osg::Group;
+    vsg::Group* group = new vsg::Group;
     group->setName("PBR animation group");
     SGSceneUserData::getOrCreateSceneUserData(group)->setLocation(getConfig()->getLocation());
 
@@ -218,13 +218,13 @@ osg::Group* SGPBRAnimation::createAnimationGroup(osg::Group& parent)
         input_root = getModelRoot()->getNode(prop_base_node->getStringValue(), true);
     }
 
-    group->getOrCreateStateSet()->setDataVariance(osg::Object::DYNAMIC);
+    group->getOrCreateStateSet()->setDataVariance(vsg::Object::DYNAMIC);
     group->setUpdateCallback(new UpdateCallback(_texture_path_list, getConfig(), input_root));
 
     if (getCondition()) {
         simgear::ConditionNode* cn = new simgear::ConditionNode;
         cn->setCondition(getCondition());
-        osg::Group* modelGroup = new osg::Group;
+        vsg::Group* modelGroup = new vsg::Group;
         group->addChild(modelGroup);
         cn->addChild(group);
         cn->addChild(modelGroup);

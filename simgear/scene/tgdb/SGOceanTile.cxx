@@ -69,8 +69,8 @@ public:
         lonPoints(lonP),
         geoPoints(latPoints * lonPoints + 2 * (lonPoints + latPoints)),
         geod_nodes(latPoints * lonPoints),
-        vl(new osg::Vec3Array(geoPoints)),
-        nl(new osg::Vec3Array(geoPoints)),
+        vl(new vsg::vec3Array(geoPoints)),
+        nl(new vsg::vec3Array(geoPoints)),
         tl(new osg::Vec2Array(geoPoints)),
         vlArray(*vl, lonPoints + 2, lonPoints, 1),
         nlArray(*nl, lonPoints + 2, lonPoints, 1),
@@ -97,11 +97,11 @@ public:
 
     std::vector<SGGeod> geod_nodes;
 
-    osg::Vec3Array* vl;
-    osg::Vec3Array* nl;
+    vsg::vec3Array* vl;
+    vsg::vec3Array* nl;
     osg::Vec2Array* tl;
-    VectorArrayAdapter<osg::Vec3Array> vlArray;
-    VectorArrayAdapter<osg::Vec3Array> nlArray;
+    VectorArrayAdapter<vsg::vec3Array> vlArray;
+    VectorArrayAdapter<vsg::vec3Array> nlArray;
     VectorArrayAdapter<osg::Vec2Array> tlArray;
 
     void calcMesh(const SGVec3d& cartCenter, const SGQuatd& orient,
@@ -181,8 +181,8 @@ void OceanMesh::calcApronPt(int latIdx, int lonIdx, int latInner, int lonInner,
     // Get vector along edge, in the right direction to make a cross
     // product with the normal vector that will point out from the
     // mesh.
-    osg::Vec3f edgePt = vlArray(latIdx, lonIdx);
-    osg::Vec3f edgeVec;
+    vsg::vec3 edgePt = vlArray(latIdx, lonIdx);
+    vsg::vec3 edgeVec;
     if (lonIdx == lonInner) {   // bottom or top edge
         if (lonIdx > 0)
             edgeVec = vlArray(latIdx, lonIdx - 1) - edgePt;
@@ -199,7 +199,7 @@ void OceanMesh::calcApronPt(int latIdx, int lonIdx, int latInner, int lonInner,
             edgeVec = -edgeVec;
     }
     edgeVec.normalize();
-    osg::Vec3f outVec = nlArray(latIdx, lonIdx) ^ edgeVec;
+    vsg::vec3 outVec = nlArray(latIdx, lonIdx) ^ edgeVec;
     (*vl)[destIdx]
         = edgePt - nlArray(latIdx, lonIdx) * downDist + outVec * outDist;
     (*nl)[destIdx] = nlArray(latIdx, lonIdx);
@@ -209,17 +209,17 @@ void OceanMesh::calcApronPt(int latIdx, int lonIdx, int latInner, int lonInner,
     if (lonIdx == lonInner) {
         if (latIdx > latInner)
             (*tl)[destIdx]
-                = tlArray(latIdx, lonIdx) + osg::Vec2f(0.0f, texDelta);
+                = tlArray(latIdx, lonIdx) + vsg::vec2(0.0f, texDelta);
         else
             (*tl)[destIdx]
-                = tlArray(latIdx, lonIdx) - osg::Vec2f(0.0f, texDelta);
+                = tlArray(latIdx, lonIdx) - vsg::vec2(0.0f, texDelta);
     } else {
         if (lonIdx > lonInner)
             (*tl)[destIdx]
-                = tlArray(latIdx, lonIdx) + osg::Vec2f(texDelta, 0.0f);
+                = tlArray(latIdx, lonIdx) + vsg::vec2(texDelta, 0.0f);
         else
             (*tl)[destIdx]
-                = tlArray(latIdx, lonIdx) - osg::Vec2f(texDelta, 0.0f);
+                = tlArray(latIdx, lonIdx) - vsg::vec2(texDelta, 0.0f);
     }
 }
 
@@ -273,14 +273,14 @@ void fillDrawElementsWithApron(short height, short width,
 }
 }
 
-osg::Node* SGOceanTile(double clat, double clon, double width, double height, SGMaterialLib *matlib, int latPoints, int lonPoints) {
+vsg::Node* SGOceanTile(double clat, double clon, double width, double height, SGMaterialLib *matlib, int latPoints, int lonPoints) {
     Effect *effect = 0;
 
     double tex_width = 1000.0;
     SGGeod center = SGGeod::fromDeg(clon, clat);
 
     // find Ocean material in the properties list
-    osg::ref_ptr<SGMaterialCache> matcache = matlib->generateMatCache(center, 0);
+    vsg::ref_ptr<SGMaterialCache> matcache = matlib->generateMatCache(center, 0);
     SGMaterial* mat = matcache->find( "Ocean" );
 
     if ( mat != NULL ) {
@@ -303,15 +303,15 @@ osg::Node* SGOceanTile(double clat, double clon, double width, double height, SG
     grid.calcApronPts(tex_width);
   
     osg::Vec4Array* cl = new osg::Vec4Array;
-    cl->push_back(osg::Vec4d(1, 1, 1, 1));
+    cl->push_back(vsg::dvec4(1, 1, 1, 1));
   
-    osg::Geometry* geometry = new osg::Geometry;
-    geometry->setDataVariance(osg::Object::STATIC);
+    vsg::Geometry* geometry = new vsg::Geometry;
+    geometry->setDataVariance(vsg::Object::STATIC);
     geometry->setVertexArray(grid.vl);
     geometry->setNormalArray(grid.nl);
-    geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+    geometry->setNormalBinding(vsg::Geometry::BIND_PER_VERTEX);
     geometry->setColorArray(cl);
-    geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+    geometry->setColorBinding(vsg::Geometry::BIND_OVERALL);
     geometry->setTexCoordArray(0, grid.tl);
 
     // Allocate the indices for triangles in the mesh and the apron
@@ -330,8 +330,8 @@ osg::Node* SGOceanTile(double clat, double clon, double width, double height, SG
 
     osg::MatrixTransform* transform = new osg::MatrixTransform;
     transform->setName("Ocean");
-    transform->setMatrix(osg::Matrix::rotate(toOsg(hlOr))*
-                         osg::Matrix::translate(toOsg(cartCenter)));
+    transform->setMatrix(vsg::mat4::rotate(toOsg(hlOr))*
+                         vsg::mat4::translate(toOsg(cartCenter)));
     transform->addChild(geode);
     transform->setNodeMask( ~(simgear::CASTSHADOW_BIT | simgear::MODELLIGHT_BIT) );
 
@@ -343,7 +343,7 @@ osg::Node* SGOceanTile(double clat, double clon, double width, double height, SG
     return transform;
 }
 
-osg::Node* SGOceanTile(const SGBucket& b, SGMaterialLib *matlib, int latPoints, int lonPoints)
+vsg::Node* SGOceanTile(const SGBucket& b, SGMaterialLib *matlib, int latPoints, int lonPoints)
 {
     return SGOceanTile(b.get_center_lat(), b.get_center_lon(), b.get_width(), b.get_height(), matlib, latPoints, lonPoints);
 }

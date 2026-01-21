@@ -27,7 +27,7 @@
 #include <simgear/structure/SGExpression.hxx>
 
 
-class SGTranslateTransform : public osg::Transform {
+class SGTranslateTransform : public vsg::Transform {
 public:
   SGTranslateTransform();
   SGTranslateTransform(const SGTranslateTransform&,
@@ -45,9 +45,9 @@ public:
   double getValue() const
   { return _value; }
 
-  virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+  virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
-  virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+  virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
   virtual osg::BoundingSphere computeBound() const;
 

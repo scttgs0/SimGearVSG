@@ -18,7 +18,7 @@
 
 namespace simgear::compositor {
 
-ClusteredShading::ClusteredShading(osg::Camera *camera,
+ClusteredShading::ClusteredShading(vsg::Camera *camera,
                                    const SGPropertyNode *config) :
     _camera(camera)
 {
@@ -56,7 +56,7 @@ ClusteredShading::ClusteredShading(osg::Camera *camera,
 
     // Create and associate the cluster 3D texture
     ////////////////////////////////////////////////////////////////////////////
-    _clusters = new osg::Image;
+    _clusters = new vsg::Image;
     // Image allocation happens in setupSubfrusta() because the number of
     // clusters can change at runtime (viewport resize)
 
@@ -73,7 +73,7 @@ ClusteredShading::ClusteredShading(osg::Camera *camera,
     // Create and associate the light indices texture
     ////////////////////////////////////////////////////////////////////////////
 
-    _indices = new osg::Image;
+    _indices = new vsg::Image;
     _indices->allocateImage(_max_light_indices, _max_light_indices, 1,
                             GL_RED, GL_FLOAT);
 
@@ -90,7 +90,7 @@ ClusteredShading::ClusteredShading(osg::Camera *camera,
     // Create and associate the pointlights buffer
     ////////////////////////////////////////////////////////////////////////////
 
-    _pointlights = new osg::Image;
+    _pointlights = new vsg::Image;
     _pointlights->allocateImage(_pbr_lights ? 2 : 5, _max_pointlights, 1, GL_RGBA, GL_FLOAT);
 
     _pointlights_tex = new osg::Texture2D;
@@ -106,7 +106,7 @@ ClusteredShading::ClusteredShading(osg::Camera *camera,
     // Create and associate the spotlights buffer
     ////////////////////////////////////////////////////////////////////////////
 
-    _spotlights = new osg::Image;
+    _spotlights = new vsg::Image;
     _spotlights->allocateImage(_pbr_lights ? 4 : 7, _max_spotlights, 1, GL_RGBA, GL_FLOAT);
 
     _spotlights_tex = new osg::Texture2D;
@@ -134,7 +134,7 @@ ClusteredShading::~ClusteredShading()
 }
 
 void
-ClusteredShading::exposeUniformsToPass(osg::Camera *camera,
+ClusteredShading::exposeUniformsToPass(vsg::Camera *camera,
                                        int clusters_bind_unit,
                                        int indices_bind_unit,
                                        int pointlights_bind_unit,
@@ -143,19 +143,19 @@ ClusteredShading::exposeUniformsToPass(osg::Camera *camera,
     osg::StateSet *ss = camera->getOrCreateStateSet();
 
     // Constant uniforms
-    osg::ref_ptr<osg::Uniform> max_pointlights_uniform =
+    vsg::ref_ptr<osg::Uniform> max_pointlights_uniform =
         new osg::Uniform("fg_ClusteredMaxPointLights", _max_pointlights);
     ss->addUniform(max_pointlights_uniform);
-    osg::ref_ptr<osg::Uniform> max_spotlights_uniform =
+    vsg::ref_ptr<osg::Uniform> max_spotlights_uniform =
         new osg::Uniform("fg_ClusteredMaxSpotLights", _max_pointlights);
     ss->addUniform(max_spotlights_uniform);
-    osg::ref_ptr<osg::Uniform> max_light_indices_uniform =
+    vsg::ref_ptr<osg::Uniform> max_light_indices_uniform =
         new osg::Uniform("fg_ClusteredMaxLightIndices", _max_light_indices);
     ss->addUniform(max_light_indices_uniform);
-    osg::ref_ptr<osg::Uniform> tile_size_uniform =
+    vsg::ref_ptr<osg::Uniform> tile_size_uniform =
         new osg::Uniform("fg_ClusteredTileSize", _tile_size);
     ss->addUniform(tile_size_uniform);
-    osg::ref_ptr<osg::Uniform> depth_slices_uniform =
+    vsg::ref_ptr<osg::Uniform> depth_slices_uniform =
         new osg::Uniform("fg_ClusteredDepthSlices", _depth_slices);
     ss->addUniform(depth_slices_uniform);
 
@@ -166,25 +166,25 @@ ClusteredShading::exposeUniformsToPass(osg::Camera *camera,
     ss->addUniform(_vertical_tiles);
 
     // Textures
-    osg::ref_ptr<osg::Uniform> clusters_uniform =
+    vsg::ref_ptr<osg::Uniform> clusters_uniform =
         new osg::Uniform("fg_Clusters", clusters_bind_unit);
     ss->addUniform(clusters_uniform.get());
     ss->setTextureAttributeAndModes(
         clusters_bind_unit, _clusters_tex.get(), osg::StateAttribute::ON);
 
-    osg::ref_ptr<osg::Uniform> indices_uniform =
+    vsg::ref_ptr<osg::Uniform> indices_uniform =
         new osg::Uniform("fg_ClusteredIndices", indices_bind_unit);
     ss->addUniform(indices_uniform.get());
     ss->setTextureAttributeAndModes(
         indices_bind_unit, _indices_tex.get(), osg::StateAttribute::ON);
 
-    osg::ref_ptr<osg::Uniform> pointlights_uniform =
+    vsg::ref_ptr<osg::Uniform> pointlights_uniform =
         new osg::Uniform("fg_ClusteredPointLights", pointlights_bind_unit);
     ss->addUniform(pointlights_uniform.get());
     ss->setTextureAttributeAndModes(
         pointlights_bind_unit, _pointlights_tex.get(), osg::StateAttribute::ON);
 
-    osg::ref_ptr<osg::Uniform> spotlights_uniform =
+    vsg::ref_ptr<osg::Uniform> spotlights_uniform =
         new osg::Uniform("fg_ClusteredSpotLights", spotlights_bind_unit);
     ss->addUniform(spotlights_uniform.get());
     ss->setTextureAttributeAndModes(
@@ -246,7 +246,7 @@ ClusteredShading::updateLightBounds(const SGLightList &light_list)
         if (light->getType() == SGLight::POINT) {
             PointlightBound point;
             point.light = light;
-            point.position = osg::Vec4f(0.0f, 0.0f, 0.0f, 1.0f) *
+            point.position = vsg::vec4(0.0f, 0.0f, 0.0f, 1.0f) *
                 // The parenthesis are very important: if the vector is
                 // multiplied by the local to world matrix first we'll have
                 // precision issues
@@ -257,9 +257,9 @@ ClusteredShading::updateLightBounds(const SGLightList &light_list)
         } else if (light->getType() == SGLight::SPOT) {
             SpotlightBound spot;
             spot.light = light;
-            spot.position = osg::Vec4f(0.0f, 0.0f, 0.0f, 1.0f) *
+            spot.position = vsg::vec4(0.0f, 0.0f, 0.0f, 1.0f) *
                 (light->getWorldMatrices()[0] * _camera->getViewMatrix());
-            spot.direction = osg::Vec4f(0.0f, 0.0f, -1.0f, 0.0f) *
+            spot.direction = vsg::vec4(0.0f, 0.0f, -1.0f, 0.0f) *
                 (light->getWorldMatrices()[0] * _camera->getViewMatrix());
             spot.direction.normalize();
 
@@ -360,7 +360,7 @@ ClusteredShading::updateSubfrusta()
 
             // Transform it to view space
             for (int i = 0; i < 4; ++i) {
-                osg::Vec4f &p = subfrustum.plane[i];
+                vsg::vec4 &p = subfrustum.plane[i];
                 p = _camera->getProjectionMatrix() * p;
                 float inv_length = 1.0f / sqrtf(p._v[0]*p._v[0] +
                                                 p._v[1]*p._v[1] +
@@ -389,8 +389,8 @@ ClusteredShading::assignLightsToSlice(int slice)
     float near = getDepthForSlice(slice);
     float far  = getDepthForSlice(slice + 1);
 
-    osg::Vec4f near_plane(0.0f, 0.0f, -1.0f, -near);
-    osg::Vec4f far_plane (0.0f, 0.0f,  1.0f,  far);
+    vsg::vec4 near_plane(0.0f, 0.0f, -1.0f, -near);
+    vsg::vec4 far_plane (0.0f, 0.0f,  1.0f,  far);
 
     GLfloat *clusters = reinterpret_cast<GLfloat *>(_clusters->data());
     GLfloat *indices  = reinterpret_cast<GLfloat *>(_indices->data());

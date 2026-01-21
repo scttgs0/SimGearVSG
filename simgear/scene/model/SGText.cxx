@@ -58,7 +58,7 @@ public:
   }
 
 private:
-  virtual void operator()(osg::Node * node, osg::NodeVisitor *nv );
+  virtual void operator()(vsg::Node * node, osg::NodeVisitor *nv );
   osgText::Text * text;
   SGConstPropertyNode_ptr property;
   double scale;
@@ -68,7 +68,7 @@ private:
   string format;
 };
 
-void SGText::UpdateCallback::operator()(osg::Node * node, osg::NodeVisitor *nv ) 
+void SGText::UpdateCallback::operator()(vsg::Node * node, osg::NodeVisitor *nv ) 
 {
   // FIXME:
   // hopefully the users never specifies bad formats here
@@ -91,7 +91,7 @@ void SGText::UpdateCallback::operator()(osg::Node * node, osg::NodeVisitor *nv )
   traverse( node, nv );
 }
 
-osg::Node * SGText::appendText(const SGPropertyNode* configNode, 
+vsg::Node * SGText::appendText(const SGPropertyNode* configNode, 
   SGPropertyNode* modelRoot, const osgDB::Options* options)
 {
   SGConstPropertyNode_ptr p;
@@ -211,23 +211,23 @@ osg::Node * SGText::appendText(const SGPropertyNode* configNode,
     }
   }
 
-  osg::Node * reply = NULL;
+  vsg::Node * reply = NULL;
   if( (p = configNode->getNode( "offsets")) == NULL ) {
     reply = g;
   } else {
     // Set up the alignment node ("stolen" from animation.cxx)
     // XXX Order of rotations is probably not correct.
     osg::MatrixTransform *align = new osg::MatrixTransform;
-    osg::Matrix res_matrix;
+    vsg::mat4 res_matrix;
     res_matrix.makeRotate(
         p->getFloatValue("pitch-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-        osg::Vec3(0, 1, 0),
+        vsg::vec3(0, 1, 0),
         p->getFloatValue("roll-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-        osg::Vec3(1, 0, 0),
+        vsg::vec3(1, 0, 0),
         p->getFloatValue("heading-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-        osg::Vec3(0, 0, 1));
+        vsg::vec3(0, 0, 1));
 
-    osg::Matrix tmat;
+    vsg::mat4 tmat;
     tmat.makeTranslate(configNode->getFloatValue("offsets/x-m", 0.0),
                        configNode->getFloatValue("offsets/y-m", 0.0),
                        configNode->getFloatValue("offsets/z-m", 0.0));

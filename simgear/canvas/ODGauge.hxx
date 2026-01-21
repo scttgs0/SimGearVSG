@@ -13,142 +13,138 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include "canvas_fwd.hxx"
 
 #include <osg/NodeCallback>
-#include <osg/Group>
 
-namespace osg
-{
-  class Camera;
-  class Texture2D;
-}
 
-namespace simgear::canvas
-{
+namespace osg {
+class Camera;
+class Texture2D;
+} // namespace osg
 
-  /**
+namespace simgear::canvas {
+
+/**
    * Owner Drawn Gauge (aka render-to-texture) helper class
    */
-  class ODGauge
-  {
-    public:
+class ODGauge
+{
+public:
+    ODGauge();
+    virtual ~ODGauge();
 
-      ODGauge();
-      virtual ~ODGauge();
-
-      /**
+    /**
        * Set the size of the render target.
        *
        * @param size_x    X size
        * @param size_y    Y size. Defaults to size_x if not specified
        */
-      void setSize(int size_x, int size_y = -1);
+    void setSize(int size_x, int size_y = -1);
 
-      /**
+    /**
        * Set the size of the viewport
        *
        * @param width
        * @param height    Defaults to width if not specified
        */
-      void setViewSize(int width, int height = -1);
+    void setViewSize(int width, int height = -1);
 
-      osg::Vec2s getViewSize() const;
+    vsg::svec2 getViewSize() const;
 
-      /**
+    /**
        * DEPRECATED
        *
        * Get size of squared texture
        */
-      int size() const { return _size_x; }
+    int size() const { return _size_x; }
 
-      /**
+    /**
        * Set whether to use image coordinates or not.
        *
        * Default: origin == center of texture
        * Image Coords: origin == top left corner
        */
-      void useImageCoords(bool use = true);
+    void useImageCoords(bool use = true);
 
-      /**
+    /**
        * Enable/Disable using a stencil buffer
        */
-      void useStencil(bool use = true);
+    void useStencil(bool use = true);
 
-      /**
+    /**
        * Enable/Disable additive alpha blending (Can improve results with
        * transparent background)
        */
-      void useAdditiveBlend(bool use = true);
+    void useAdditiveBlend(bool use = true);
 
-      /**
+    /**
        * Set sampling parameters for mipmapping and coverage sampling
        * antialiasing.
        *
        * @note color_samples is not allowed to be higher than coverage_samples
        *
        */
-      void setSampling( bool mipmapping,
-                        int coverage_samples = 0,
-                        int color_samples = 0 );
+    void setSampling(bool mipmapping,
+                     int coverage_samples = 0,
+                     int color_samples = 0);
 
-      void setMaxAnisotropy(float anis);
+    void setMaxAnisotropy(float anis);
 
-      /**
+    /**
        * Enable/Disable updating the texture (If disabled the contents of the
        * texture remains with the outcome of the last rendering pass)
        */
-      void setRender(bool render);
+    void setRender(bool render);
 
-      /**
+    /**
        * Say if we can render to a texture.
        * @return true if rtt is available
        */
-      bool serviceable() const;
+    bool serviceable() const;
 
-      /**
+    /**
        * Get the OSG camera for drawing this gauge.
        */
-      osg::Camera* getCamera() const { return camera.get(); }
+    vsg::Camera* getCamera() const { return camera.get(); }
 
-      osg::Texture2D* getTexture() const { return texture.get(); }
+    osg::Texture2D* getTexture() const { return texture.get(); }
 
-      // Real initialization function. Bad name.
-      void allocRT(osg::NodeCallback* camera_cull_callback = 0);
-      void clear();
+    // Real initialization function. Bad name.
+    void allocRT(osg::NodeCallback* camera_cull_callback = 0);
+    void clear();
 
-    protected:
+protected:
+    int _size_x,
+        _size_y,
+        _view_width,
+        _view_height;
 
-      int _size_x,
-          _size_y,
-          _view_width,
-          _view_height;
+    enum Flags {
+        AVAILABLE = 1,
+        USE_IMAGE_COORDS = AVAILABLE << 1,
+        USE_STENCIL = USE_IMAGE_COORDS << 1,
+        USE_MIPMAPPING = USE_STENCIL << 1,
+        USE_ADDITIVE_BLEND = USE_MIPMAPPING << 1
+    };
 
-      enum Flags
-      {
-        AVAILABLE           = 1,
-        USE_IMAGE_COORDS    = AVAILABLE << 1,
-        USE_STENCIL         = USE_IMAGE_COORDS << 1,
-        USE_MIPMAPPING      = USE_STENCIL << 1,
-        USE_ADDITIVE_BLEND  = USE_MIPMAPPING << 1
-      };
+    uint32_t _flags;
 
-      uint32_t _flags;
+    // Multisampling parameters
+    int _coverage_samples,
+        _color_samples;
 
-      // Multisampling parameters
-      int  _coverage_samples,
-           _color_samples;
+    vsg::ref_ptr<vsg::Camera> camera;
+    vsg::ref_ptr<osg::Texture2D> texture;
 
-      osg::ref_ptr<osg::Camera> camera;
-      osg::ref_ptr<osg::Texture2D> texture;
+    bool updateFlag(Flags flag, bool enable);
 
-      bool updateFlag(Flags flag, bool enable);
-
-      void updateCoordinateFrame();
-      void updateStencil();
-      void updateSampling();
-      void updateBlendMode();
-
-  };
+    void updateCoordinateFrame();
+    void updateStencil();
+    void updateSampling();
+    void updateBlendMode();
+};
 
 } // namespace simgear::canvas

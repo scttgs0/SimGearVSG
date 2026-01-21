@@ -5,18 +5,14 @@
 // SPDX-FileCopyrightText: 2001 Curtis L. Olson - http://www.flightgear.org/~curt
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#ifdef HAVE_CONFIG_H
-#  include <simgear_config.h>
-#endif
-
 #include <vector>
 
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <osg/Group>
 #include <osg/MatrixTransform>
 #include <osg/StateSet>
 
+#include <simgear_config.h>
 #include <simgear/debug/logstream.hxx>
 #include <simgear/math/sg_types.hxx>
 #include <simgear/scene/material/Effect.hxx>
@@ -27,23 +23,23 @@
 
 #include "apt_signs.hxx"
 
+
 #define SIGN "OBJECT_SIGN: "
 
-using std::vector;
 using std::string;
+using std::vector;
 using namespace simgear;
 
 // for temporary storage of sign elements
 struct element_info {
-    element_info(SGMaterial *m, SGMaterialGlyph *g, double h, double c)
+    element_info(SGMaterial* m, SGMaterialGlyph* g, double h, double c)
         : material(m), glyph(g), height(h), coverwidth(c)
     {
-        scale = h * m->get_xsize()
-                / (m->get_ysize() < 0.001 ? 1.0 : m->get_ysize());
+        scale = h * m->get_xsize() / (m->get_ysize() < 0.001 ? 1.0 : m->get_ysize());
         abswidth = c == 0 ? g->get_width() * scale : c;
     }
-    SGMaterial *material;
-    SGMaterialGlyph *glyph;
+    SGMaterial* material;
+    SGMaterialGlyph* glyph;
     double height;
     double scale;
     double abswidth;
@@ -56,184 +52,181 @@ typedef std::vector<element_info*> ElementVec;
 // make sure the size value equals 1:1 the value from the apt.dat file:
 const double HT[6] = {0.1, 0.460, 0.610, 0.760, 1.220, 0.760};
 
-const double grounddist = 0.2;     // hard-code sign distance from surface for now
-const double thick = 0.1;    // half the thickness of the 3D sign
+const double grounddist = 0.2; // hard-code sign distance from surface for now
+const double thick = 0.1;      // half the thickness of the 3D sign
 
 
 // translation table for "command" to "glyph name"
 struct pair {
-    const char *keyword;
-    const char *glyph_name;
+    const char* keyword;
+    const char* glyph_name;
 } cmds[] = {
-    {"@u",       "^u"},
-    {"@d",       "^d"},
-    {"@l",       "^l"},
-    {"@lu",      "^lu"},
-    {"@ld",      "^ld"},
-    {"@r",       "^r"},
-    {"@ru",      "^ru"},
-    {"@rd",      "^rd"},
-    {"r1",       "^I1"},
-    {"r2",       "^I2"},
-    {"r3",       "^I3"},
+    {"@u", "^u"},
+    {"@d", "^d"},
+    {"@l", "^l"},
+    {"@lu", "^lu"},
+    {"@ld", "^ld"},
+    {"@r", "^r"},
+    {"@ru", "^ru"},
+    {"@rd", "^rd"},
+    {"r1", "^I1"},
+    {"r2", "^I2"},
+    {"r3", "^I3"},
     {0, 0},
 };
 
-struct GlyphGeometry
-{
-  osg::DrawArrays* triangles;
-  osg::Vec2Array* uvs;
-  osg::Vec3Array* vertices;
-  osg::Vec3Array* normals;
+struct GlyphGeometry {
+    osg::DrawArrays* triangles;
+    osg::Vec2Array* uvs;
+    vsg::vec3Array* vertices;
+    vsg::vec3Array* normals;
 
-  void addGlyph(SGMaterialGlyph* glyph, double x, double y, double width, double height, const osg::Matrix& xform)
-  {
+    void addGlyph(SGMaterialGlyph* glyph, double x, double y, double width, double height, const vsg::mat4& xform)
+    {
+        vertices->push_back(xform.preMult(vsg::vec3(thick, x, y)));
+        vertices->push_back(xform.preMult(vsg::vec3(thick, x + width, y)));
+        vertices->push_back(xform.preMult(vsg::vec3(thick, x + width, y + height)));
 
-    vertices->push_back(xform.preMult(osg::Vec3(thick, x, y)));
-    vertices->push_back(xform.preMult(osg::Vec3(thick, x + width, y)));
-    vertices->push_back(xform.preMult(osg::Vec3(thick, x + width, y + height)));
+        vertices->push_back(xform.preMult(vsg::vec3(thick, x, y)));
+        vertices->push_back(xform.preMult(vsg::vec3(thick, x + width, y + height)));
+        vertices->push_back(xform.preMult(vsg::vec3(thick, x, y + height)));
 
-    vertices->push_back(xform.preMult(osg::Vec3(thick, x, y)));
-    vertices->push_back(xform.preMult(osg::Vec3(thick, x + width, y + height)));
-    vertices->push_back(xform.preMult(osg::Vec3(thick, x, y + height)));
+        // texture coordinates
+        double xoffset = glyph->get_left();
+        double texWidth = glyph->get_width();
 
-    // texture coordinates
-    double xoffset = glyph->get_left();
-    double texWidth = glyph->get_width();
+        uvs->push_back(vsg::vec2(xoffset, 0));
+        uvs->push_back(vsg::vec2(xoffset + texWidth, 0));
+        uvs->push_back(vsg::vec2(xoffset + texWidth, 1));
 
-    uvs->push_back(osg::Vec2(xoffset,         0));
-    uvs->push_back(osg::Vec2(xoffset + texWidth, 0));
-    uvs->push_back(osg::Vec2(xoffset + texWidth, 1));
+        uvs->push_back(vsg::vec2(xoffset, 0));
+        uvs->push_back(vsg::vec2(xoffset + texWidth, 1));
+        uvs->push_back(vsg::vec2(xoffset, 1));
 
-    uvs->push_back(osg::Vec2(xoffset,         0));
-    uvs->push_back(osg::Vec2(xoffset + texWidth, 1));
-    uvs->push_back(osg::Vec2(xoffset,         1));
+        // normals
+        for (int i = 0; i < 6; ++i)
+            normals->push_back(xform.preMult(vsg::vec3(0, -1, 0)));
 
-    // normals
-    for (int i=0; i<6; ++i)
-      normals->push_back(xform.preMult(osg::Vec3(0, -1, 0)));
-
-    triangles->setCount(vertices->size());
-  }
-
-  void addSignCase(double caseWidth, double caseHeight, const osg::Matrix& xform)
-  {
-    int last = vertices->size();
-    double texsize = caseWidth / caseHeight;
-
-    //left
-    vertices->push_back(osg::Vec3(-thick, -caseWidth,  grounddist));
-    vertices->push_back(osg::Vec3(thick, -caseWidth,  grounddist));
-    vertices->push_back(osg::Vec3(thick, -caseWidth,  grounddist + caseHeight));
-
-    vertices->push_back(osg::Vec3(-thick, -caseWidth,  grounddist));
-    vertices->push_back(osg::Vec3(thick, -caseWidth,  grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(-thick, -caseWidth,  grounddist + caseHeight));
-
-    uvs->push_back(osg::Vec2(1,    1));
-    uvs->push_back(osg::Vec2(0.75, 1));
-    uvs->push_back(osg::Vec2(0.75, 0));
-
-    uvs->push_back(osg::Vec2(1,    1));
-    uvs->push_back(osg::Vec2(0.75, 0));
-    uvs->push_back(osg::Vec2(1,    0));
-
-    for (int i=0; i<6; ++i)
-      normals->push_back(osg::Vec3(-1, 0.0, 0));
-
-    //top
-    vertices->push_back(osg::Vec3(-thick, -caseWidth,  grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(thick,  -caseWidth,  grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(thick,  caseWidth, grounddist + caseHeight));
-
-    vertices->push_back(osg::Vec3(-thick, -caseWidth,  grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(thick,  caseWidth, grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(-thick, caseWidth, grounddist + caseHeight));
-
-    uvs->push_back(osg::Vec2(1,    texsize));
-    uvs->push_back(osg::Vec2(0.75, texsize));
-    uvs->push_back(osg::Vec2(0.75, 0));
-
-    uvs->push_back(osg::Vec2(1,    texsize));
-    uvs->push_back(osg::Vec2(0.75, 0));
-    uvs->push_back(osg::Vec2(1,    0));
-
-    for (int i=0; i<6; ++i)
-      normals->push_back(osg::Vec3(0, 0, 1));
-
-    //right
-    vertices->push_back(osg::Vec3(-thick, caseWidth, grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(thick,  caseWidth, grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(thick,  caseWidth, grounddist));
-
-    vertices->push_back(osg::Vec3(-thick, caseWidth, grounddist + caseHeight));
-    vertices->push_back(osg::Vec3(thick,  caseWidth, grounddist));
-    vertices->push_back(osg::Vec3(-thick, caseWidth, grounddist));
-
-    uvs->push_back(osg::Vec2(1,    1));
-    uvs->push_back(osg::Vec2(0.75, 1));
-    uvs->push_back(osg::Vec2(0.75, 0));
-
-    uvs->push_back(osg::Vec2(1,    1));
-    uvs->push_back(osg::Vec2(0.75, 0));
-    uvs->push_back(osg::Vec2(1,    0));
-
-    for (int i=0; i<6; ++i)
-      normals->push_back(osg::Vec3(1, 0.0, 0));
-
-
-  // transform all the newly added vertices and normals by the matrix
-    for (unsigned int i=last; i<vertices->size(); ++i) {
-      (*vertices)[i]= xform.preMult((*vertices)[i]);
-      (*normals)[i] = xform.preMult((*normals)[i]);
+        triangles->setCount(vertices->size());
     }
 
-    triangles->setCount(vertices->size());
-  }
+    void addSignCase(double caseWidth, double caseHeight, const vsg::mat4& xform)
+    {
+        int last = vertices->size();
+        double texsize = caseWidth / caseHeight;
+
+        //left
+        vertices->push_back(vsg::vec3(-thick, -caseWidth, grounddist));
+        vertices->push_back(vsg::vec3(thick, -caseWidth, grounddist));
+        vertices->push_back(vsg::vec3(thick, -caseWidth, grounddist + caseHeight));
+
+        vertices->push_back(vsg::vec3(-thick, -caseWidth, grounddist));
+        vertices->push_back(vsg::vec3(thick, -caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(-thick, -caseWidth, grounddist + caseHeight));
+
+        uvs->push_back(vsg::vec2(1, 1));
+        uvs->push_back(vsg::vec2(0.75, 1));
+        uvs->push_back(vsg::vec2(0.75, 0));
+
+        uvs->push_back(vsg::vec2(1, 1));
+        uvs->push_back(vsg::vec2(0.75, 0));
+        uvs->push_back(vsg::vec2(1, 0));
+
+        for (int i = 0; i < 6; ++i)
+            normals->push_back(vsg::vec3(-1, 0.0, 0));
+
+        //top
+        vertices->push_back(vsg::vec3(-thick, -caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(thick, -caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(thick, caseWidth, grounddist + caseHeight));
+
+        vertices->push_back(vsg::vec3(-thick, -caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(thick, caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(-thick, caseWidth, grounddist + caseHeight));
+
+        uvs->push_back(vsg::vec2(1, texsize));
+        uvs->push_back(vsg::vec2(0.75, texsize));
+        uvs->push_back(vsg::vec2(0.75, 0));
+
+        uvs->push_back(vsg::vec2(1, texsize));
+        uvs->push_back(vsg::vec2(0.75, 0));
+        uvs->push_back(vsg::vec2(1, 0));
+
+        for (int i = 0; i < 6; ++i)
+            normals->push_back(vsg::vec3(0, 0, 1));
+
+        //right
+        vertices->push_back(vsg::vec3(-thick, caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(thick, caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(thick, caseWidth, grounddist));
+
+        vertices->push_back(vsg::vec3(-thick, caseWidth, grounddist + caseHeight));
+        vertices->push_back(vsg::vec3(thick, caseWidth, grounddist));
+        vertices->push_back(vsg::vec3(-thick, caseWidth, grounddist));
+
+        uvs->push_back(vsg::vec2(1, 1));
+        uvs->push_back(vsg::vec2(0.75, 1));
+        uvs->push_back(vsg::vec2(0.75, 0));
+
+        uvs->push_back(vsg::vec2(1, 1));
+        uvs->push_back(vsg::vec2(0.75, 0));
+        uvs->push_back(vsg::vec2(1, 0));
+
+        for (int i = 0; i < 6; ++i)
+            normals->push_back(vsg::vec3(1, 0.0, 0));
+
+
+        // transform all the newly added vertices and normals by the matrix
+        for (unsigned int i = last; i < vertices->size(); ++i) {
+            (*vertices)[i] = xform.preMult((*vertices)[i]);
+            (*normals)[i] = xform.preMult((*normals)[i]);
+        }
+
+        triangles->setCount(vertices->size());
+    }
 };
 
 typedef std::map<Effect*, GlyphGeometry*> EffectGeometryMap;
 
-GlyphGeometry* makeGeometry(Effect* eff, osg::Group* group)
+GlyphGeometry* makeGeometry(Effect* eff, vsg::Group* group)
 {
-  GlyphGeometry* gg = new GlyphGeometry;
+    GlyphGeometry* gg = new GlyphGeometry;
 
-  EffectGeode* geode = new EffectGeode;
-  geode->setEffect(eff);
+    EffectGeode* geode = new EffectGeode;
+    geode->setEffect(eff);
 
-  gg->vertices = new osg::Vec3Array;
-  gg->normals = new osg::Vec3Array;
-  gg->uvs = new osg::Vec2Array;
+    gg->vertices = new vsg::vec3Array;
+    gg->normals = new vsg::vec3Array;
+    gg->uvs = new osg::Vec2Array;
 
-  osg::Vec4Array* cl = new osg::Vec4Array;
-  cl->push_back(osg::Vec4(1, 1, 1, 1));
+    osg::Vec4Array* cl = new osg::Vec4Array;
+    cl->push_back(vsg::vec4(1, 1, 1, 1));
 
-  osg::Geometry* geometry = new osg::Geometry;
-  geometry->setVertexArray(gg->vertices);
-  geometry->setNormalArray(gg->normals);
-  geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
-  geometry->setColorArray(cl);
-  geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-  geometry->setTexCoordArray(0, gg->uvs);
+    vsg::Geometry* geometry = new vsg::Geometry;
+    geometry->setVertexArray(gg->vertices);
+    geometry->setNormalArray(gg->normals);
+    geometry->setNormalBinding(vsg::Geometry::BIND_PER_VERTEX);
+    geometry->setColorArray(cl);
+    geometry->setColorBinding(vsg::Geometry::BIND_OVERALL);
+    geometry->setTexCoordArray(0, gg->uvs);
 
-  gg->triangles = new osg::DrawArrays(GL_TRIANGLES, 0, gg->vertices->size());
-  geometry->addPrimitiveSet(gg->triangles);
-  geode->addDrawable(geometry);
-  group->addChild(geode);
+    gg->triangles = new osg::DrawArrays(GL_TRIANGLES, 0, gg->vertices->size());
+    geometry->addPrimitiveSet(gg->triangles);
+    geode->addDrawable(geometry);
+    group->addChild(geode);
 
-  // Because the airport signs are rendered with some of the same shaders as terrain,
-  // we need to explicitly set orthophotoAvailable to false.
-  osg::StateSet *stateSet = group->getOrCreateStateSet();
-  osg::ref_ptr<osg::Uniform> orthophotoAvailable = stateSet->getOrCreateUniform("orthophotoAvailable", osg::Uniform::Type::BOOL);
-  orthophotoAvailable->set(false);
+    // Because the airport signs are rendered with some of the same shaders as terrain,
+    // we need to explicitly set orthophotoAvailable to false.
+    osg::StateSet* stateSet = group->getOrCreateStateSet();
+    vsg::ref_ptr<osg::Uniform> orthophotoAvailable = stateSet->getOrCreateUniform("orthophotoAvailable", osg::Uniform::Type::BOOL);
+    orthophotoAvailable->set(false);
 
-  return gg;
+    return gg;
 }
 
 // see $FG_ROOT/Docs/README.scenery
 
-namespace simgear
-{
+namespace simgear {
 
 class AirportSignBuilder::AirportSignBuilderPrivate
 {
@@ -255,7 +248,7 @@ public:
         return gg;
     }
 
-    void makeFace(const ElementVec& elements, double hpos, const osg::Matrix& xform)
+    void makeFace(const ElementVec& elements, double hpos, const vsg::mat4& xform)
     {
         for (auto element : elements) {
             GlyphGeometry* gg = getGeometry(element->material->get_effect());
@@ -264,11 +257,9 @@ public:
             delete element;
         }
     }
-
 };
 
-AirportSignBuilder::AirportSignBuilder(SGMaterialLib* mats, const SGGeod& center) :
-    d(new AirportSignBuilderPrivate)
+AirportSignBuilder::AirportSignBuilder(SGMaterialLib* mats, const SGGeod& center) : d(new AirportSignBuilderPrivate)
 {
     d->signsGroup = new osg::MatrixTransform;
     d->signsGroup->setMatrix(makeZUpFrame(center));
@@ -278,7 +269,7 @@ AirportSignBuilder::AirportSignBuilder(SGMaterialLib* mats, const SGGeod& center
     d->signCaseGeometry = d->getGeometry(d->materials->find("signcase", center)->get_effect());
 }
 
-osg::Node* AirportSignBuilder::getSignsGroup()
+vsg::Node* AirportSignBuilder::getSignsGroup()
 {
     if (0 == d->signsGroup->getNumChildren())
         return 0;
@@ -295,25 +286,25 @@ AirportSignBuilder::~AirportSignBuilder()
 
 void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::string& content, int size)
 {
-    double sign_height = 1.0;  // meter
+    double sign_height = 1.0; // meter
     string newmat = "BlackSign";
     ElementVec elements1, elements2;
-    element_info *close1 = 0;
-    element_info *close2 = 0;
+    element_info* close1 = 0;
+    element_info* close2 = 0;
     double total_width1 = 0.0;
     double total_width2 = 0.0;
     bool cmd = false;
     bool isBackside = false;
     char oldtype = 0, newtype = 0;
-    SGMaterial *material = 0;
+    SGMaterial* material = 0;
 
-    if (size < -1 || size > 5){
+    if (size < -1 || size > 5) {
         SG_LOG(SG_TERRAIN, SG_INFO, SIGN "Found illegal sign size value of '" << size << "' for " << content << ".");
         size = -1;
     }
 
     // Part I: parse & measure
-    for (const char *s = content.data(); *s; s++) {
+    for (const char* s = content.data(); *s; s++) {
         string name;
         string value;
 
@@ -338,7 +329,7 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
 
             for (; *s; s++) {
                 name += *s;
-                if (s[1] == ',' || s[1] == '}' )
+                if (s[1] == ',' || s[1] == '}')
                     break;
             }
 
@@ -420,7 +411,7 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
                     continue;
 
                 } else if (n == "@B") {
-                    if ( (size != -1) && (size != 4) && (size != 5) ) {
+                    if ((size != -1) && (size != 4) && (size != 5)) {
                         size = -1;
                         SG_LOG(SG_TERRAIN, SG_INFO, SIGN << content << " has wrong size. Allowed values are 4 or 5");
                     }
@@ -444,7 +435,7 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
             }
         }
 
-        if (! newmat.empty()) {
+        if (!newmat.empty()) {
             material = d->materials->find(newmat, pos);
             if (!material) {
                 SG_LOG(SG_TERRAIN, SG_INFO, SIGN "could not find material '" << newmat << "'.");
@@ -453,13 +444,13 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
             newmat.clear();
         }
 
-        SGMaterialGlyph *glyph = material->get_glyph(name);
+        SGMaterialGlyph* glyph = material->get_glyph(name);
         if (!glyph) {
-            SG_LOG( SG_TERRAIN, SG_INFO, SIGN "unsupported glyph '" << *s << "' in '" << content << "'.");
+            SG_LOG(SG_TERRAIN, SG_INFO, SIGN "unsupported glyph '" << *s << "' in '" << content << "'.");
             continue;
         }
 
-    // in managed mode push frame stop and frame start first
+        // in managed mode push frame stop and frame start first
         if (!isBackside) {
             if (newtype && newtype != oldtype) {
                 if (close1) {
@@ -468,7 +459,7 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
                     close1 = 0;
                 }
                 oldtype = newtype;
-                SGMaterialGlyph *g = material->get_glyph("stop-frame");
+                SGMaterialGlyph* g = material->get_glyph("stop-frame");
                 if (g)
                     close1 = new element_info(material, g, sign_height, 0);
                 g = material->get_glyph("start-frame");
@@ -490,7 +481,7 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
                     close2 = 0;
                 }
                 oldtype = newtype;
-                SGMaterialGlyph *g = material->get_glyph("stop-frame");
+                SGMaterialGlyph* g = material->get_glyph("stop-frame");
                 if (g)
                     close2 = new element_info(material, g, sign_height, 0);
                 g = material->get_glyph("start-frame");
@@ -520,10 +511,10 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
         close2 = 0;
     }
 
-  // Part II: typeset
+    // Part II: typeset
     double boxwidth = std::max(total_width1, total_width2) * 0.5;
     double hpos = -boxwidth;
-    SGMaterial *mat = d->materials->find("signcase", pos);
+    SGMaterial* mat = d->materials->find("signcase", pos);
 
     double coverSize = fabs(total_width1 - total_width2) * 0.5;
     element_info* s1 = new element_info(mat, mat->get_glyph("cover1"), sign_height, coverSize);
@@ -540,9 +531,9 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
         delete s2;
     }
 
-// position the sign
-    const osg::Vec3 Z_AXIS(0, 0, 1);
-    osg::Matrix m(makeZUpFrame(pos));
+    // position the sign
+    const vsg::vec3 Z_AXIS(0, 0, 1);
+    vsg::mat4 m(makeZUpFrame(pos));
     m.preMultRotate(osg::Quat(SGMiscd::deg2rad(heading), Z_AXIS));
 
     // apply the inverse of the group transform, so sign vertices
@@ -551,12 +542,12 @@ void AirportSignBuilder::addSign(const SGGeod& pos, double heading, const std::s
     m.postMult(d->signsGroup->getInverseMatrix());
 
     d->makeFace(elements1, hpos, m);
-// Create back side
-    osg::Matrix back(m);
+    // Create back side
+    vsg::mat4 back(m);
     back.preMultRotate(osg::Quat(M_PI, Z_AXIS));
     d->makeFace(elements2, hpos, back);
 
     d->signCaseGeometry->addSignCase(boxwidth, sign_height, m);
 }
 
-} // of namespace simgear
+} // namespace simgear

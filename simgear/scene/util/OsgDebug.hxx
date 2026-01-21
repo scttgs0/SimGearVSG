@@ -21,18 +21,21 @@
 
 #include <string>
 #include <vector>
+
+#include <vsg/all.h>
+
 namespace osg {
 class Node;
 typedef std::vector<Node*> NodePath;
 } // namespace osg
-namespace simgear
-{
 
-  /**
+namespace simgear {
+
+/**
    * Get parent path(s) of scene graph node as string.
    */
-  std::string getNodePathString(const osg::Node* node);
+std::string getNodePathString(const vsg::Node* node);
 
-  std::string getNodePathString(const osg::NodePath& np);
+std::string getNodePathString(const osg::NodePath& np);
 
-  } // namespace simgear
+} // namespace simgear

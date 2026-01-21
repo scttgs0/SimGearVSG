@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <osg/Vec4f>
+#include <vsg/all.h>
 
 #include "EffectElement.hxx"
 #include "EffectElementBuilder.hxx"
@@ -39,7 +39,7 @@ private:
 };
 
 typedef EffectData<float> EffectFloat;
-typedef EffectData<osg::Vec4f> EffectVec4f;
+typedef EffectData<vsg::vec4> EffectVec4f;
 
 
 }

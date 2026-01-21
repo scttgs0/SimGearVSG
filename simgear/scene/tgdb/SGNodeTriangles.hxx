@@ -26,7 +26,7 @@ public:
     }
 
     // API used to build the Info by the visitor
-    void addGeometry( osg::Geometry* g ) { 
+    void addGeometry( vsg::Geometry* g ) { 
         geometries.push_back(g); 
     }
     
@@ -43,9 +43,9 @@ public:
     // This will be constant, and give the same result each time to select one effect/texture per drawable.
     int getTextureIndex( void ) const {
         int texInfo = 0;
-        const osg::Vec3Array* vertices =  dynamic_cast<osg::Vec3Array*>(geometries[0]->getVertexArray());
+        const vsg::vec3Array* vertices =  dynamic_cast<vsg::vec3Array*>(geometries[0]->getVertexArray());
         if ( vertices ) {
-            const osg::Vec3 *v0 = &vertices->operator[](0);
+            const vsg::vec3 *v0 = &vertices->operator[](0);
             texInfo = floor(v0->x()); 
         }
         return texInfo;
@@ -54,7 +54,7 @@ public:
     // new API - TODO
     void getTriangles( std::vector<SGTexturedTriangle>& tris )
     {
-        const osg::Vec3Array* vertices  = dynamic_cast<osg::Vec3Array*>(geometries[0]->getVertexArray());
+        const vsg::vec3Array* vertices  = dynamic_cast<vsg::vec3Array*>(geometries[0]->getVertexArray());
         const osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geometries[0]->getTexCoordArray(0));
         
         int numPrimitiveSets = geometries[0]->getNumPrimitiveSets();
@@ -81,7 +81,7 @@ public:
         // each structure contains a list of target indexes and a count
         int numPrimitiveSets = geometries[0]->getNumPrimitiveSets();
         if ( numPrimitiveSets > 0 ) {
-            const osg::Vec3Array* vertices  = dynamic_cast<osg::Vec3Array*>(geometries[0]->getVertexArray());
+            const vsg::vec3Array* vertices  = dynamic_cast<vsg::vec3Array*>(geometries[0]->getVertexArray());
 
             const osg::PrimitiveSet* ps = geometries[0]->getPrimitiveSet(0);
             unsigned int numTriangles = ps->getNumIndices()/3;
@@ -194,7 +194,7 @@ public:
     }
     
     void getTriangle(unsigned int i, std::vector<SGVec3f>& triVerts, std::vector<SGVec2f>& triTCs) const {
-        const osg::Vec3Array* vertices  = dynamic_cast<osg::Vec3Array*>(geometries[0]->getVertexArray());
+        const vsg::vec3Array* vertices  = dynamic_cast<vsg::vec3Array*>(geometries[0]->getVertexArray());
         const osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geometries[0]->getTexCoordArray(0));
 
         if ( !geometries.empty() ) {
@@ -222,7 +222,7 @@ public:
                                 std::vector<SGVec3f>& points)
     {
         if ( !geometries.empty() ) {
-            const osg::Vec3Array* vertices  = dynamic_cast<osg::Vec3Array*>(geometries[0]->getVertexArray());
+            const vsg::vec3Array* vertices  = dynamic_cast<vsg::vec3Array*>(geometries[0]->getVertexArray());
             const osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geometries[0]->getTexCoordArray(0));
             
             int numPrimitiveSets = geometries[0]->getNumPrimitiveSets();
@@ -270,7 +270,7 @@ public:
                     
                             // Check this random point against the object mask
                             // blue channel.
-                            osg::Image* img = object_mask->getImage();            
+                            vsg::Image* img = object_mask->getImage();            
                             const uint32_t x = static_cast<uint32_t>(img->s() * texCoord.x()) % img->s();
                             const uint32_t y = static_cast<uint32_t>(img->t() * texCoord.y()) % img->t();
                     
@@ -300,7 +300,7 @@ public:
         using std::min;
 
         if ( !geometries.empty() ) {
-            const osg::Vec3Array* vertices  = dynamic_cast<osg::Vec3Array*>(geometries[0]->getVertexArray());
+            const vsg::vec3Array* vertices  = dynamic_cast<vsg::vec3Array*>(geometries[0]->getVertexArray());
             const osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geometries[0]->getTexCoordArray(0));
 
             int numPrimitiveSets = geometries[0]->getNumPrimitiveSets();
@@ -375,7 +375,7 @@ public:
                                 if (object_mask != NULL) {
                                     // Check this point against the object mask
                                     // green (for trees) channel.
-                                    osg::Image* img = object_mask->getImage();
+                                    vsg::Image* img = object_mask->getImage();
                                     unsigned int x = (int) (img->s() * newpt.x()) % img->s();
                                     unsigned int y = (int) (img->t() * newpt.y()) % img->t();
 
@@ -414,7 +414,7 @@ public:
 
                                 // Check this random point against the object mask
                                 // green (for trees) channel.
-                                osg::Image* img = object_mask->getImage();       
+                                vsg::Image* img = object_mask->getImage();       
                                 const uint32_t x = static_cast<uint32_t>(img->s() * texCoord.x()) % img->s();
                                 const uint32_t y = static_cast<uint32_t>(img->t() * texCoord.y()) % img->t();
 
@@ -440,7 +440,7 @@ public:
         //dump the first triangle only of the first geometry, for now...
         SG_LOG(SG_TERRAIN, SG_ALERT, "effect geode has " << geometries.size() << " geometries" );
         
-        const osg::Vec3Array* vertices =  dynamic_cast<osg::Vec3Array*>(geometries[0]->getVertexArray());
+        const vsg::vec3Array* vertices =  dynamic_cast<vsg::vec3Array*>(geometries[0]->getVertexArray());
         if ( vertices ) {
             SG_LOG(SG_TERRAIN, SG_ALERT, " geometry has " << vertices->getNumElements() << " vertices" );
         }
@@ -465,9 +465,9 @@ public:
                         unsigned int v1i = ps->index(i-1);
                         unsigned int v2i = ps->index(i-0);
                     
-                        const osg::Vec3 *v0 = &vertices->operator[](v0i);
-                        const osg::Vec3 *v1 = &vertices->operator[](v1i);
-                        const osg::Vec3 *v2 = &vertices->operator[](v2i);
+                        const vsg::vec3 *v0 = &vertices->operator[](v0i);
+                        const vsg::vec3 *v1 = &vertices->operator[](v1i);
+                        const vsg::vec3 *v2 = &vertices->operator[](v2i);
                    
                         // de-rotate and translate : todo - create a paralell vertex list so we just do this 
                         // once per vertex, not for every triangle's use of the vertex
@@ -494,13 +494,13 @@ private:
     mt seed;
     SGMaterial* mat;
     SGVec3d gbs_center;
-    std::vector<osg::Geometry*> geometries;
+    std::vector<vsg::Geometry*> geometries;
     std::vector<int> polygon_border;    // TODO
 };
 
 // This visitor will generate an SGTriangleInfo.
 // currently, it looks like it could save multiple lists, which could be the case
-// if multiple osg::geods are found with osg::Geometry.
+// if multiple osg::geods are found with vsg::Geometry.
 // But right now, we store a single PrimitiveSet under a single EffectGeod.  
 // so the traversal should only find a single EffectGeod - building a single SGTriangleInfo
 class GetNodeTriangles : public osg::NodeVisitor
@@ -511,7 +511,7 @@ public:
     // This method gets called for every node in the scene
     //   graph. Check each node to see if it has user
     //   out target. If so, save the node's address.
-    virtual void apply( osg::Node& node )
+    virtual void apply( vsg::Node& node )
     {
         EffectGeode* eg = dynamic_cast<EffectGeode*>(&node);
         if ( eg ) {

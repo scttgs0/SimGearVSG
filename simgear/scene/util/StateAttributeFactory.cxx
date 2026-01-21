@@ -1,8 +1,8 @@
 // Copyright (C) 2007 Tim Moore
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <simgear_config.h>
 #include "StateAttributeFactory.hxx"
+#include <simgear_config.h>
 
 #include <osg/AlphaFunc>
 #include <osg/Array>
@@ -10,20 +10,18 @@
 #include <osg/CullFace>
 #include <osg/Depth>
 #include <osg/ShadeModel>
+#include <osg/TexEnv>
 #include <osg/Texture2D>
 #include <osg/Texture3D>
-#include <osg/TexEnv>
-
-#include <osg/Image>
 
 #include <simgear/debug/logstream.hxx>
 
 #include "Noise.hxx"
 
+
 using namespace osg;
 
-namespace simgear
-{
+namespace simgear {
 StateAttributeFactory::StateAttributeFactory()
 {
     // Standard blend function
@@ -38,7 +36,7 @@ StateAttributeFactory::StateAttributeFactory()
     _white->setDataVariance(Object::STATIC);
 
     // White texture
-    osg::ref_ptr<osg::Image> whiteImage = new osg::Image;
+    vsg::ref_ptr<vsg::Image> whiteImage = new vsg::Image;
     whiteImage->allocateImage(1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE);
     unsigned char* whiteImageBytes = whiteImage->data();
     whiteImageBytes[0] = 255;
@@ -51,10 +49,10 @@ StateAttributeFactory::StateAttributeFactory()
     _whiteTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
     _whiteTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
     _whiteTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
-    _whiteTexture->setDataVariance(osg::Object::STATIC);
+    _whiteTexture->setDataVariance(vsg::Object::STATIC);
 
     // Transparent texture
-    osg::ref_ptr<osg::Image> transparentImage = new osg::Image;
+    vsg::ref_ptr<vsg::Image> transparentImage = new vsg::Image;
     transparentImage->allocateImage(1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE);
     unsigned char* transparentImageBytes = transparentImage->data();
     transparentImageBytes[0] = 255;
@@ -67,10 +65,10 @@ StateAttributeFactory::StateAttributeFactory()
     _transparentTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
     _transparentTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
     _transparentTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
-    _transparentTexture->setDataVariance(osg::Object::STATIC);
+    _transparentTexture->setDataVariance(vsg::Object::STATIC);
 
     // And a null normal map texture
-    osg::ref_ptr<osg::Image> nullNormalMapImage = new osg::Image;
+    vsg::ref_ptr<vsg::Image> nullNormalMapImage = new vsg::Image;
     nullNormalMapImage->allocateImage(1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE);
     unsigned char* nullNormalMapBytes = nullNormalMapImage->data();
     nullNormalMapBytes[0] = 128;
@@ -83,7 +81,7 @@ StateAttributeFactory::StateAttributeFactory()
     _nullNormalmapTexture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
     _nullNormalmapTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
     _nullNormalmapTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
-    _nullNormalmapTexture->setDataVariance(osg::Object::STATIC);
+    _nullNormalmapTexture->setDataVariance(vsg::Object::STATIC);
 
     // Cull front facing polygons
     _cullFaceFront = new CullFace(CullFace::FRONT);
@@ -102,13 +100,13 @@ StateAttributeFactory::StateAttributeFactory()
     _standardDepthWritesDisabled->setDataVariance(Object::STATIC);
 }
 
-osg::Image* make3DNoiseImage(int texSize)
+vsg::Image* make3DNoiseImage(int texSize)
 {
-    osg::Image* image = new osg::Image;
+    vsg::Image* image = new vsg::Image;
     image->setImage(texSize, texSize, texSize,
                     4, GL_RGBA, GL_UNSIGNED_BYTE,
                     new unsigned char[4 * texSize * texSize * texSize],
-                    osg::Image::USE_NEW_DELETE);
+                    vsg::Image::USE_NEW_DELETE);
 
     const int startFrequency = 4;
     const int numOctaves = 4;
@@ -117,27 +115,23 @@ osg::Image* make3DNoiseImage(int texSize)
     double ni[3];
     double inci, incj, inck;
     int frequency = startFrequency;
-    GLubyte *ptr;
+    GLubyte* ptr;
     double amp = 0.5;
 
     SG_LOG(SG_TERRAIN, SG_BULK, "creating 3D noise texture... ");
 
-    for (f = 0, inc = 0; f < numOctaves; ++f, frequency *= 2, ++inc, amp *= 0.5)
-    {
+    for (f = 0, inc = 0; f < numOctaves; ++f, frequency *= 2, ++inc, amp *= 0.5) {
         SetNoiseFrequency(frequency);
         ptr = image->data();
         ni[0] = ni[1] = ni[2] = 0;
 
         inci = 1.0 / (texSize / frequency);
-        for (i = 0; i < texSize; ++i, ni[0] += inci)
-        {
+        for (i = 0; i < texSize; ++i, ni[0] += inci) {
             incj = 1.0 / (texSize / frequency);
-            for (j = 0; j < texSize; ++j, ni[1] += incj)
-            {
+            for (j = 0; j < texSize; ++j, ni[1] += incj) {
                 inck = 1.0 / (texSize / frequency);
-                for (k = 0; k < texSize; ++k, ni[2] += inck, ptr += 4)
-                {
-                    *(ptr+inc) = (GLubyte) (((noise3(ni) + 1.0) * amp) * 128.0);
+                for (k = 0; k < texSize; ++k, ni[2] += inck, ptr += 4) {
+                    *(ptr + inc) = (GLubyte)(((noise3(ni) + 1.0) * amp) * 128.0);
                 }
             }
         }
@@ -160,7 +154,7 @@ osg::Texture3D* StateAttributeFactory::getNoiseTexture(int size)
     noiseTexture->setWrap(osg::Texture3D::WRAP_S, osg::Texture3D::REPEAT);
     noiseTexture->setWrap(osg::Texture3D::WRAP_T, osg::Texture3D::REPEAT);
     noiseTexture->setWrap(osg::Texture3D::WRAP_R, osg::Texture3D::REPEAT);
-    noiseTexture->setImage( make3DNoiseImage(size) );
+    noiseTexture->setImage(make3DNoiseImage(size));
     _noises.insert(std::make_pair(size, noiseTexture));
     return noiseTexture;
 }
@@ -168,7 +162,6 @@ osg::Texture3D* StateAttributeFactory::getNoiseTexture(int size)
 // anchor the destructor into this file, to avoid ref_ptr warnings
 StateAttributeFactory::~StateAttributeFactory()
 {
-  
 }
 
 } // namespace simgear

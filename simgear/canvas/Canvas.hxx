@@ -35,7 +35,7 @@ namespace simgear::canvas
    */
   class CanvasImageReadyListener {
   public:
-    virtual void imageReady(osg::ref_ptr<osg::Image>) = 0;
+    virtual void imageReady(vsg::ref_ptr<vsg::Image>) = 0;
     virtual ~CanvasImageReadyListener()
     {
     }
@@ -73,9 +73,9 @@ namespace simgear::canvas
         private:
           CanvasWeakPtr _canvas;
 
-          void operator()(osg::Node* node, osg::NodeVisitor* nv) override;
+          void operator()(vsg::Node* node, osg::NodeVisitor* nv) override;
       };
-      typedef osg::ref_ptr<CullCallback> CullCallbackPtr;
+      typedef vsg::ref_ptr<CullCallback> CullCallbackPtr;
 
       explicit Canvas(SGPropertyNode* node);
       virtual ~Canvas();
@@ -190,7 +190,7 @@ namespace simgear::canvas
       void childRemoved(SGPropertyNode* parent, SGPropertyNode* child) override;
       void valueChanged(SGPropertyNode * node) override;
 
-      osg::Camera* getCamera() const;
+      vsg::Camera* getCamera() const;
       osg::Texture2D* getTexture() const;
 
       CullCallbackPtr getCullCallback() const;

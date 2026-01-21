@@ -5,15 +5,15 @@
 
 #include <unordered_map>
 
-#include <osg/Camera>
-#include <osg/Vec2f>
-#include <osg/Vec2i>
+#include <vsg/all.h>
+
 #include <osg/View>
 
 #include <simgear/props/condition.hxx>
 #include <simgear/scene/material/Effect.hxx>
 #include <simgear/structure/Singleton.hxx>
 #include <simgear/props/props.hxx>
+
 
 namespace simgear {
 
@@ -41,9 +41,9 @@ struct Pass : public osg::Referenced {
     std::string                      type;
     bool                             collect_lights         = false;
     std::string                      effect_scheme;
-    osg::ref_ptr<osg::Camera>        camera;
+    vsg::ref_ptr<vsg::Camera>        camera;
     bool                             useMastersSceneData    = true;
-    osg::Node::NodeMask              cull_mask              = 0xffffff;
+    vsg::Node::NodeMask              cull_mask              = 0xffffff;
     bool                             has_custom_lod_scale   = false;
     /** Whether the cull mask is ANDed with the view master camera cull mask. */
     bool                             inherit_cull_mask      = false;
@@ -56,21 +56,21 @@ struct Pass : public osg::Referenced {
     SGSharedPtr<SGCondition>         render_condition;
     std::string                      multiview;
 
-    osg::ref_ptr<osg::Drawable>      compute_node;
-    osg::Vec2i                       compute_wg_size;
-    osg::Vec2f                       compute_global_scale;
+    vsg::ref_ptr<osg::Drawable>      compute_node;
+    vsg::ivec2                       compute_wg_size;
+    vsg::vec2                       compute_global_scale;
 
     struct PassUpdateCallback : public virtual osg::Referenced {
     public:
         virtual void updatePass(Pass &pass,
-                                const osg::Matrix &view_matrix,
-                                const osg::Matrix &proj_matrix) = 0;
+                                const vsg::mat4 &view_matrix,
+                                const vsg::mat4 &proj_matrix) = 0;
         virtual void updateSubView(Pass &pass, unsigned int sub_view_index,
-                                   const osg::Matrix &view_matrix,
-                                   const osg::Matrix &proj_matrix) {}
+                                   const vsg::mat4 &view_matrix,
+                                   const vsg::mat4 &proj_matrix) {}
     };
 
-    osg::ref_ptr<PassUpdateCallback> update_callback;
+    vsg::ref_ptr<PassUpdateCallback> update_callback;
 };
 
 class PassBuilder : public SGReferenced {

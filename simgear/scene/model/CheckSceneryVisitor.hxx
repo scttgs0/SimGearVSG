@@ -35,13 +35,13 @@ namespace simgear
 class CheckSceneryVisitor : public osg::NodeVisitor
 {
 public:
-    CheckSceneryVisitor(osgDB::DatabasePager* dbp, const osg::Vec3 &position, double range, osg::FrameStamp* framestamp);
+    CheckSceneryVisitor(osgDB::DatabasePager* dbp, const vsg::vec3 &position, double range, osg::FrameStamp* framestamp);
     virtual ~CheckSceneryVisitor();
 
-    virtual void apply(osg::Node& node);
+    virtual void apply(vsg::Node& node);
     virtual void apply(osg::ProxyNode& node);
     virtual void apply(osg::PagedLOD& node);
-    virtual void apply(osg::Transform& node);
+    virtual void apply(vsg::Transform& node);
 
     bool isLoaded() const {
         return _loaded;
@@ -49,15 +49,15 @@ public:
     void setLoaded(bool l) {
         _loaded=l;
     }
-    const osg::Vec3 &getPosition() const {
+    const vsg::vec3 &getPosition() const {
         return _position;
     }
 
 private:
-    osg::Vec3 _position;
+    vsg::vec3 _position;
     double _range;
     bool _loaded;
-    osg::Matrix _matrix;
+    vsg::mat4 _matrix;
 };
 
 }

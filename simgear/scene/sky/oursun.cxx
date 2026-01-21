@@ -20,12 +20,12 @@
 
 using namespace simgear;
 
-osg::Node* SGSun::build(double sun_size, SGPropertyNode *property_tree_Node,
+vsg::Node* SGSun::build(double sun_size, SGPropertyNode *property_tree_Node,
                         const SGReaderWriterOptions* options)
 {
     env_node = property_tree_Node;
 
-    osg::ref_ptr<EffectGeode> geode = new EffectGeode;
+    vsg::ref_ptr<EffectGeode> geode = new EffectGeode;
     geode->setName("Sun");
 
     Effect* effect = makeEffect("Effects/oursun", true, options);
@@ -33,19 +33,19 @@ osg::Node* SGSun::build(double sun_size, SGPropertyNode *property_tree_Node,
         geode->setEffect(effect);
     }
 
-    osg::ref_ptr<osg::Vec3Array> sun_vl = new osg::Vec3Array;
-    sun_vl->push_back(osg::Vec3(-sun_size, 0.0f, -sun_size));
-    sun_vl->push_back(osg::Vec3( sun_size, 0.0f, -sun_size));
-    sun_vl->push_back(osg::Vec3(-sun_size, 0.0f,  sun_size));
-    sun_vl->push_back(osg::Vec3( sun_size, 0.0f,  sun_size));
+    vsg::ref_ptr<vsg::vec3Array> sun_vl = new vsg::vec3Array;
+    sun_vl->push_back(vsg::vec3(-sun_size, 0.0f, -sun_size));
+    sun_vl->push_back(vsg::vec3( sun_size, 0.0f, -sun_size));
+    sun_vl->push_back(vsg::vec3(-sun_size, 0.0f,  sun_size));
+    sun_vl->push_back(vsg::vec3( sun_size, 0.0f,  sun_size));
 
-    osg::ref_ptr<osg::Vec2Array> sun_tl = new osg::Vec2Array;
-    sun_tl->push_back(osg::Vec2(0.0f, 0.0f));
-    sun_tl->push_back(osg::Vec2(1.0f, 0.0f));
-    sun_tl->push_back(osg::Vec2(0.0f, 1.0f));
-    sun_tl->push_back(osg::Vec2(1.0f, 1.0f));
+    vsg::ref_ptr<osg::Vec2Array> sun_tl = new osg::Vec2Array;
+    sun_tl->push_back(vsg::vec2(0.0f, 0.0f));
+    sun_tl->push_back(vsg::vec2(1.0f, 0.0f));
+    sun_tl->push_back(vsg::vec2(0.0f, 1.0f));
+    sun_tl->push_back(vsg::vec2(1.0f, 1.0f));
 
-    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
+    vsg::ref_ptr<vsg::Geometry> geometry = new vsg::Geometry;
     geometry->setUseVertexBufferObjects(true);
     geometry->setVertexArray(sun_vl);
     geometry->setTexCoordArray(0, sun_tl, osg::Array::BIND_PER_VERTEX);
@@ -64,10 +64,10 @@ bool SGSun::reposition(double rightAscension, double declination,
                        double sun_dist, double lat, double alt_asl, double sun_angle)
 {
     // GST - GMT sidereal time
-    osg::Matrix T2, RA, DEC;
-    RA.makeRotate(rightAscension - 90*SGD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
-    DEC.makeRotate(declination, osg::Vec3(1, 0, 0));
-    T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
+    vsg::mat4 T2, RA, DEC;
+    RA.makeRotate(rightAscension - 90*SGD_DEGREES_TO_RADIANS, vsg::vec3(0, 0, 1));
+    DEC.makeRotate(declination, vsg::vec3(1, 0, 0));
+    T2.makeTranslate(vsg::vec3(0, sun_dist, 0));
     sun_transform->setMatrix(T2*DEC*RA);
 
     // Push some data to the property tree, so it can be used in the enviromental code

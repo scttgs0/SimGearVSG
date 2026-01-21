@@ -37,9 +37,9 @@ namespace simgear::canvas
     public:
 
       ReferenceFrame                _coord_reference;
-      osg::observer_ptr<osg::Node>  _node;
+      osg::observer_ptr<vsg::Node>  _node;
 
-      explicit RelativeScissor(osg::Node* node = NULL):
+      explicit RelativeScissor(vsg::Node* node = NULL):
         _coord_reference(GLOBAL),
         _node(node),
         _x(0),
@@ -100,7 +100,7 @@ namespace simgear::canvas
       inline float& height() { return _height; }
       inline float height() const { return _height; }
 
-      virtual void apply(osg::State& state) const
+      virtual void apply(vsg::State& state) const
       {
         if( _width <= 0 || _height <= 0 )
           return;
@@ -109,7 +109,7 @@ namespace simgear::canvas
         float w2 = 0.5 * vp->width(),
               h2 = 0.5 * vp->height();
 
-        osg::Matrix model_view
+        vsg::mat4 model_view
         (
           w2, 0,  0, 0,
           0,  h2, 0, 0,
@@ -120,7 +120,7 @@ namespace simgear::canvas
 
         if( _coord_reference != GLOBAL )
         {
-          osg::Node* ref_obj = _node.get();
+          vsg::Node* ref_obj = _node.get();
 
           if( _coord_reference == PARENT )
           {
@@ -138,7 +138,7 @@ namespace simgear::canvas
           model_view.preMult(parent_matrices.front());
         }
 
-        const osg::Vec2 scale( model_view(0,0), model_view(1,1)),
+        const vsg::vec2 scale( model_view(0,0), model_view(1,1)),
                         offset(model_view(3,0), model_view(3,1));
 
         // TODO check/warn for rotation?
@@ -155,15 +155,15 @@ namespace simgear::canvas
         glScissor(x, y, w, h);
       }
 
-      bool contains(const osg::Vec2f& pos) const
+      bool contains(const vsg::vec2& pos) const
       {
         return _x <= pos.x() && pos.x() <= _x + _width
             && _y <= pos.y() && pos.y() <= _y + _height;
       }
 
-      bool contains( const osg::Vec2f& global_pos,
-                     const osg::Vec2f& parent_pos,
-                     const osg::Vec2f& local_pos ) const
+      bool contains( const vsg::vec2& global_pos,
+                     const vsg::vec2& parent_pos,
+                     const vsg::vec2& local_pos ) const
       {
         switch( _coord_reference )
         {
@@ -202,7 +202,7 @@ namespace simgear::canvas
 
     // The transform node keeps a reference on this element, so ensure it is
     // deleted.
-    for(osg::Group* parent: _scene_group->getParents())
+    for(vsg::Group* parent: _scene_group->getParents())
     {
       parent->removeChild(_scene_group.get());
     }
@@ -349,21 +349,21 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  bool Element::hitBound( const osg::Vec2f& global_pos,
-                          const osg::Vec2f& parent_pos,
-                          const osg::Vec2f& local_pos ) const
+  bool Element::hitBound( const vsg::vec2& global_pos,
+                          const vsg::vec2& parent_pos,
+                          const vsg::vec2& local_pos ) const
   {
     if( _scissor && !_scissor->contains(global_pos, parent_pos, local_pos) )
       return false;
 
-    const osg::Vec3f pos3(parent_pos, 0);
+    const vsg::vec3 pos3(parent_pos, 0);
 
     // Drawables have a bounding box...
     if( _drawable )
-      return _drawable->getBoundingBox().contains(osg::Vec3f(local_pos, 0));
+      return _drawable->getBoundingBox().contains(vsg::vec3(local_pos, 0));
     else if( _scene_group.valid() )
       // ... for other elements, i.e. groups only a bounding sphere is available
-      return _scene_group->getBound().contains(osg::Vec3f(parent_pos, 0));
+      return _scene_group->getBound().contains(vsg::vec3(parent_pos, 0));
     else
       return false;
   }
@@ -390,7 +390,7 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::Vec2f Element::posToLocal(const osg::Vec2f& pos) const
+  vsg::vec2 Element::posToLocal(const vsg::vec2& pos) const
   {
     if( !_scene_group )
       // TODO log warning?
@@ -399,8 +399,8 @@ namespace simgear::canvas
     // this looks heavy, but both updateMatrix and getInverseMatrix
     // use dirty flags to cache the matrices, so it's actually efficient
     updateMatrix();
-    const osg::Matrix& m = _scene_group->getInverseMatrix();
-    return osg::Vec2f
+    const vsg::mat4& m = _scene_group->getInverseMatrix();
+    return vsg::vec2
     (
       m(0, 0) * pos[0] + m(1, 0) * pos[1] + m(3, 0),
       m(0, 1) * pos[0] + m(1, 1) * pos[1] + m(3, 1)
@@ -409,7 +409,7 @@ namespace simgear::canvas
 
 
   //----------------------------------------------------------------------------
-  osg::Vec2f Element::posFromLocal(const osg::Vec2f& pos) const
+  vsg::vec2 Element::posFromLocal(const vsg::vec2& pos) const
   {
     if (!_scene_group) {
       // TODO log warning?
@@ -417,8 +417,8 @@ namespace simgear::canvas
     }
 
     updateMatrix();
-    const osg::Matrix& m = _scene_group->getMatrix();
-    return osg::Vec2f(
+    const vsg::mat4& m = _scene_group->getMatrix();
+    return vsg::vec2(
         m(0, 0) * pos[0] + m(1, 0) * pos[1] + m(3, 0),
         m(0, 1) * pos[0] + m(1, 1) * pos[1] + m(3, 1));
   }
@@ -426,7 +426,7 @@ namespace simgear::canvas
 
   //----------------------------------------------------------------------------
 
-  osg::Vec2f Element::canvasToLocal(const osg::Vec2f& pos) const
+  vsg::vec2 Element::canvasToLocal(const vsg::vec2& pos) const
   {
     ElementPtr parent = getParent();
     if (parent) {
@@ -441,7 +441,7 @@ namespace simgear::canvas
 
   //----------------------------------------------------------------------------
 
-  osg::Vec2f Element::localToCanvas(const osg::Vec2f& pos) const
+  vsg::vec2 Element::localToCanvas(const vsg::vec2& pos) const
   {
     const auto ppos = posFromLocal(pos);
     ElementPtr parent = getParent();
@@ -696,7 +696,7 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::BoundingBox Element::getTransformedBounds(const osg::Matrix& m) const
+  osg::BoundingBox Element::getTransformedBounds(const vsg::mat4& m) const
   {
     if( !_drawable )
       return osg::BoundingBox();
@@ -711,10 +711,10 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::Matrix Element::getMatrix() const
+  vsg::mat4 Element::getMatrix() const
   {
     if( !_scene_group )
-      return osg::Matrix::identity();
+      return vsg::mat4::identity();
 
     updateMatrix();
     return _scene_group->getMatrix();
@@ -881,7 +881,7 @@ namespace simgear::canvas
     if( !(_attributes_dirty & TRANSFORM) || !_scene_group )
       return;
 
-    osg::Matrix m;
+    vsg::mat4 m;
     for( size_t i = 0; i < _transform_types.size(); ++i )
     {
       // Skip unused indizes...
@@ -894,11 +894,11 @@ namespace simgear::canvas
       }
 
       // Build up the matrix representation of the current transform node
-      osg::Matrix tf;
+      vsg::mat4 tf;
       switch( _transform_types[i] )
       {
         case TT_MATRIX:
-          tf = osg::Matrix( tf_node->getDoubleValue("m[0]", 1),
+          tf = vsg::mat4( tf_node->getDoubleValue("m[0]", 1),
                             tf_node->getDoubleValue("m[1]", 0),
                             0,
                             tf_node->getDoubleValue("m[6]", 0),
@@ -919,7 +919,7 @@ namespace simgear::canvas
                             tf_node->getDoubleValue("m[8]", 1) );
           break;
         case TT_TRANSLATE:
-          tf.makeTranslate( osg::Vec3f( tf_node->getDoubleValue("t[0]", 0),
+          tf.makeTranslate( vsg::vec3( tf_node->getDoubleValue("t[0]", 0),
                                         tf_node->getDoubleValue("t[1]", 0),
                                         0 ) );
           break;

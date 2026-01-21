@@ -109,16 +109,16 @@ public:
     static SGPropertyNode_ptr loadPropertyList(const std::string &name);
 
     void updateSubView(unsigned int sub_view_index,
-                       const osg::Matrix &view_matrix,
-                       const osg::Matrix &proj_matrix,
-                       const osg::Vec4 &viewport);
+                       const vsg::mat4 &view_matrix,
+                       const vsg::mat4 &proj_matrix,
+                       const vsg::vec4 &viewport);
 
-    void               update(const osg::Matrix &view_matrix,
-                              const osg::Matrix &proj_matrix);
+    void               update(const vsg::mat4 &view_matrix,
+                              const vsg::mat4 &proj_matrix);
 
     void               resized();
 
-    void               setCullMask(osg::Node::NodeMask cull_mask);
+    void               setCullMask(vsg::Node::NodeMask cull_mask);
 
     void               setLODScale(float scale);
 
@@ -129,7 +129,7 @@ public:
     osg::Viewport     *getViewport() const { return _viewport; }
 
     typedef std::array<
-        osg::ref_ptr<osg::Uniform>,
+        vsg::ref_ptr<osg::Uniform>,
         SG_TOTAL_BUILTIN_UNIFORMS> BuiltinUniforms;
     const BuiltinUniforms &getBuiltinUniforms() const { return _uniforms; }
 
@@ -144,11 +144,11 @@ public:
     const std::string &getMVRViewIdStr(unsigned int index) const { return _mvr.viewIdStr[index]; }
     unsigned int getMVRCells() const { return _mvr.cells; }
 
-    typedef std::unordered_map<std::string, osg::ref_ptr<Buffer>> BufferMap;
+    typedef std::unordered_map<std::string, vsg::ref_ptr<Buffer>> BufferMap;
     const BufferMap &  getBufferMap() const { return _buffers; }
     Buffer *           getBuffer(const std::string &name) const;
 
-    typedef std::vector<osg::ref_ptr<Pass>> PassList;
+    typedef std::vector<vsg::ref_ptr<Pass>> PassList;
     const PassList &   getPassList() const { return _passes; }
     unsigned int       getNumPasses() const { return _passes.size(); }
     Pass *             getPass(size_t index) const { return _passes[index]; }
@@ -159,7 +159,7 @@ public:
 protected:
     osg::View                   *_view;
     osg::GraphicsContext        *_gc;
-    osg::ref_ptr<osg::Viewport>  _viewport;
+    vsg::ref_ptr<osg::Viewport>  _viewport;
     std::string                  _name;
     MVRInfo                      _mvr;
     BufferMap                    _buffers;

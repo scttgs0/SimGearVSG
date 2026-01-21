@@ -3,25 +3,27 @@
 #include <cstddef>
 #include <map>
 #include <vector>
-#include <osg/NodeVisitor>
-#include <osg/Group>
 
-namespace simgear
-{
+#include <vsg/all.h>
+
+#include <osg/NodeVisitor>
+
+
+namespace simgear {
 class SplicingVisitor : public osg::NodeVisitor
 {
 public:
-    META_NodeVisitor(simgear,SplicingVisitor);
+    META_NodeVisitor(simgear, SplicingVisitor);
     SplicingVisitor();
     virtual ~SplicingVisitor() {}
     virtual void reset();
-    osg::NodeList traverse(osg::Node& node);
+    osg::NodeList traverse(vsg::Node& node);
     using osg::NodeVisitor::apply;
-    virtual void apply(osg::Node& node);
-    virtual void apply(osg::Group& node);
-    template<typename T>
+    virtual void apply(vsg::Node& node);
+    virtual void apply(vsg::Group& node);
+    template <typename T>
     static T* copyIfNeeded(T& node, const osg::NodeList& children);
-    template<typename T>
+    template <typename T>
     static T* copy(T& node, const osg::NodeList& children);
     /**
      * Push the result of processing this node.
@@ -30,7 +32,7 @@ public:
      * make a copy of the node. Record the (possibly new) node which
      * should be the returned result if the node is visited again.
      */
-    osg::Group* pushResultNode(osg::Group* node, osg::Group* newNode,
+    vsg::Group* pushResultNode(vsg::Group* node, vsg::Group* newNode,
                                const osg::NodeList& children);
     /**
      * Push the result of processing this node.
@@ -38,26 +40,27 @@ public:
      * Record the (possibly new) node which should be the returned
      * result if the node is visited again.
      */
-    osg::Node* pushResultNode(osg::Node* node, osg::Node* newNode);
+    vsg::Node* pushResultNode(vsg::Node* node, vsg::Node* newNode);
     /**
      * Push some node onto the list of result nodes.
      */
-    osg::Node* pushNode(osg::Node* node);
-    osg::Node* getResult();
-    osg::Node* getNewNode(osg::Node& node)
+    vsg::Node* pushNode(vsg::Node* node);
+    vsg::Node* getResult();
+    vsg::Node* getNewNode(vsg::Node& node)
     {
         return getNewNode(&node);
     }
-    osg::Node* getNewNode(osg::Node* node);
-    bool recordNewNode(osg::Node* oldNode, osg::Node* newNode);
+    vsg::Node* getNewNode(vsg::Node* node);
+    bool recordNewNode(vsg::Node* oldNode, vsg::Node* newNode);
     osg::NodeList& getResults() { return _childStack.back(); }
+
 protected:
     std::vector<osg::NodeList> _childStack;
-    typedef std::map<osg::ref_ptr<osg::Node>, osg::ref_ptr<osg::Node> > NodeMap;
+    typedef std::map<vsg::ref_ptr<vsg::Node>, vsg::ref_ptr<vsg::Node>> NodeMap;
     NodeMap _visited;
 };
 
-template<typename T>
+template <typename T>
 T* SplicingVisitor::copyIfNeeded(T& node, const osg::NodeList& children)
 {
     bool copyNeeded = false;
@@ -76,16 +79,16 @@ T* SplicingVisitor::copyIfNeeded(T& node, const osg::NodeList& children)
         return &node;
 }
 
-template<typename T>
+template <typename T>
 T* SplicingVisitor::copy(T& node, const osg::NodeList& children)
 {
     T* result = osg::clone(&node, osg::CopyOp::SHALLOW_COPY);
     result->removeChildren(0, result->getNumChildren());
     for (osg::NodeList::const_iterator itr = children.begin(),
-             end = children.end();
+                                       end = children.end();
          itr != end;
          ++itr)
         result->addChild(itr->get());
     return result;
 }
-}
+} // namespace simgear

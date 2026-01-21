@@ -42,57 +42,57 @@ PrimitiveCollector::swap(PrimitiveCollector& primitiveFunctor)
 }
 
 void
-PrimitiveCollector::setVertexArray(unsigned int count, const osg::Vec2* vertices)
+PrimitiveCollector::setVertexArray(unsigned int count, const vsg::vec2* vertices)
 {
     _vertices.resize(0);
     _vertices.reserve(count);
     for (unsigned i = 0; i < count; ++i)
-        addVertex(osg::Vec3d(vertices[i][0], vertices[i][1], 0));
+        addVertex(vsg::dvec3(vertices[i][0], vertices[i][1], 0));
 }
     
 void
-PrimitiveCollector::setVertexArray(unsigned int count, const osg::Vec3* vertices)
+PrimitiveCollector::setVertexArray(unsigned int count, const vsg::vec3* vertices)
 {
     _vertices.resize(0);
     _vertices.reserve(count);
     for (unsigned i = 0; i < count; ++i)
-        addVertex(osg::Vec3d(vertices[i][0], vertices[i][1], vertices[i][2]));
+        addVertex(vsg::dvec3(vertices[i][0], vertices[i][1], vertices[i][2]));
 }
 
 void
-PrimitiveCollector::setVertexArray(unsigned int count, const osg::Vec4* vertices)
+PrimitiveCollector::setVertexArray(unsigned int count, const vsg::vec4* vertices)
 {
     _vertices.resize(0);
     _vertices.reserve(count);
     for (unsigned i = 0; i < count; ++i)
-        addVertex(osg::Vec4d(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3]));
+        addVertex(vsg::dvec4(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3]));
 }
 
 void
-PrimitiveCollector::setVertexArray(unsigned int count, const osg::Vec2d* vertices)
+PrimitiveCollector::setVertexArray(unsigned int count, const vsg::dvec2* vertices)
 {
     _vertices.resize(0);
     _vertices.reserve(count);
     for (unsigned i = 0; i < count; ++i)
-        addVertex(osg::Vec3d(vertices[i][0], vertices[i][1], 0));
+        addVertex(vsg::dvec3(vertices[i][0], vertices[i][1], 0));
 }
 
 void
-PrimitiveCollector::setVertexArray(unsigned int count, const osg::Vec3d* vertices)
+PrimitiveCollector::setVertexArray(unsigned int count, const vsg::dvec3* vertices)
 {
     _vertices.resize(0);
     _vertices.reserve(count);
     for (unsigned i = 0; i < count; ++i)
-        addVertex(osg::Vec3d(vertices[i][0], vertices[i][1], vertices[i][2]));
+        addVertex(vsg::dvec3(vertices[i][0], vertices[i][1], vertices[i][2]));
 }
 
 void
-PrimitiveCollector::setVertexArray(unsigned int count, const osg::Vec4d* vertices) 
+PrimitiveCollector::setVertexArray(unsigned int count, const vsg::dvec4* vertices) 
 {
     _vertices.resize(0);
     _vertices.reserve(count);
     for (unsigned i = 0; i < count; ++i)
-        addVertex(osg::Vec4d(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3]));
+        addVertex(vsg::dvec4(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3]));
 }
 
 void
@@ -232,39 +232,39 @@ PrimitiveCollector::begin(GLenum mode)
 }
 
 void
-PrimitiveCollector::vertex(const osg::Vec2& v)
+PrimitiveCollector::vertex(const vsg::vec2& v)
 {
-    addVertex(osg::Vec3d(v[0], v[1], 0));
+    addVertex(vsg::dvec3(v[0], v[1], 0));
 }
 
 void
-PrimitiveCollector::vertex(const osg::Vec3& v)
+PrimitiveCollector::vertex(const vsg::vec3& v)
 {
-    addVertex(osg::Vec3d(v[0], v[1], v[2]));
+    addVertex(vsg::dvec3(v[0], v[1], v[2]));
 }
 
 void
-PrimitiveCollector::vertex(const osg::Vec4& v)
+PrimitiveCollector::vertex(const vsg::vec4& v)
 {
-    addVertex(osg::Vec4d(v[0], v[1], v[2], v[3]));
+    addVertex(vsg::dvec4(v[0], v[1], v[2], v[3]));
 }
 
 void
 PrimitiveCollector::vertex(float x, float y)
 {
-    addVertex(osg::Vec3d(x, y, 0));
+    addVertex(vsg::dvec3(x, y, 0));
 }
 
 void
 PrimitiveCollector::vertex(float x, float y, float z)
 {
-    addVertex(osg::Vec3d(x, y, z));
+    addVertex(vsg::dvec3(x, y, z));
 }
 
 void
 PrimitiveCollector::vertex(float x, float y, float z, float w)
 {
-    addVertex(osg::Vec4d(x, y, z, w));
+    addVertex(vsg::dvec4(x, y, z, w));
 }
 
 void
@@ -277,15 +277,15 @@ PrimitiveCollector::end()
 }
 
 void
-PrimitiveCollector::addVertex(const osg::Vec3d& v)
+PrimitiveCollector::addVertex(const vsg::dvec3& v)
 {
     _vertices.push_back(v);
 }
 
 void
-PrimitiveCollector::addVertex(const osg::Vec4d& v)
+PrimitiveCollector::addVertex(const vsg::dvec4& v)
 {
-    _vertices.push_back(osg::Vec3d(v[0]/v[3], v[1]/v[3], v[2]/v[3]));
+    _vertices.push_back(vsg::dvec3(v[0]/v[3], v[1]/v[3], v[2]/v[3]));
 }
 
 void

@@ -41,7 +41,7 @@ SGScaleTransform::SGScaleTransform() :
 
 SGScaleTransform::SGScaleTransform(const SGScaleTransform& scale,
                                    const osg::CopyOp& copyop) :
-    osg::Transform(scale, copyop),
+    vsg::Transform(scale, copyop),
     _center(scale._center),
     _scaleFactor(scale._scaleFactor),
     _boundScale(scale._boundScale)
@@ -49,10 +49,10 @@ SGScaleTransform::SGScaleTransform(const SGScaleTransform& scale,
 }
 
 bool
-SGScaleTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
+SGScaleTransform::computeLocalToWorldMatrix(vsg::mat4& matrix,
                                             osg::NodeVisitor* nv) const
 {
-  osg::Matrix transform;
+  vsg::mat4 transform;
   transform(0,0) = _scaleFactor[0];
   transform(1,1) = _scaleFactor[1];
   transform(2,2) = _scaleFactor[2];
@@ -67,7 +67,7 @@ SGScaleTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
 }
 
 bool
-SGScaleTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
+SGScaleTransform::computeWorldToLocalMatrix(vsg::mat4& matrix,
                                             osg::NodeVisitor* nv) const
 {
   if (fabs(_scaleFactor[0]) < SGLimitsd::min())
@@ -79,7 +79,7 @@ SGScaleTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
   SGVec3d rScaleFactor(1/_scaleFactor[0],
                        1/_scaleFactor[1],
                        1/_scaleFactor[2]);
-  osg::Matrix transform;
+  vsg::mat4 transform;
   transform(0,0) = rScaleFactor[0];
   transform(1,1) = rScaleFactor[1];
   transform(2,2) = rScaleFactor[2];
@@ -96,7 +96,7 @@ SGScaleTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
 osg::BoundingSphere
 SGScaleTransform::computeBound() const
 {
-  osg::BoundingSphere bs = osg::Group::computeBound();
+  osg::BoundingSphere bs = vsg::Group::computeBound();
   _boundScale = normI(_scaleFactor);
   bs.radius() *= _boundScale;
   return bs;
@@ -104,12 +104,12 @@ SGScaleTransform::computeBound() const
 
 namespace {
 
-bool ScaleTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
+bool ScaleTransform_readLocalData(vsg::Object& obj, osgDB::Input& fr)
 {
     SGScaleTransform& scale = static_cast<SGScaleTransform&>(obj);
     if (fr[0].matchWord("center")) {
         ++fr;
-        osg::Vec3d center;
+        vsg::dvec3 center;
         if (fr.readSequence(center))
             fr += 3;
         else
@@ -118,7 +118,7 @@ bool ScaleTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
     }
     if (fr[0].matchWord("scaleFactor")) {
         ++fr;
-        osg::Vec3d scaleFactor;
+        vsg::dvec3 scaleFactor;
         if (fr.readSequence(scaleFactor))
             fr += 3;
         else
@@ -128,7 +128,7 @@ bool ScaleTransform_readLocalData(osg::Object& obj, osgDB::Input& fr)
     return true;
 }
 
-bool ScaleTransform_writeLocalData(const osg::Object& obj, osgDB::Output& fw)
+bool ScaleTransform_writeLocalData(const vsg::Object& obj, osgDB::Output& fw)
 {
     const SGScaleTransform& scale = static_cast<const SGScaleTransform&>(obj);
     const SGVec3d& center = scale.getCenter();

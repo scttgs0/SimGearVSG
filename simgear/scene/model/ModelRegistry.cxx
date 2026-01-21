@@ -6,44 +6,42 @@
 
 #include <simgear_config.h>
 
+#include "../material/mipmap.hxx"
 #include "ModelRegistry.hxx"
 #include <simgear/scene/util/SGImageUtils.hxx>
-#include "../material/mipmap.hxx"
 
 #include <algorithm>
 #include <chrono>
 #include <utility>
 #include <vector>
 
-#include <OpenThreads/ScopedLock>
+#include <vsg/all.h>
 
-#include <osg/ref_ptr>
-#include <osg/Group>
-#include <osg/NodeCallback>
-#include <osg/Switch>
+#include <OpenThreads/ScopedLock>
 #include <osg/Material>
 #include <osg/MatrixTransform>
+#include <osg/NodeCallback>
+#include <osg/Switch>
+#include <osg/Texture>
 #include <osg/Version>
 #include <osgDB/Archive>
 #include <osgDB/FileNameUtils>
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
-#include <osgDB/WriteFile>
 #include <osgDB/Registry>
 #include <osgDB/SharedStateManager>
-#include <osgUtil/Optimizer>
-#include <osg/Texture>
-
+#include <osgDB/WriteFile>
 #include <osgTerrain/Terrain>
+#include <osgUtil/Optimizer>
 
 #include <simgear/sg_inlines.h>
 
+#include <simgear/debug/Reporting.hxx>
+#include <simgear/scene/util/NodeAndDrawableVisitor.hxx>
+#include <simgear/scene/util/SGReaderWriterOptions.hxx>
 #include <simgear/scene/util/SGSceneFeatures.hxx>
 #include <simgear/scene/util/SGStateAttributeVisitor.hxx>
 #include <simgear/scene/util/SGTextureStateAttributeVisitor.hxx>
-#include <simgear/scene/util/SGReaderWriterOptions.hxx>
-#include <simgear/scene/util/NodeAndDrawableVisitor.hxx>
-#include <simgear/debug/Reporting.hxx>
 
 #include <simgear/scene/tgdb/VPBTechnique.hxx>
 
@@ -69,10 +67,10 @@ namespace {
 // Set the name of a Texture to the simple name of its image
 // file. This can be used to do livery substitution after the image
 // has been deallocated.
-class TextureNameVisitor  : public NodeAndDrawableVisitor {
+class TextureNameVisitor : public NodeAndDrawableVisitor
+{
 public:
-    TextureNameVisitor(NodeVisitor::TraversalMode tm = NodeVisitor::TRAVERSE_ALL_CHILDREN) :
-        NodeAndDrawableVisitor(tm)
+    TextureNameVisitor(NodeVisitor::TraversalMode tm = NodeVisitor::TRAVERSE_ALL_CHILDREN) : NodeAndDrawableVisitor(tm)
     {
     }
 
@@ -86,6 +84,7 @@ public:
     {
         nameTextures(drawable.getStateSet());
     }
+
 protected:
     void nameTextures(StateSet* stateSet)
     {
@@ -93,12 +92,11 @@ protected:
             return;
         int numUnits = stateSet->getTextureAttributeList().size();
         for (int i = 0; i < numUnits; ++i) {
-            StateAttribute* attr
-                = stateSet->getTextureAttribute(i, StateAttribute::TEXTURE);
+            StateAttribute* attr = stateSet->getTextureAttribute(i, StateAttribute::TEXTURE);
             Texture2D* texture = dynamic_cast<Texture2D*>(attr);
             if (!texture || !texture->getName().empty())
                 continue;
-            const Image *image = texture->getImage();
+            const Image* image = texture->getImage();
             if (!image)
                 continue;
             texture->setName(image->getFileName());
@@ -106,66 +104,68 @@ protected:
     }
 };
 
-class SGTexCompressionVisitor : public SGTextureStateAttributeVisitor {
+class SGTexCompressionVisitor : public SGTextureStateAttributeVisitor
+{
 public:
-  virtual void apply(int, StateSet::RefAttributePair& refAttr)
-  {
-    Texture2D* texture;
-    texture = dynamic_cast<Texture2D*>(refAttr.first.get());
-    if (!texture)
-      return;
+    virtual void apply(int, StateSet::RefAttributePair& refAttr)
+    {
+        Texture2D* texture;
+        texture = dynamic_cast<Texture2D*>(refAttr.first.get());
+        if (!texture)
+            return;
 
-    // Do not touch dynamically generated textures.
-    if (texture->getReadPBuffer())
-      return;
-    if (texture->getDataVariance() == osg::Object::DYNAMIC)
-      return;
+        // Do not touch dynamically generated textures.
+        if (texture->getReadPBuffer())
+            return;
+        if (texture->getDataVariance() == vsg::Object::DYNAMIC)
+            return;
 
-    // If no image attached, we assume this one is dynamically generated
-    Image* image = texture->getImage(0);
-    if (!image)
-      return;
+        // If no image attached, we assume this one is dynamically generated
+        Image* image = texture->getImage(0);
+        if (!image)
+            return;
 
-    int s = image->s();
-    int t = image->t();
+        int s = image->s();
+        int t = image->t();
 
-    if (s <= t && 32 <= s) {
-      SGSceneFeatures::instance()->applyTextureCompression(texture);
-    } else if (t < s && 32 <= t) {
-      SGSceneFeatures::instance()->applyTextureCompression(texture);
+        if (s <= t && 32 <= s) {
+            SGSceneFeatures::instance()->applyTextureCompression(texture);
+        } else if (t < s && 32 <= t) {
+            SGSceneFeatures::instance()->applyTextureCompression(texture);
+        }
     }
-  }
 };
 
-class SGTexDataVarianceVisitor : public SGTextureStateAttributeVisitor {
+class SGTexDataVarianceVisitor : public SGTextureStateAttributeVisitor
+{
 public:
-  virtual void apply(int, StateSet::RefAttributePair& refAttr)
-  {
-    Texture* texture;
-    texture = dynamic_cast<Texture*>(refAttr.first.get());
-    if (!texture)
-      return;
+    virtual void apply(int, StateSet::RefAttributePair& refAttr)
+    {
+        Texture* texture;
+        texture = dynamic_cast<Texture*>(refAttr.first.get());
+        if (!texture)
+            return;
 
-    // Cannot be static if this is a render to texture thing
-    if (texture->getReadPBuffer())
-      return;
-    if (texture->getDataVariance() == osg::Object::DYNAMIC)
-      return;
-    // If no image attached, we assume this one is dynamically generated
-    Image* image = texture->getImage(0);
-    if (!image)
-      return;
+        // Cannot be static if this is a render to texture thing
+        if (texture->getReadPBuffer())
+            return;
+        if (texture->getDataVariance() == vsg::Object::DYNAMIC)
+            return;
+        // If no image attached, we assume this one is dynamically generated
+        Image* image = texture->getImage(0);
+        if (!image)
+            return;
 
-    texture->setDataVariance(Object::STATIC);
-  }
+        texture->setDataVariance(Object::STATIC);
+    }
 
-  virtual void apply(StateSet* stateSet)
-  {
-    if (!stateSet)
-      return;
-    stateSet->setDataVariance(Object::STATIC);
-    SGTextureStateAttributeVisitor::apply(stateSet);
-  }
+    virtual void apply(StateSet* stateSet)
+    {
+        if (!stateSet)
+            return;
+        stateSet->setDataVariance(Object::STATIC);
+        SGTextureStateAttributeVisitor::apply(stateSet);
+    }
 };
 
 } // namespace
@@ -201,8 +201,8 @@ static bool isPowerOfTwo(int v)
     return ((v & (v - 1)) == 0);
 }
 
-osg::Node* DefaultProcessPolicy::process(osg::Node* node, const std::string& filename,
-    const Options* opt)
+vsg::Node* DefaultProcessPolicy::process(vsg::Node* node, const std::string& filename,
+                                         const Options* opt)
 {
     TextureNameVisitor nameVisitor;
     node->accept(nameVisitor);
@@ -211,11 +211,11 @@ osg::Node* DefaultProcessPolicy::process(osg::Node* node, const std::string& fil
 
 //#define LOCAL_IMAGE_CACHE
 #ifdef LOCAL_IMAGE_CACHE
-typedef std::map<std::string, osg::ref_ptr<Image>> ImageMap;
+typedef std::map<std::string, vsg::ref_ptr<Image>> ImageMap;
 ImageMap _imageMap;
-//typedef std::map<std::string, osg::ref_ptr<osg::Image> >    ImageMap;
+//typedef std::map<std::string, vsg::ref_ptr<vsg::Image> >    ImageMap;
 //ImageMap _imageMap;
-osg::Image* getImageByName(const std::string& filename)
+vsg::Image* getImageByName(const std::string& filename)
 {
     ImageMap::iterator itr = _imageMap.find(filename);
     if (itr != _imageMap.end()) return itr->second.get();
@@ -226,7 +226,7 @@ osg::Image* getImageByName(const std::string& filename)
 // least recently used cache to speed up the process of finding a file
 // after the first time - otherwise each time we'll have to generate a hash
 // of the contents.
-static lru_cache < std::string, std::string> filename_hash_cache(100000);
+static lru_cache<std::string, std::string> filename_hash_cache(100000);
 
 // experimental (incomplete) features to allow maintenance of the filecache.
 //lru_cache < std::string, bool> filesCleaned(100000);
@@ -234,7 +234,7 @@ static lru_cache < std::string, std::string> filename_hash_cache(100000);
 
 ReaderWriter::ReadResult
 ModelRegistry::readImage(const string& fileName,
-    const Options* opt)
+                         const Options* opt)
 {
     // experimental feature to see if we can reload textures during model load
     // as otherwise texture creation/editing requires a restart or a change to
@@ -248,7 +248,7 @@ ModelRegistry::readImage(const string& fileName,
      * processor is the interface to the osg_nvtt plugin
      */
     static bool init = false;
-    static osgDB::ImageProcessor *processor = 0;
+    static osgDB::ImageProcessor* processor = 0;
     int max_texture_size = SGSceneFeatures::instance()->getMaxTextureSize();
     if (!init) {
         processor = osgDB::Registry::instance()->getImageProcessor();
@@ -273,8 +273,7 @@ ModelRegistry::readImage(const string& fileName,
     string absFileName = SGModelLib::findDataFile(fileName, opt);
     string originalFileName = absFileName;
     if (!fileExists(absFileName)) {
-        SG_LOG(SG_IO, SG_DEV_ALERT, "Cannot find image file \""
-            << fileName << "\"");
+        SG_LOG(SG_IO, SG_DEV_ALERT, "Cannot find image file \"" << fileName << "\"");
         return ReaderWriter::ReadResult::FILE_NOT_FOUND;
     }
     Registry* registry = Registry::instance();
@@ -290,10 +289,7 @@ ModelRegistry::readImage(const string& fileName,
     // only do this if the cache is active, the filename isn't already in dds or compressed with gzip
     // and providing that the load origin hint permits the usage of the cache.
     if (cache_active && fileExtension != "dds" && fileExtension != "gz" &&
-        (!sgoptC
-            || (sgoptC->getLoadOriginHint() != SGReaderWriterOptions::LoadOriginHint::ORIGIN_SPLASH_SCREEN
-                && sgoptC->getLoadOriginHint() != SGReaderWriterOptions::LoadOriginHint::ORIGIN_MATERIAL_ATLAS
-                && sgoptC->getLoadOriginHint() != SGReaderWriterOptions::LoadOriginHint::ORIGIN_CANVAS))) {
+        (!sgoptC || (sgoptC->getLoadOriginHint() != SGReaderWriterOptions::LoadOriginHint::ORIGIN_SPLASH_SCREEN && sgoptC->getLoadOriginHint() != SGReaderWriterOptions::LoadOriginHint::ORIGIN_MATERIAL_ATLAS && sgoptC->getLoadOriginHint() != SGReaderWriterOptions::LoadOriginHint::ORIGIN_CANVAS))) {
         std::string root = getPathRoot(absFileName);
         std::string prr = getPathRelative(root, absFileName);
         std::string cache_root = SGSceneFeatures::instance()->getTextureCompressionPath().c_str();
@@ -320,12 +316,10 @@ ModelRegistry::readImage(const string& fileName,
             boost::optional<std::string> cachehash = filename_hash_cache.get(absFileName);
             if (cachehash) {
                 hash = *cachehash;
-            }
-            else {
+            } else {
                 try {
                     hash = f.computeHash();
-                }
-                catch (sg_io_exception& e) {
+                } catch (sg_io_exception& e) {
                     SG_LOG(SG_IO, SG_DEV_ALERT, "Modelregistry::failed to compute filehash '" << absFileName << "' " << e.getFormattedMessage());
                     hash = std::string();
                 }
@@ -340,9 +334,7 @@ ModelRegistry::readImage(const string& fileName,
                 }
             }
             newName = cache_root + "/" + hash.substr(0, 2) + "/" + hash + ".cache.dds";
-        }
-        else
-        {
+        } else {
             tstream << std::hex << file.modTime();
             newName += "." + tstream.str();
             newName += ".cache.dds";
@@ -359,7 +351,7 @@ ModelRegistry::readImage(const string& fileName,
         if (newName != std::string() && !fileExists(newName)) {
             res = registry->readImageImplementation(absFileName, opt);
             if (res.validImage()) {
-                osg::ref_ptr<osg::Image> srcImage = res.getImage();
+                vsg::ref_ptr<vsg::Image> srcImage = res.getImage();
                 int width = srcImage->s();
                 //int packing = srcImage->getPacking();
                 //printf("packing %d format %x pixel size %d InternalTextureFormat %x\n", packing, srcImage->getPixelFormat(), srcImage->getPixelSizeInBits(), srcImage->getInternalTextureFormat() );
@@ -384,19 +376,16 @@ ModelRegistry::readImage(const string& fileName,
                 // - images loaded from effects
                 if (sgoptC && transparent && sgoptC->getLoadOriginHint() == SGReaderWriterOptions::LoadOriginHint::ORIGIN_EFFECTS_NORMALIZED) {
                     isNormalMap = true;
-                }
-                else if (sgoptC && transparent && sgoptC->getLoadOriginHint() == SGReaderWriterOptions::LoadOriginHint::ORIGIN_EFFECTS) {
+                } else if (sgoptC && transparent && sgoptC->getLoadOriginHint() == SGReaderWriterOptions::LoadOriginHint::ORIGIN_EFFECTS) {
                     SG_LOG(SG_IO, SG_INFO, "From effects transparent " + absFileName + " will generate mipmap only");
                     isEffect = true;
                     can_compress = false;
-                }
-                else if (sgoptC && !transparent && sgoptC->getLoadOriginHint() == SGReaderWriterOptions::LoadOriginHint::ORIGIN_EFFECTS) {
+                } else if (sgoptC && !transparent && sgoptC->getLoadOriginHint() == SGReaderWriterOptions::LoadOriginHint::ORIGIN_EFFECTS) {
                     SG_LOG(SG_IO, SG_INFO, "From effects " + absFileName + " will generate mipmap only");
                     isEffect = true;
                     //                        can_compress = false;
                 }
-                if (can_compress)
-                {
+                if (can_compress) {
                     std::string pot_message;
                     bool resize = false;
                     if (!isPowerOfTwo(width)) {
@@ -414,16 +403,14 @@ ModelRegistry::readImage(const string& fileName,
                         SG_LOG(SG_IO, SG_DEV_WARN, pot_message << " " << absFileName);
 
                     // unlikely that after resizing in height the width will still be outside of the max texture size.
-                    if (height > max_texture_size)
-                    {
+                    if (height > max_texture_size) {
                         SG_LOG(SG_IO, SG_DEV_WARN, "Image texture too high (max " << max_texture_size << ") " << width << "," << height << " " << absFileName);
                         int factor = height / max_texture_size;
                         height /= factor;
                         width /= factor;
                         resize = true;
                     }
-                    if (width > max_texture_size)
-                    {
+                    if (width > max_texture_size) {
                         SG_LOG(SG_IO, SG_DEV_WARN, "Image texture too wide (max " << max_texture_size << ") " << width << "," << height << " " << absFileName);
                         int factor = width / max_texture_size;
                         height /= factor;
@@ -432,7 +419,7 @@ ModelRegistry::readImage(const string& fileName,
                     }
 
                     if (resize) {
-                        osg::ref_ptr<osg::Image> resizedImage;
+                        vsg::ref_ptr<vsg::Image> resizedImage;
 
                         if (ImageUtils::resizeImage(srcImage, width, height, resizedImage))
                             srcImage = resizedImage;
@@ -441,7 +428,6 @@ ModelRegistry::readImage(const string& fileName,
                     //
                     // only cache power of two textures that are of a reasonable size
                     if (width >= 4 && height >= 4) {
-
                         simgear::effect::MipMapTuple mipmapFunctions(simgear::effect::AVERAGE, simgear::effect::AVERAGE, simgear::effect::AVERAGE, simgear::effect::AVERAGE);
 
                         SGPath filePath(newName);
@@ -451,7 +437,7 @@ ModelRegistry::readImage(const string& fileName,
                         // as this complicates loading as it requires a flag to flip it back which will preclude the
                         // image from being cached because we will have to clone the options to set the flag and thus lose
                         // the link to the cache in the options from the caller.
-                        osg::ref_ptr<Options> nopt;
+                        vsg::ref_ptr<Options> nopt;
                         nopt = opt->cloneOptions();
                         std::string optionstring = nopt->getOptionString();
 
@@ -463,49 +449,39 @@ ModelRegistry::readImage(const string& fileName,
                         //GLenum srcImageType = srcImage->getDataType();
                         //                            printf("--- %-80s --> f=%8x t=%8x\n", newName.c_str(), srcImage->getPixelFormat(), srcImageType);
 
-                        try
-                        {
+                        try {
                             if (can_compress) {
                                 osg::Texture::InternalFormatMode targetFormat = osg::Texture::USE_S3TC_DXT1_COMPRESSION;
                                 if (isNormalMap) {
                                     if (transparent) {
                                         targetFormat = osg::Texture::USE_S3TC_DXT5_COMPRESSION;
-                                    }
-                                    else
+                                    } else
                                         targetFormat = osg::Texture::USE_S3TC_DXT5_COMPRESSION;
-                                }
-                                else if (isEffect)
-                                {
+                                } else if (isEffect) {
                                     if (transparent) {
                                         targetFormat = osg::Texture::USE_S3TC_DXT5_COMPRESSION;
-                                    }
-                                    else
+                                    } else
                                         targetFormat = osg::Texture::USE_S3TC_DXT1_COMPRESSION;
-                                }
-                                else {
+                                } else {
                                     if (transparent) {
                                         targetFormat = osg::Texture::USE_S3TC_DXT3_COMPRESSION;
-                                    }
-                                    else
+                                    } else
                                         targetFormat = osg::Texture::USE_S3TC_DXT1_COMPRESSION;
                                 }
 
-                                if (processor)
-                                {
+                                if (processor) {
                                     SG_LOG(SG_IO, SG_DEV_ALERT, "Creating " << targetFormat << " for " + absFileName);
                                     // normal maps:
                                     // nvdxt.exe - quality_highest - rescaleKaiser - Kaiser - dxt5nm - norm
                                     processor->compress(*srcImage, targetFormat, true, true, osgDB::ImageProcessor::USE_CPU, osgDB::ImageProcessor::PRODUCTION);
                                     SG_LOG(SG_IO, SG_INFO, "-- finished creating DDS: " + newName);
                                     //processor->generateMipMap(*srcImage, true, osgDB::ImageProcessor::USE_CPU);
-                                }
-                                else {
+                                } else {
                                     simgear::effect::MipMapTuple mipmapFunctions(simgear::effect::AVERAGE, simgear::effect::AVERAGE, simgear::effect::AVERAGE, simgear::effect::AVERAGE);
                                     SG_LOG(SG_IO, SG_INFO, "Texture compression plugin (osg_nvtt) not available; storing uncompressed image: " << absFileName);
                                     srcImage = simgear::effect::computeMipmap(srcImage, mipmapFunctions);
                                 }
-                            }
-                            else {
+                            } else {
                                 SG_LOG(SG_IO, SG_INFO, "Creating uncompressed DDS for " + absFileName);
                                 //if (processor) {
                                 //    processor->generateMipMap(*srcImage, true, osgDB::ImageProcessor::USE_CPU);
@@ -523,29 +499,25 @@ ModelRegistry::readImage(const string& fileName,
                             {
                                 std::string mdlDirectory = cache_root + "/cache-index.txt";
                                 FILE* f = ::fopen(mdlDirectory.c_str(), "a");
-                                if (f)
-                                {
+                                if (f) {
                                     ::fprintf(f, "%s, %s\n", absFileName.c_str(), newName.c_str());
                                     ::fclose(f);
                                 }
                             }
                             absFileName = newName;
-                        }
-                        catch (...) {
+                        } catch (...) {
                             SG_LOG(SG_IO, SG_DEV_ALERT, "Exception processing " << absFileName << " may be corrupted");
                         }
-                    }
-                    else
+                    } else
                         SG_LOG(SG_IO, SG_DEV_WARN, absFileName + " too small " << width << "," << height);
                 }
             }
-        }
-        else {
+        } else {
             if (newName != std::string())
                 absFileName = newName;
         }
     }
-//    SG_LOG(SG_IO, SG_ALERT, "Loading image file "<< absFileName);
+    //    SG_LOG(SG_IO, SG_ALERT, "Loading image file "<< absFileName);
 
 
     try {
@@ -565,7 +537,7 @@ ModelRegistry::readImage(const string& fileName,
         return res;
     }
 
-    osg::ref_ptr<osg::Image> srcImage1 = res.getImage();
+    vsg::ref_ptr<vsg::Image> srcImage1 = res.getImage();
 
     /*
      * Fixup the filename - as when loading from eg. dds.gz the originating filename is lost in the conversion due to the way the OSG loader works
@@ -575,8 +547,7 @@ ModelRegistry::readImage(const string& fileName,
     //}
     srcImage1->setFileName(originalFileName);
 
-    if(cache_active && getFileExtension(absFileName) != "dds"&& getFileExtension(absFileName) != "gz")
-    {
+    if (cache_active && getFileExtension(absFileName) != "dds" && getFileExtension(absFileName) != "gz") {
         // In testing the internal mipmap generation works better than the external nvtt one
         // (less artefacts); it might be that there are flags we can use to make this better
         // but for now we'll just using the built in one
@@ -593,17 +564,15 @@ ModelRegistry::readImage(const string& fileName,
     }
 
     if (res.loadedFromCache())
-        SG_LOG(SG_IO, SG_BULK, "Returning cached image \""
-            << res.getImage()->getFileName() << "\"");
+        SG_LOG(SG_IO, SG_BULK, "Returning cached image \"" << res.getImage()->getFileName() << "\"");
     else
-        SG_LOG(SG_IO, SG_BULK, "Reading image \""
-            << res.getImage()->getFileName() << "\"");
+        SG_LOG(SG_IO, SG_BULK, "Reading image \"" << res.getImage()->getFileName() << "\"");
 
     return res;
 }
 
 
-osg::ref_ptr<osg::Node> DefaultCachePolicy::find(const string& fileName, const Options* opt)
+vsg::ref_ptr<vsg::Node> DefaultCachePolicy::find(const string& fileName, const Options* opt)
 {
     // If the options explicitly ask for no cache, do not use the cached version, even if it exists
     if (opt->getObjectCacheHint() == osgDB::Options::CACHE_NONE) {
@@ -611,9 +580,9 @@ osg::ref_ptr<osg::Node> DefaultCachePolicy::find(const string& fileName, const O
         return NULL;
     }
     Registry* registry = Registry::instance();
-    osg::ref_ptr<osg::Object> cachedObject = registry->getRefFromObjectCache(fileName);
+    vsg::ref_ptr<vsg::Object> cachedObject = registry->getRefFromObjectCache(fileName);
 
-    ref_ptr<osg::Node> cachedNode = dynamic_cast<osg::Node*>(cachedObject.get());
+    ref_ptr<vsg::Node> cachedNode = dynamic_cast<vsg::Node*>(cachedObject.get());
     if (cachedNode.valid())
         SG_LOG(SG_IO, SG_BULK, "Got cached model \"" << fileName << "\"");
     else
@@ -622,7 +591,7 @@ osg::ref_ptr<osg::Node> DefaultCachePolicy::find(const string& fileName, const O
 }
 
 void DefaultCachePolicy::addToCache(const string& fileName,
-                                    osg::Node* node)
+                                    vsg::Node* node)
 {
     Registry::instance()->addEntryToObjectCache(fileName, node);
 }
@@ -645,16 +614,11 @@ void DefaultCachePolicy::addToCache(const string& fileName,
 // opts |= osgUtil::Optimizer::VERTEX_POSTTRANSFORM
 // opts |= osgUtil::Optimizer::VERTEX_PRETRANSFORM
 
-OptimizeModelPolicy::OptimizeModelPolicy(const string& extension) :
-    _osgOptions(Optimizer::SHARE_DUPLICATE_STATE
-                | Optimizer::MERGE_GEOMETRY
-                | Optimizer::FLATTEN_STATIC_TRANSFORMS
-                | Optimizer::INDEX_MESH
-    )
+OptimizeModelPolicy::OptimizeModelPolicy(const string& extension) : _osgOptions(Optimizer::SHARE_DUPLICATE_STATE | Optimizer::MERGE_GEOMETRY | Optimizer::FLATTEN_STATIC_TRANSFORMS | Optimizer::INDEX_MESH)
 {
 }
 
-osg::Node* OptimizeModelPolicy::optimize(osg::Node* node,
+vsg::Node* OptimizeModelPolicy::optimize(vsg::Node* node,
                                          const string& fileName,
                                          const osgDB::Options* opt,
                                          const bool compressTextures)
@@ -689,7 +653,7 @@ string OSGSubstitutePolicy::substitute(const string& name,
 }
 
 string ArchiveSubstitutePolicy::substitute(const string& name,
-                                          const Options* opt)
+                                           const Options* opt)
 {
     std::size_t wsPos = name.find(ModelRegistry::WS30_PREFIX);
     std::size_t zipPos = name.find(ModelRegistry::WS30_ARCHIVE_EXT);
@@ -706,7 +670,7 @@ string ArchiveSubstitutePolicy::substitute(const string& name,
         // So we need to change
         //   vpb/w070n10/w061n14.zip/ws_w061n14_root_L0_X0_Y0/ws_w061n14_L0_X0_Y0_subtile.osgb
         //   vpb/w070n10/w061n14.zip/ws_w061n14_L0_X0_Y0_subtile.osgb
-        std::string archivePath = name.substr(0 ,zipPos + 4);
+        std::string archivePath = name.substr(0, zipPos + 4);
         archivePath.append(name.substr(subdirPos + ModelRegistry::WS30_SUBDIR_SUFFIX.length()));
         SG_LOG(SG_IO, SG_DEBUG, "Converted path " << name << " to " << archivePath);
         return archivePath;
@@ -715,46 +679,37 @@ string ArchiveSubstitutePolicy::substitute(const string& name,
     }
 }
 
-void
-BuildLeafBVHPolicy::buildBVH(const std::string& fileName, osg::Node* node)
+void BuildLeafBVHPolicy::buildBVH(const std::string& fileName, vsg::Node* node)
 {
-    SG_LOG(SG_IO, SG_BULK, "Building leaf attached boundingvolume tree for \""
-           << fileName << "\".");
+    SG_LOG(SG_IO, SG_BULK, "Building leaf attached boundingvolume tree for \"" << fileName << "\".");
     BoundingVolumeBuildVisitor bvBuilder(true);
     node->accept(bvBuilder);
 }
 
-void
-BuildGroupBVHPolicy::buildBVH(const std::string& fileName, osg::Node* node)
+void BuildGroupBVHPolicy::buildBVH(const std::string& fileName, vsg::Node* node)
 {
-    SG_LOG(SG_IO, SG_BULK, "Building group attached boundingvolume tree for \""
-           << fileName << "\".");
+    SG_LOG(SG_IO, SG_BULK, "Building group attached boundingvolume tree for \"" << fileName << "\".");
     BoundingVolumeBuildVisitor bvBuilder(false);
     node->accept(bvBuilder);
 }
 
-void
-NoBuildBVHPolicy::buildBVH(const std::string& fileName, osg::Node*)
+void NoBuildBVHPolicy::buildBVH(const std::string& fileName, vsg::Node*)
 {
-    SG_LOG(SG_IO, SG_BULK, "Omitting boundingvolume tree for \""
-           << fileName << "\".");
+    SG_LOG(SG_IO, SG_BULK, "Omitting boundingvolume tree for \"" << fileName << "\".");
 }
 
-ModelRegistry::ModelRegistry() :
-    _defaultCallback(new DefaultCallback(""))
+ModelRegistry::ModelRegistry() : _defaultCallback(new DefaultCallback(""))
 {
 }
 
-void
-ModelRegistry::addImageCallbackForExtension(const string& extension,
-                                            Registry::ReadFileCallback* callback)
+void ModelRegistry::addImageCallbackForExtension(const string& extension,
+                                                 Registry::ReadFileCallback* callback)
 {
     imageCallbackMap.insert(CallbackMap::value_type(extension, callback));
 }
 
-void
-ModelRegistry::addNodeCallbackForExtension(const string& extension,
-                                           Registry::ReadFileCallback* callback)
+void ModelRegistry::addNodeCallbackForExtension(const string& extension,
+                                                Registry::ReadFileCallback* callback)
 {
     nodeCallbackMap.insert(CallbackMap::value_type(extension, callback));
 }
@@ -793,50 +748,42 @@ ModelRegistry::readNode(const string& fileName,
     return result;
 }
 
-class SGReadCallbackInstaller {
+class SGReadCallbackInstaller
+{
 public:
-  SGReadCallbackInstaller()
-  {
-    Registry* registry = Registry::instance();
-    Options* options = new Options;
-    int cacheOptions = Options::CACHE_ALL;
-    options->
-      setObjectCacheHint((Options::CacheHintOptions)cacheOptions);
-    registry->setOptions(options);
-    registry->getOrCreateSharedStateManager()->
-      setShareMode(SharedStateManager::SHARE_ALL);
-    registry->setReadFileCallback(ModelRegistry::instance());
-  }
+    SGReadCallbackInstaller()
+    {
+        Registry* registry = Registry::instance();
+        Options* options = new Options;
+        int cacheOptions = Options::CACHE_ALL;
+        options->setObjectCacheHint((Options::CacheHintOptions)cacheOptions);
+        registry->setOptions(options);
+        registry->getOrCreateSharedStateManager()->setShareMode(SharedStateManager::SHARE_ALL);
+        registry->setReadFileCallback(ModelRegistry::instance());
+    }
 };
 
 static SGReadCallbackInstaller readCallbackInstaller;
 
 // we get optimal geometry from the loader (Hah!).
 struct ACOptimizePolicy : public OptimizeModelPolicy {
-    ACOptimizePolicy(const string& extension)  :
-        OptimizeModelPolicy(extension)
+    ACOptimizePolicy(const string& extension) : OptimizeModelPolicy(extension)
     {
         _osgOptions &= ~Optimizer::TRISTRIP_GEOMETRY;
     }
     Node* optimize(Node* node, const string& fileName,
                    const Options* opt)
     {
-        ref_ptr<Node> optimized
-            = OptimizeModelPolicy::optimize(node, fileName, opt);
+        ref_ptr<Node> optimized = OptimizeModelPolicy::optimize(node, fileName, opt);
         Group* group = dynamic_cast<Group*>(optimized.get());
-        MatrixTransform* transform
-            = dynamic_cast<MatrixTransform*>(optimized.get());
-        if (((transform && transform->getMatrix().isIdentity()) || group)
-            && group->getName().empty()
-            && group->getNumChildren() == 1) {
+        MatrixTransform* transform = dynamic_cast<MatrixTransform*>(optimized.get());
+        if (((transform && transform->getMatrix().isIdentity()) || group) && group->getName().empty() && group->getNumChildren() == 1) {
             optimized = static_cast<Node*>(group->getChild(0));
             group = dynamic_cast<Group*>(optimized.get());
-            if (group && group->getName().empty()
-                && group->getNumChildren() == 1)
+            if (group && group->getName().empty() && group->getNumChildren() == 1)
                 optimized = static_cast<Node*>(group->getChild(0));
         }
-        const SGReaderWriterOptions* sgopt
-            = dynamic_cast<const SGReaderWriterOptions*>(opt);
+        const SGReaderWriterOptions* sgopt = dynamic_cast<const SGReaderWriterOptions*>(opt);
 
         if (sgopt && sgopt->getInstantiateMaterialEffects()) {
             optimized = instantiateMaterialEffects(optimized.get(), sgopt);
@@ -859,7 +806,7 @@ struct ACProcessPolicy {
                  0, 0, 0, 1);
         // XXX Does there need to be a Group node here to trick the
         // optimizer into optimizing the static transform?
-        osg::Group* root = new Group;
+        vsg::Group* root = new Group;
         MatrixTransform* transform = new MatrixTransform;
         root->addChild(transform);
 
@@ -876,40 +823,32 @@ typedef ModelRegistryCallback<ACProcessPolicy,
                               ACOptimizePolicy,
                               OSGSubstitutePolicy,
                               BuildLeafBVHPolicy>
-ACCallback;
+    ACCallback;
 
 
 // we get optimal geometry from the loader (Hah!).
 struct IVEOptimizePolicy : public OptimizeModelPolicy {
-    IVEOptimizePolicy(const string& extension) :
-        OptimizeModelPolicy(extension)
+    IVEOptimizePolicy(const string& extension) : OptimizeModelPolicy(extension)
     {
         _osgOptions &= ~Optimizer::TRISTRIP_GEOMETRY;
     }
     Node* optimize(Node* node, const string& fileName,
-        const Options* opt)
+                   const Options* opt)
     {
-        ref_ptr<Node> optimized
-            = OptimizeModelPolicy::optimize(node, fileName, opt);
+        ref_ptr<Node> optimized = OptimizeModelPolicy::optimize(node, fileName, opt);
         Group* group = dynamic_cast<Group*>(optimized.get());
-        MatrixTransform* transform
-            = dynamic_cast<MatrixTransform*>(optimized.get());
-        if (((transform && transform->getMatrix().isIdentity()) || group)
-            && group->getName().empty()
-            && group->getNumChildren() == 1) {
+        MatrixTransform* transform = dynamic_cast<MatrixTransform*>(optimized.get());
+        if (((transform && transform->getMatrix().isIdentity()) || group) && group->getName().empty() && group->getNumChildren() == 1) {
             optimized = static_cast<Node*>(group->getChild(0));
             group = dynamic_cast<Group*>(optimized.get());
-            if (group && group->getName().empty()
-                && group->getNumChildren() == 1)
+            if (group && group->getName().empty() && group->getNumChildren() == 1)
                 optimized = static_cast<Node*>(group->getChild(0));
         }
-        const SGReaderWriterOptions* sgopt
-            = dynamic_cast<const SGReaderWriterOptions*>(opt);
+        const SGReaderWriterOptions* sgopt = dynamic_cast<const SGReaderWriterOptions*>(opt);
 
         if (sgopt && sgopt->getInstantiateMaterialEffects()) {
             optimized = instantiateMaterialEffects(optimized.get(), sgopt);
-        }
-        else if (sgopt && sgopt->getInstantiateEffects()) {
+        } else if (sgopt && sgopt->getInstantiateEffects()) {
             optimized = instantiateEffects(optimized.get(), sgopt);
         }
 
@@ -917,24 +856,21 @@ struct IVEOptimizePolicy : public OptimizeModelPolicy {
     }
 };
 
-template<class T>
+template <class T>
 class FindTopMostNodeOfTypeVisitor : public osg::NodeVisitor
 {
 public:
-    FindTopMostNodeOfTypeVisitor():
-        osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ACTIVE_CHILDREN),
-        _foundNode(0)
-    {}
+    FindTopMostNodeOfTypeVisitor() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ACTIVE_CHILDREN),
+                                     _foundNode(0)
+    {
+    }
 
-    void apply(osg::Node& node)
+    void apply(vsg::Node& node)
     {
         T* result = dynamic_cast<T*>(&node);
-        if (result)
-        {
+        if (result) {
             _foundNode = result;
-        }
-        else if (! dynamic_cast<osg::PagedLOD*>(&node))
-        {
+        } else if (!dynamic_cast<osg::PagedLOD*>(&node)) {
             traverse(node);
         }
     }
@@ -942,8 +878,8 @@ public:
     T* _foundNode;
 };
 
-template<class T>
-T* findTopMostNodeOfType(osg::Node* node)
+template <class T>
+T* findTopMostNodeOfType(vsg::Node* node)
 {
     if (!node) return 0;
 
@@ -956,47 +892,39 @@ T* findTopMostNodeOfType(osg::Node* node)
 class CleanTechniqueVisitor : public osg::NodeVisitor
 {
 public:
-    CleanTechniqueVisitor():
-        osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
+    CleanTechniqueVisitor() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
 
-    void apply(osg::Node& node)
+    void apply(vsg::Node& node)
     {
         osgTerrain::TerrainTile* tile = dynamic_cast<osgTerrain::TerrainTile*>(&node);
-        if (tile)
-        {
-            if (tile->getTerrainTechnique())
-            {
+        if (tile) {
+            if (tile->getTerrainTechnique()) {
                 // OSG_NOTICE<<"Resetting TerrainTechnhique "<<tile->getTerrainTechnique()->className()<<" to 0"<<std::endl;
                 tile->setTerrainTechnique(0);
             }
-        }
-        else
-        {
+        } else {
             traverse(node);
         }
     }
 };
 
 struct OSGOptimizePolicy : public OptimizeModelPolicy {
-
-
-    OSGOptimizePolicy(const string& extension) :
-        OptimizeModelPolicy(extension)
+    OSGOptimizePolicy(const string& extension) : OptimizeModelPolicy(extension)
     {
         _osgOptions &= ~Optimizer::TRISTRIP_GEOMETRY;
     }
     Node* optimize(Node* node, const string& fileName,
-        const Options* opt)
+                   const Options* opt)
     {
         ref_ptr<Node> optimized = node;
 
-        osg::ref_ptr<simgear::SGReaderWriterOptions> sgopt = SGReaderWriterOptions::copyOrCreate(opt);
+        vsg::ref_ptr<simgear::SGReaderWriterOptions> sgopt = SGReaderWriterOptions::copyOrCreate(opt);
 
         if (fileName.find(ModelRegistry::WS30_PREFIX) != string::npos) {
             // Currently the only way we have to identify WS3.0 / VirtualPlanetBuilder files is by the filename
 
             SGSceneFeatures* features = SGSceneFeatures::instance();
-            osg::ref_ptr<osgTerrain::Terrain> terrain = findTopMostNodeOfType<osgTerrain::Terrain>(optimized.get());
+            vsg::ref_ptr<osgTerrain::Terrain> terrain = findTopMostNodeOfType<osgTerrain::Terrain>(optimized.get());
 
             if (terrain != NULL) {
                 // Top level.  This is likely to have the default GeometryTechnique already assigned which we need to replace with our own
@@ -1009,22 +937,17 @@ struct OSGOptimizePolicy : public OptimizeModelPolicy {
         }
 
         Group* group = dynamic_cast<Group*>(optimized.get());
-        MatrixTransform* transform
-            = dynamic_cast<MatrixTransform*>(optimized.get());
-        if (((transform && transform->getMatrix().isIdentity()) || group)
-            && group->getName().empty()
-            && group->getNumChildren() == 1) {
+        MatrixTransform* transform = dynamic_cast<MatrixTransform*>(optimized.get());
+        if (((transform && transform->getMatrix().isIdentity()) || group) && group->getName().empty() && group->getNumChildren() == 1) {
             optimized = static_cast<Node*>(group->getChild(0));
             group = dynamic_cast<Group*>(optimized.get());
-            if (group && group->getName().empty()
-                && group->getNumChildren() == 1)
+            if (group && group->getName().empty() && group->getNumChildren() == 1)
                 optimized = static_cast<Node*>(group->getChild(0));
         }
 
         if (sgopt && sgopt->getInstantiateMaterialEffects()) {
             optimized = instantiateMaterialEffects(optimized.get(), sgopt);
-        }
-        else if (sgopt && sgopt->getInstantiateEffects()) {
+        } else if (sgopt && sgopt->getInstantiateEffects()) {
             optimized = instantiateEffects(optimized.get(), sgopt);
         }
 
@@ -1036,15 +959,15 @@ struct OSGOptimizePolicy : public OptimizeModelPolicy {
 struct IVEProcessPolicy {
     IVEProcessPolicy(const string& extension) {}
     Node* process(Node* node, const string& filename,
-        const Options* opt)
+                  const Options* opt)
     {
         Matrix m(1, 0, 0, 0,
-            0, 0, 1, 0,
-            0, -1, 0, 0,
-            0, 0, 0, 1);
+                 0, 0, 1, 0,
+                 0, -1, 0, 0,
+                 0, 0, 0, 1);
         // XXX Does there need to be a Group node here to trick the
         // optimizer into optimizing the static transform?
-        osg::Group* root = new Group;
+        vsg::Group* root = new Group;
         MatrixTransform* transform = new MatrixTransform;
         root->addChild(transform);
 
@@ -1057,22 +980,22 @@ struct IVEProcessPolicy {
 };
 
 typedef ModelRegistryCallback<IVEProcessPolicy, DefaultCachePolicy,
-    IVEOptimizePolicy,
-    OSGSubstitutePolicy,
-    BuildLeafBVHPolicy>
+                              IVEOptimizePolicy,
+                              OSGSubstitutePolicy,
+                              BuildLeafBVHPolicy>
     IVECallback;
 
 typedef ModelRegistryCallback<IVEProcessPolicy, NoCachePolicy,
-    OSGOptimizePolicy,
-    ArchiveSubstitutePolicy,
-    BuildLeafBVHPolicy>
+                              OSGOptimizePolicy,
+                              ArchiveSubstitutePolicy,
+                              BuildLeafBVHPolicy>
     OSGCallback;
 
 namespace {
 
 // The AC3D model loader used to come from OSG, that's why the
 // ModelRegistryCallback is placed here.
-ModelRegistryCallbackProxy<ACCallback>  g_acRegister("ac");
+ModelRegistryCallbackProxy<ACCallback> g_acRegister("ac");
 
 // Native OSG formats
 ModelRegistryCallbackProxy<IVECallback> g_iveRegister("ive");

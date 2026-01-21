@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <osg/Camera>
+#include <vsg/all.h>
+
 #include <osg/Drawable>
 
 namespace simgear {
@@ -31,7 +32,7 @@ private:
  * the barrier is issued before the drawing of the camera's subgraph and pre
  * render stages.
  */
-class CameraMemoryBarrier : public osg::Camera::DrawCallback {
+class CameraMemoryBarrier : public vsg::Camera::DrawCallback {
 public:
     CameraMemoryBarrier(GLbitfield barriers) : _barriers(barriers) {}
     void operator()(osg::RenderInfo& renderInfo) const override

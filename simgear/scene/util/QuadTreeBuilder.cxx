@@ -27,7 +27,7 @@ namespace simgear
 {
 #if 0
 QuadTreeBuilder::QuadTreeBuilder(const Vec2& min, const Vec2& max, int depth) :
-    _root(new osg::Group), _min(min), _max(max), _depth(depth),
+    _root(new vsg::Group), _min(min), _max(max), _depth(depth),
     _dimension(1 << depth), _leafStorage(_dimension * _dimension),
     _leaves(_leafStorage, _dimension)
 {
@@ -69,7 +69,7 @@ void QuadTreeBuilder::addNode(Node* node, int lod, const Matrix& transform)
     _leaves(y, x)->addChild(node, 0, lod);
 }
 
-osg::Group* QuadTreeBuilder::makeQuadTree(LodMap& models,
+vsg::Group* QuadTreeBuilder::makeQuadTree(LodMap& models,
                                           const Matrix& transform)
 {
     typedef vector<ref_ptr<Node> > NodeList;

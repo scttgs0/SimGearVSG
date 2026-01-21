@@ -47,7 +47,7 @@ namespace simgear {
 struct ReaderWriterPGT::CullCallback : public osg::NodeCallback {
     virtual ~CullCallback()
     { }
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+    virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
     {
         const osg::BoundingSphere& nodeBound = node->getBound();
         // If the bounding sphere of the node is empty, there is nothing to do
@@ -72,11 +72,11 @@ struct ReaderWriterPGT::CullCallback : public osg::NodeCallback {
         //      \|/
         //
         // The distance from the eyepoint to the point
-        // where the line of sight is perpandicular to
+        // where the line of sight is perpendicular to
         // the radius vector with minimal height is
         // d1 = sqrt(r^2 - rmin^2).
         // The distance from the point where the line of sight
-        // is perpandicular to the radius vector with minimal height
+        // is perpendicular to the radius vector with minimal height
         // to the highest possible object on earth with radius rmax is 
         // d2 = sqrt(rmax^2 - rmin^2).
         // So the maximum distance we can see something on the earth
@@ -93,9 +93,9 @@ struct ReaderWriterPGT::CullCallback : public osg::NodeCallback {
         float rmax2 = rmax*rmax;
 
         // Check if we are looking from below any ground
-        osg::Vec3 viewPoint = nv->getViewPoint();
+        vsg::vec3 viewPoint = nv->getViewPoint();
         // blow the viewpoint up to a spherical earth with equatorial radius:
-        osg::Vec3 sphericViewPoint = viewPoint;
+        vsg::vec3 sphericViewPoint = viewPoint;
         sphericViewPoint[2] *= 1.0033641;
         float r2 = sphericViewPoint.length2();
         if (r2 <= rmin2)
@@ -118,7 +118,7 @@ struct ReaderWriterPGT::LocalOptions {
     LocalOptions(const osgDB::Options* options) : 
         _options(options)
     {
-        osg::ref_ptr<SGReaderWriterOptions> sgOptions;
+        vsg::ref_ptr<SGReaderWriterOptions> sgOptions;
         sgOptions = SGReaderWriterOptions::copyOrCreate(options);
 
         std::string pageLevelsString;
@@ -242,7 +242,7 @@ ReaderWriterPGT::readObject(const std::string& fileName, const osgDB::Options* o
         imageFileName = osgDB::concatPaths(imageFileName, "Globe");
         imageFileName = osgDB::concatPaths(imageFileName, "world.topo.bathy.200407.3x4096x2048.png");
     }
-    if (osg::Image* image = osgDB::readImageFile(imageFileName, options)) {
+    if (vsg::Image* image = osgDB::readImageFile(imageFileName, options)) {
         osg::Texture2D* texture = new osg::Texture2D;
         texture->setImage(image);
         texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::REPEAT);
@@ -281,13 +281,13 @@ ReaderWriterPGT::readNode(const std::string& fileName, const osgDB::Options* opt
         return ReadResult(createTree(bucketBoxList[0], localOptions, true));
 
     assert(bucketBoxListSize == 2);
-    osg::ref_ptr<osg::Group> group = new osg::Group;
+    vsg::ref_ptr<vsg::Group> group = new vsg::Group;
     group->addChild(createTree(bucketBoxList[0], localOptions, true));
     group->addChild(createTree(bucketBoxList[1], localOptions, true));
     return ReadResult(group);
 }
 
-osg::ref_ptr<osg::Node>
+vsg::ref_ptr<vsg::Node>
 ReaderWriterPGT::createTree(const BucketBox& bucketBox, const LocalOptions& options, bool topLevel) const
 {
     if (bucketBox.getIsBucketSize()) {
@@ -306,9 +306,9 @@ ReaderWriterPGT::createTree(const BucketBox& bucketBox, const LocalOptions& opti
         if (numTiles == 1) 
             return createTree(bucketBoxList[0], options, false);
 
-        osg::ref_ptr<osg::Group> group = new osg::Group;
+        vsg::ref_ptr<vsg::Group> group = new vsg::Group;
         for (unsigned i = 0; i < numTiles; ++i) {
-            osg::ref_ptr<osg::Node> node = createTree(bucketBoxList[i], options, false);
+            vsg::ref_ptr<vsg::Node> node = createTree(bucketBoxList[i], options, false);
             if (!node.valid())
                 continue;
             group->addChild(node.get());
@@ -320,7 +320,7 @@ ReaderWriterPGT::createTree(const BucketBox& bucketBox, const LocalOptions& opti
     }
 }
 
-osg::ref_ptr<osg::Node>
+vsg::ref_ptr<vsg::Node>
 ReaderWriterPGT::createPagedLOD(const BucketBox& bucketBox, const LocalOptions& options) const
 {
     osg::PagedLOD* pagedLOD = new osg::PagedLOD;
@@ -332,7 +332,7 @@ ReaderWriterPGT::createPagedLOD(const BucketBox& bucketBox, const LocalOptions& 
 
     pagedLOD->setCullCallback(new CullCallback);
 
-    osg::ref_ptr<osgDB::Options> localOptions;
+    vsg::ref_ptr<osgDB::Options> localOptions;
     localOptions = static_cast<osgDB::Options*>(options._options->clone(osg::CopyOp()));
     // FIXME:
     // The particle systems have nodes with culling disabled.
@@ -352,7 +352,7 @@ ReaderWriterPGT::createPagedLOD(const BucketBox& bucketBox, const LocalOptions& 
         std::string fileName = osgDB::findDataFile(lodPath + extensions[i], options._options);
         if (fileName.empty())
             continue;
-        osg::ref_ptr<osg::Node> node = osgDB::readRefNodeFile(fileName, options._options);
+        vsg::ref_ptr<vsg::Node> node = osgDB::readRefNodeFile(fileName, options._options);
         if (!node.valid())
             continue;
         pagedLOD->addChild(node.get(), range, std::numeric_limits<float>::max());
@@ -360,7 +360,7 @@ ReaderWriterPGT::createPagedLOD(const BucketBox& bucketBox, const LocalOptions& 
     }
     // Add the static sea level textured shell if there is nothing found
     if (pagedLOD->getNumChildren() == 0) {
-        osg::ref_ptr<osg::Node> node = createTileMesh(bucketBox, options._options);
+        vsg::ref_ptr<vsg::Node> node = createTileMesh(bucketBox, options._options);
         if (node.valid())
             pagedLOD->addChild(node.get(), range, std::numeric_limits<float>::max());
     }
@@ -374,23 +374,23 @@ ReaderWriterPGT::createPagedLOD(const BucketBox& bucketBox, const LocalOptions& 
     return pagedLOD;
 }
 
-osg::ref_ptr<osg::Node>
+vsg::ref_ptr<vsg::Node>
 ReaderWriterPGT::createTileMesh(const BucketBox& bucketBox, const LocalOptions& options) const
 {
     if (options._options->getPluginStringData("SimGear::FG_EARTH") != "ON")
         return 0;
 
     SGSpheref sphere = bucketBox.getBoundingSphere();
-    osg::Matrixd transform;
+    vsg::dmat4 transform;
     transform.makeTranslate(toOsg(-sphere.getCenter()));
 
     // TODO : return geode, not geometry - so we texture in SGMesh
-    // osg::Geometry* geometry = bucketBox.getTileTriangleMesh( options._dem, options._meshResolution, options._textureMethod );
+    // vsg::Geometry* geometry = bucketBox.getTileTriangleMesh( options._dem, options._meshResolution, options._textureMethod );
     osg::Geode* geode = bucketBox.getTileTriangleMesh( options._dem, options._meshResolution, options._textureMethod, options._options );
     if ( geode ) {
         transform.makeTranslate(toOsg(sphere.getCenter()));
         osg::MatrixTransform* matrixTransform = new osg::MatrixTransform(transform);
-        matrixTransform->setDataVariance(osg::Object::STATIC);
+        matrixTransform->setDataVariance(vsg::Object::STATIC);
         matrixTransform->addChild(geode);
 
         return matrixTransform;
@@ -399,14 +399,14 @@ ReaderWriterPGT::createTileMesh(const BucketBox& bucketBox, const LocalOptions& 
     }
 }
 
-osg::ref_ptr<osg::StateSet>
+vsg::ref_ptr<osg::StateSet>
 ReaderWriterPGT::getLowLODStateSet(const LocalOptions& options) const
 {
-    osg::ref_ptr<osgDB::Options> localOptions;
+    vsg::ref_ptr<osgDB::Options> localOptions;
     localOptions = static_cast<osgDB::Options*>(options._options->clone(osg::CopyOp()));
     localOptions->setObjectCacheHint(osgDB::Options::CACHE_ALL);
 
-    osg::ref_ptr<osg::Object> object = osgDB::readRefObjectFile("state.pgt", localOptions.get());
+    vsg::ref_ptr<vsg::Object> object = osgDB::readRefObjectFile("state.pgt", localOptions.get());
     if (!dynamic_cast<osg::StateSet*>(object.get()))
         return 0;
 

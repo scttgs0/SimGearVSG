@@ -35,12 +35,12 @@ class SGTrackToAnimation:
   public:
     SGTrackToAnimation(simgear::SGTransientModelData &modelData);
 
-    virtual osg::Group* createAnimationGroup(osg::Group& parent);
+    virtual vsg::Group* createAnimationGroup(vsg::Group& parent);
 
   protected:
     class UpdateCallback;
 
-    osg::Group     *_target_group,
+    vsg::Group     *_target_group,
                    *_slave_group;
     SGVec3d _node_center, _slave_center, _target_center, _lock_axis, _track_axis;
 

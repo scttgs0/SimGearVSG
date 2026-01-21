@@ -20,7 +20,6 @@
 #include <osg/Geometry>
 #include <osg/LOD>
 #include <osg/Math>
-#include <osg/Object>
 #include <osg/StateSet>
 #include <osg/Switch>
 #include <osg/TexMat>
@@ -84,13 +83,13 @@ using namespace simgear;
 class LineCollector : public osg::NodeVisitor {
     struct LineCollector_LinePrimitiveFunctor {
         LineCollector_LinePrimitiveFunctor() : _lineCollector(0) { }
-        void operator() (const osg::Vec3&, bool) { }
-        void operator() (const osg::Vec3& v1, const osg::Vec3& v2, bool)
+        void operator() (const vsg::vec3&, bool) { }
+        void operator() (const vsg::vec3& v1, const vsg::vec3& v2, bool)
         {
             if (_lineCollector) _lineCollector->addLine(v1, v2);
         }
-        void operator() (const osg::Vec3&, const osg::Vec3&, const osg::Vec3&, bool) { }
-        void operator() (const osg::Vec3&, const osg::Vec3&, const osg::Vec3&, const osg::Vec3&, bool) { }
+        void operator() (const vsg::vec3&, const vsg::vec3&, const vsg::vec3&, bool) { }
+        void operator() (const vsg::vec3&, const vsg::vec3&, const vsg::vec3&, const vsg::vec3&, bool) { }
         LineCollector* _lineCollector;
     };
 
@@ -106,14 +105,14 @@ public:
         }
     }
 
-    virtual void apply(osg::Node& node)
+    virtual void apply(vsg::Node& node)
     {
         traverse(node);
     }
 
-    virtual void apply(osg::Transform& transform)
+    virtual void apply(vsg::Transform& transform)
     {
-        osg::Matrix matrix = _matrix;
+        vsg::mat4 matrix = _matrix;
         if (transform.computeLocalToWorldMatrix(_matrix, this))
             traverse(transform);
         _matrix = matrix;
@@ -125,7 +124,7 @@ public:
     }
     // instead of using the lowest X to instead find the lowest of all (x,y,z) and use this
     // see https://sourceforge.net/p/flightgear/codetickets/2706/
-    bool compareVec3(const osg::Vec3& v1, const osg::Vec3& v2) {
+    bool compareVec3(const vsg::vec3& v1, const vsg::vec3& v2) {
         // compare to the nearest 0.01mm
         if (abs(v2[0]-v1[0]) > 0.00001)
             return v2[0] < v1[0];
@@ -134,7 +133,7 @@ public:
         else
             return v2[2] < v1[2];
     }
-    void addLine(const osg::Vec3& v1, const osg::Vec3& v2)
+    void addLine(const vsg::vec3& v1, const vsg::vec3& v2)
     {
         SGVec3f tv1(toSG(_matrix.preMult(v1)));
         SGVec3f tv2(toSG(_matrix.preMult(v2)));
@@ -170,7 +169,7 @@ public:
         else
             _lineSegments.push_back(SGLineSegmentf(v1, v2));
     }
-    void addBVHElements(osg::Node& node, simgear::BVHLineGeometry::Type type)
+    void addBVHElements(vsg::Node& node, simgear::BVHLineGeometry::Type type)
     {
         if (_lineSegments.empty())
             return;
@@ -199,7 +198,7 @@ public:
     }
 
 private:
-    osg::Matrix _matrix;
+    vsg::mat4 _matrix;
     std::vector<SGLineSegmentf> _lineSegments;
     bool _orderXYZ; /// 2020.3 and prior sorting vertex ordering rules (Only compare X component of vector)
     bool _swapAxis; // invert the vector direction.
@@ -209,7 +208,7 @@ private:
  * Set up the transform matrix for a translation.
  */
 static void
-set_translation (osg::Matrix &matrix, double position_m, const SGVec3d &axis)
+set_translation (vsg::mat4 &matrix, double position_m, const SGVec3d &axis)
 {
   SGVec3d xyz = axis * position_m;
   matrix.makeIdentity();
@@ -570,13 +569,13 @@ SGAnimation::animate(simgear::SGTransientModelData &modelData)
 
 
 void
-SGAnimation::apply(osg::Node* node)
+SGAnimation::apply(vsg::Node* node)
 {
   // duh what a special case ...
   if (_objectNames.empty()) {
-    osg::Group* group = node->asGroup();
+    vsg::Group* group = node->asGroup();
     if (group) {
-      osg::ref_ptr<osg::Group> animationGroup;
+      vsg::ref_ptr<vsg::Group> animationGroup;
       installInGroup(std::string(), *group, animationGroup);
     }
   } else
@@ -584,7 +583,7 @@ SGAnimation::apply(osg::Node* node)
 }
 
 void
-SGAnimation::install(osg::Node& node)
+SGAnimation::install(vsg::Node& node)
 {
   _found = true;
   if (_enableHOT)
@@ -593,8 +592,8 @@ SGAnimation::install(osg::Node& node)
     node.setNodeMask(~SG_NODEMASK_TERRAIN_BIT & node.getNodeMask());
 }
 
-osg::Group*
-SGAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGAnimation::createAnimationGroup(vsg::Group& parent)
 {
   // default implementation, we do not need a new group
   // for every animation type. Usually animations that just change
@@ -603,7 +602,7 @@ SGAnimation::createAnimationGroup(osg::Group& parent)
 }
 
 void
-SGAnimation::apply(osg::Group& group)
+SGAnimation::apply(vsg::Group& group)
 {
     // the trick is to first traverse the children and then
     // possibly splice in a new group node if required.
@@ -614,7 +613,7 @@ SGAnimation::apply(osg::Group& group)
     // Note that this algorithm preserves the order of the child objects
     // like they appear in the object-name tags.
     // The timed animations require this
-    osg::ref_ptr<osg::Group> animationGroup;
+    vsg::ref_ptr<vsg::Group> animationGroup;
     std::list<std::string>::const_iterator nameIt;
     for (nameIt = _objectNames.begin(); nameIt != _objectNames.end(); ++nameIt)
         installInGroup(*nameIt, group, animationGroup);
@@ -627,12 +626,12 @@ SGAnimation::apply(simgear::SGTransientModelData &modelData)
 }
 
 void
-SGAnimation::installInGroup(const std::string& name, osg::Group& group,
-                            osg::ref_ptr<osg::Group>& animationGroup)
+SGAnimation::installInGroup(const std::string& name, vsg::Group& group,
+                            vsg::ref_ptr<vsg::Group>& animationGroup)
 {
   int i = group.getNumChildren() - 1;
   for (; 0 <= i; --i) {
-    osg::Node* child = group.getChild(i);
+    vsg::Node* child = group.getChild(i);
 
     // Check if this one is already processed
     if (std::find(_installedAnimations.begin(),
@@ -691,7 +690,7 @@ SGVec3d SGAnimation::readVec3( const std::string& name,
  * This function will take action when axis has an object-name tag and the corresponding object
  * can be found within the hierarchy.
  */
-const SGLineSegment<double>* SGAnimation::setCenterAndAxisFromObject(osg::Node* rootNode,
+const SGLineSegment<double>* SGAnimation::setCenterAndAxisFromObject(vsg::Node* rootNode,
                                                                      SGVec3d& center, SGVec3d& axis, simgear::SGTransientModelData& modelData,
                                                                      const std::string& axisName) const
 {
@@ -725,7 +724,7 @@ const SGLineSegment<double>* SGAnimation::setCenterAndAxisFromObject(osg::Node* 
              */
             simgear::FindGroupVisitor axis_object_name_finder(axis_object_name);
             rootNode->accept(axis_object_name_finder);
-            osg::Group *object_group = axis_object_name_finder.getGroup();
+            vsg::Group *object_group = axis_object_name_finder.getGroup();
             if (object_group)
             {
                 /*
@@ -809,7 +808,7 @@ const SGLineSegment<double>* SGAnimation::setCenterAndAxisFromObject(osg::Node* 
 }
 //------------------------------------------------------------------------------
 // factored out to share with SGKnobAnimation
-void SGAnimation::readRotationCenterAndAxis(osg::Node* _rootNode, SGVec3d& center,
+void SGAnimation::readRotationCenterAndAxis(vsg::Node* _rootNode, SGVec3d& center,
                                             SGVec3d& axis, simgear::SGTransientModelData& modelData,
                                             const std::string& centerName,
                                             const std::string& axisName) const
@@ -861,21 +860,21 @@ SGExpressiond* SGAnimation::readOffsetValue(const char* tag_name) const
 }
 
 void
-SGAnimation::removeMode(osg::Node& node, osg::StateAttribute::GLMode mode)
+SGAnimation::removeMode(vsg::Node& node, osg::StateAttribute::GLMode mode)
 {
   RemoveModeVisitor visitor(mode);
   node.accept(visitor);
 }
 
 void
-SGAnimation::removeAttribute(osg::Node& node, osg::StateAttribute::Type type)
+SGAnimation::removeAttribute(vsg::Node& node, osg::StateAttribute::Type type)
 {
   RemoveAttributeVisitor visitor(type);
   node.accept(visitor);
 }
 
 void
-SGAnimation::removeTextureMode(osg::Node& node, unsigned unit,
+SGAnimation::removeTextureMode(vsg::Node& node, unsigned unit,
                                osg::StateAttribute::GLMode mode)
 {
   RemoveTextureModeVisitor visitor(unit, mode);
@@ -883,7 +882,7 @@ SGAnimation::removeTextureMode(osg::Node& node, unsigned unit,
 }
 
 void
-SGAnimation::removeTextureAttribute(osg::Node& node, unsigned unit,
+SGAnimation::removeTextureAttribute(vsg::Node& node, unsigned unit,
                                     osg::StateAttribute::Type type)
 {
   RemoveTextureAttributeVisitor visitor(unit, type);
@@ -891,14 +890,14 @@ SGAnimation::removeTextureAttribute(osg::Node& node, unsigned unit,
 }
 
 void
-SGAnimation::setRenderBinToInherit(osg::Node& node)
+SGAnimation::setRenderBinToInherit(vsg::Node& node)
 {
   BinToInheritVisitor visitor;
   node.accept(visitor);
 }
 
 void
-SGAnimation::cloneDrawables(osg::Node& node)
+SGAnimation::cloneDrawables(vsg::Node& node)
 {
   DrawableCloneVisitor visitor;
   node.accept(visitor);
@@ -927,10 +926,10 @@ SGGroupAnimation::SGGroupAnimation(simgear::SGTransientModelData &modelData):
 {
 }
 
-osg::Group*
-SGGroupAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGGroupAnimation::createAnimationGroup(vsg::Group& parent)
 {
-  osg::Group* group = new osg::Group;
+  vsg::Group* group = new vsg::Group;
   parent.addChild(group);
   return group;
 }
@@ -949,7 +948,7 @@ public:
   {
       setName("SGTranslateAnimation::UpdateCallback");
   }
-  virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+  virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
   {
     if (!_condition || _condition->test()) {
       SGTranslateTransform* transform;
@@ -995,8 +994,8 @@ SGTranslateAnimation::SGTranslateAnimation(simgear::SGTransientModelData &modelD
 	}
 }
 
-osg::Group*
-SGTranslateAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGTranslateAnimation::createAnimationGroup(vsg::Group& parent)
 {
   SGTranslateTransform* transform = new SGTranslateTransform;
   transform->setName("translate animation");
@@ -1023,9 +1022,9 @@ public:
     SGRotAnimTransform(const SGRotAnimTransform&,
                        const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY);
     META_Node(simgear, SGRotAnimTransform);
-    virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+    virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                            osg::NodeVisitor* nv) const;
-    virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+    virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                            osg::NodeVisitor* nv) const;
     SGSharedPtr<SGCondition const> _condition;
     SGSharedPtr<SGExpressiond const> _animationValue;
@@ -1045,7 +1044,7 @@ SGRotAnimTransform::SGRotAnimTransform(const SGRotAnimTransform& rhs,
 {
 }
 
-bool SGRotAnimTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
+bool SGRotAnimTransform::computeLocalToWorldMatrix(vsg::mat4& matrix,
                                                    osg::NodeVisitor* nv) const
 {
     double angle = 0.0;
@@ -1058,18 +1057,18 @@ bool SGRotAnimTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,
     double angleRad = SGMiscd::deg2rad(angle);
     if (_referenceFrame == RELATIVE_RF) {
         // FIXME optimize
-        osg::Matrix tmp;
+        vsg::mat4 tmp;
         set_rotation(tmp, angleRad, getCenter(), getAxis());
         matrix.preMult(tmp);
     } else {
-        osg::Matrix tmp;
+        vsg::mat4 tmp;
         SGRotateTransform::set_rotation(tmp, angleRad, getCenter(), getAxis());
         matrix = tmp;
     }
     return true;
 }
 
-bool SGRotAnimTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
+bool SGRotAnimTransform::computeWorldToLocalMatrix(vsg::mat4& matrix,
                                                    osg::NodeVisitor* nv) const
 {
     double angle = 0.0;
@@ -1082,11 +1081,11 @@ bool SGRotAnimTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,
     double angleRad = SGMiscd::deg2rad(angle);
     if (_referenceFrame == RELATIVE_RF) {
         // FIXME optimize
-        osg::Matrix tmp;
+        vsg::mat4 tmp;
         set_rotation(tmp, -angleRad, getCenter(), getAxis());
         matrix.postMult(tmp);
     } else {
-        osg::Matrix tmp;
+        vsg::mat4 tmp;
         set_rotation(tmp, -angleRad, getCenter(), getAxis());
         matrix = tmp;
     }
@@ -1103,7 +1102,7 @@ public:
     _animationValue(animationValue),
     _initialValue(initialValue)
     {}
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
+    virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv);
 public:
     SGSharedPtr<SGCondition const> _condition;
     SGSharedPtr<SGExpressiond const> _animationValue;
@@ -1126,7 +1125,7 @@ protected:
     OpenThreads::AtomicPtr _referenceValues;
 };
 
-void SpinAnimCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
+void SpinAnimCallback::operator()(vsg::Node* node, osg::NodeVisitor* nv)
 {
     using namespace osg;
     SGRotateTransform* transform = static_cast<SGRotateTransform*>(node);
@@ -1166,7 +1165,7 @@ void SpinAnimCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
         double rotation = refval->_rotation + (t - refval->_time) * rps;
         double intPart;
         double rot = modf(rotation, &intPart);
-        double angle = rot * 2.0 * osg::PI;
+        double angle = rot * 2.0 * vsg::PI;
         transform->setAngleRad(angle);
         traverse(transform, nv);
     } else {
@@ -1220,8 +1219,8 @@ SGRotateAnimation::SGRotateAnimation(simgear::SGTransientModelData &modelData) :
   readRotationCenterAndAxis(modelData.getNode(), _center, _axis, modelData);
 }
 
-osg::Group*
-SGRotateAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGRotateAnimation::createAnimationGroup(vsg::Group& parent)
 {
     if (_isSpin) {
         SGRotateTransform* transform = new SGRotateTransform;
@@ -1263,7 +1262,7 @@ public:
     _animationValue[2] = animationValue[2];
     setName("SGScaleAnimation::UpdateCallback");
   }
-  virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+  virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
   {
     if (!_condition || _condition->test()) {
       SGScaleTransform* transform;
@@ -1367,8 +1366,8 @@ SGScaleAnimation::SGScaleAnimation(simgear::SGTransientModelData &modelData) :
   _center[2] = modelData.getConfigNode()->getDoubleValue("center/z-m", 0);
 }
 
-osg::Group*
-SGScaleAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGScaleAnimation::createAnimationGroup(vsg::Group& parent)
 {
   SGScaleTransform* transform = new SGScaleTransform;
   transform->setName("scale animation");
@@ -1384,12 +1383,12 @@ SGScaleAnimation::createAnimationGroup(osg::Group& parent)
 // Implementation of dist scale animation
 ////////////////////////////////////////////////////////////////////////
 
-class SGDistScaleAnimation::Transform : public osg::Transform {
+class SGDistScaleAnimation::Transform : public vsg::Transform {
 public:
   Transform() : _min_v(0.0), _max_v(0.0), _factor(0.0), _offset(0.0) {}
   Transform(const Transform& rhs,
             const osg::CopyOp& copyOp = osg::CopyOp::SHALLOW_COPY)
-    : osg::Transform(rhs, copyOp), _table(rhs._table), _center(rhs._center),
+    : vsg::Transform(rhs, copyOp), _table(rhs._table), _center(rhs._center),
       _min_v(rhs._min_v), _max_v(rhs._max_v), _factor(rhs._factor),
       _offset(rhs._offset)
   {
@@ -1408,10 +1407,10 @@ public:
     _center[1] = configNode->getFloatValue("center/y-m", 0);
     _center[2] = configNode->getFloatValue("center/z-m", 0);
   }
-  virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+  virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const
   {
-    osg::Matrix transform;
+    vsg::mat4 transform;
     double scale_factor = computeScaleFactor(nv);
     transform(0,0) = scale_factor;
     transform(1,1) = scale_factor;
@@ -1423,13 +1422,13 @@ public:
     return true;
   }
 
-  virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+  virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const
   {
     double scale_factor = computeScaleFactor(nv);
     if (fabs(scale_factor) <= SGLimits<double>::min())
       return false;
-    osg::Matrix transform;
+    vsg::mat4 transform;
     double rScaleFactor = 1/scale_factor;
     transform(0,0) = rScaleFactor;
     transform(1,1) = rScaleFactor;
@@ -1441,7 +1440,7 @@ public:
     return true;
   }
 
-  static bool writeLocalData(const osg::Object& obj, osgDB::Output& fw)
+  static bool writeLocalData(const vsg::Object& obj, osgDB::Output& fw)
   {
     const Transform& trans = static_cast<const Transform&>(obj);
     fw.indent() << "center " << trans._center << "\n";
@@ -1485,8 +1484,8 @@ SGDistScaleAnimation::SGDistScaleAnimation(simgear::SGTransientModelData &modelD
 {
 }
 
-osg::Group*
-SGDistScaleAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGDistScaleAnimation::createAnimationGroup(vsg::Group& parent)
 {
   Transform* transform = new Transform(getConfig());
   parent.addChild(transform);
@@ -1509,7 +1508,7 @@ namespace
 // Implementation of flash animation
 ////////////////////////////////////////////////////////////////////////
 
-class SGFlashAnimation::Transform : public osg::Transform {
+class SGFlashAnimation::Transform : public vsg::Transform {
 public:
   Transform() : _power(0.0), _factor(0.0), _offset(0.0), _min_v(0.0),
                 _max_v(0.0), _two_sides(false)
@@ -1517,7 +1516,7 @@ public:
 
   Transform(const Transform& rhs,
             const osg::CopyOp& copyOp = osg::CopyOp::SHALLOW_COPY)
-    : osg::Transform(rhs, copyOp), _center(rhs._center), _axis(rhs._axis),
+    : vsg::Transform(rhs, copyOp), _center(rhs._center), _axis(rhs._axis),
       _power(rhs._power), _factor(rhs._factor), _offset(rhs._offset),
       _min_v(rhs._min_v), _max_v(rhs._max_v), _two_sides(rhs._two_sides)
   {
@@ -1546,10 +1545,10 @@ public:
     _min_v = configNode->getFloatValue("min", SGLimitsf::epsilon());
     _max_v = configNode->getFloatValue("max", 1);
   }
-  virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+  virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const
   {
-    osg::Matrix transform;
+    vsg::mat4 transform;
     double scale_factor = computeScaleFactor(nv);
     transform(0,0) = scale_factor;
     transform(1,1) = scale_factor;
@@ -1561,13 +1560,13 @@ public:
     return true;
   }
 
-  virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+  virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const
   {
     double scale_factor = computeScaleFactor(nv);
     if (fabs(scale_factor) <= SGLimits<double>::min())
       return false;
-    osg::Matrix transform;
+    vsg::mat4 transform;
     double rScaleFactor = 1/scale_factor;
     transform(0,0) = rScaleFactor;
     transform(1,1) = rScaleFactor;
@@ -1579,7 +1578,7 @@ public:
     return true;
   }
 
-  static bool writeLocalData(const osg::Object& obj, osgDB::Output& fw)
+  static bool writeLocalData(const vsg::Object& obj, osgDB::Output& fw)
   {
     const Transform& trans = static_cast<const Transform&>(obj);
     fw.indent() << "center " << trans._center[0] << " "
@@ -1600,7 +1599,7 @@ private:
     if (!nv)
       return 1;
 
-    osg::Vec3 localEyeToCenter = nv->getEyePoint() - _center;
+    vsg::vec3 localEyeToCenter = nv->getEyePoint() - _center;
     localEyeToCenter.normalize();
 
     double cos_angle = localEyeToCenter*_axis;
@@ -1621,14 +1620,14 @@ private:
   virtual osg::BoundingSphere computeBound() const
   {
     // avoid being culled away by small feature culling
-    osg::BoundingSphere bs = osg::Group::computeBound();
+    osg::BoundingSphere bs = vsg::Group::computeBound();
     bs.radius() *= _max_v;
     return bs;
   }
 
 private:
-  osg::Vec3 _center;
-  osg::Vec3 _axis;
+  vsg::vec3 _center;
+  vsg::vec3 _axis;
   double _power, _factor, _offset, _min_v, _max_v;
   bool _two_sides;
 };
@@ -1639,8 +1638,8 @@ SGFlashAnimation::SGFlashAnimation(simgear::SGTransientModelData &modelData) :
 {
 }
 
-osg::Group*
-SGFlashAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGFlashAnimation::createAnimationGroup(vsg::Group& parent)
 {
   Transform* transform = new Transform(getConfig());
   parent.addChild(transform);
@@ -1663,12 +1662,12 @@ namespace
 // Implementation of billboard animation
 ////////////////////////////////////////////////////////////////////////
 
-class SGBillboardAnimation::Transform : public osg::Transform {
+class SGBillboardAnimation::Transform : public vsg::Transform {
 public:
   Transform() : _spherical(true) {}
   Transform(const Transform& rhs,
             const osg::CopyOp& copyOp = osg::CopyOp::SHALLOW_COPY)
-    : osg::Transform(rhs, copyOp), _spherical(rhs._spherical) {}
+    : vsg::Transform(rhs, copyOp), _spherical(rhs._spherical) {}
   META_Node(simgear, SGBillboardAnimation::Transform);
   Transform(const SGPropertyNode* configNode) :
     _spherical(configNode->getBoolValue("spherical", true))
@@ -1676,7 +1675,7 @@ public:
     setReferenceFrame(RELATIVE_RF);
     setName(configNode->getStringValue("name", "billboard animation"));
   }
-  virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+  virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const
   {
     // More or less taken from plibs ssgCutout
@@ -1685,9 +1684,9 @@ public:
       matrix(1,0) = 0; matrix(1,1) = 0; matrix(1,2) = -1;
       matrix(2,0) = 0; matrix(2,1) = 1; matrix(2,2) = 0;
     } else {
-      osg::Vec3 zAxis(matrix(2, 0), matrix(2, 1), matrix(2, 2));
-      osg::Vec3 xAxis = osg::Vec3(0, 0, -1)^zAxis;
-      osg::Vec3 yAxis = zAxis^xAxis;
+      vsg::vec3 zAxis(matrix(2, 0), matrix(2, 1), matrix(2, 2));
+      vsg::vec3 xAxis = vsg::vec3(0, 0, -1)^zAxis;
+      vsg::vec3 yAxis = zAxis^xAxis;
 
       xAxis.normalize();
       yAxis.normalize();
@@ -1700,13 +1699,13 @@ public:
     return true;
   }
 
-  virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+  virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const
   {
     // Hmm, don't yet know how to get that back ...
     return false;
   }
-  static bool writeLocalData(const osg::Object& obj, osgDB::Output& fw)
+  static bool writeLocalData(const vsg::Object& obj, osgDB::Output& fw)
   {
     const Transform& trans = static_cast<const Transform&>(obj);
 
@@ -1723,8 +1722,8 @@ SGBillboardAnimation::SGBillboardAnimation(simgear::SGTransientModelData &modelD
 {
 }
 
-osg::Group*
-SGBillboardAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGBillboardAnimation::createAnimationGroup(vsg::Group& parent)
 {
   Transform* transform = new Transform(getConfig());
   parent.addChild(transform);
@@ -1761,7 +1760,7 @@ public:
   {
       setName("SGRangeAnimation::UpdateCallback");
   }
-  virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+  virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
   {
     osg::LOD* lod = static_cast<osg::LOD*>(node);
     if (!_condition || _condition->test()) {
@@ -1824,10 +1823,10 @@ SGRangeAnimation::SGRangeAnimation(simgear::SGTransientModelData &modelData) :
   _initialValue[1] *= modelData.getConfigNode()->getDoubleValue("max-factor", 1);
 }
 
-osg::Group*
-SGRangeAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGRangeAnimation::createAnimationGroup(vsg::Group& parent)
 {
-  osg::Group* group = new osg::Group;
+  vsg::Group* group = new vsg::Group;
   group->setName("range animation group");
   SGSceneUserData::getOrCreateSceneUserData(group)->setLocation(getConfig()->getLocation());
 
@@ -1857,19 +1856,19 @@ SGSelectAnimation::SGSelectAnimation(simgear::SGTransientModelData &modelData) :
 {
 }
 
-osg::Group*
-SGSelectAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGSelectAnimation::createAnimationGroup(vsg::Group& parent)
 {
   // if no condition given, this is a noop.
   SGSharedPtr<SGCondition const> condition = getCondition();
   // trick, gets deleted with all its 'animated' children
   // when the animation installer returns
   if (!condition)
-    return new osg::Group;
+    return new vsg::Group;
   simgear::ConditionNode* cn = new simgear::ConditionNode;
   cn->setName("select animation node");
   cn->setCondition(condition.ptr());
-  osg::Group* grp = new osg::Group;
+  vsg::Group* grp = new vsg::Group;
   cn->addChild(grp);
   parent.addChild(cn);
   return grp;
@@ -1908,7 +1907,7 @@ public:
     }
     setName("SGTimedAnimation::UpdateCallback");
   }
-  virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+  virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
   {
     assert(dynamic_cast<osg::Switch*>(node));
     osg::Switch* sw = static_cast<osg::Switch*>(node);
@@ -1975,8 +1974,8 @@ SGTimedAnimation::SGTimedAnimation(simgear::SGTransientModelData &modelData) :
 {
 }
 
-osg::Group*
-SGTimedAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGTimedAnimation::createAnimationGroup(vsg::Group& parent)
 {
   osg::Switch* sw = new osg::Switch;
   sw->setName("timed animation node");
@@ -1997,7 +1996,7 @@ public:
   {
       setName("SGShadowAnimation::UpdateCallback");
   }
-  virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+  virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
   {
     if (_condition->test())
       node->setNodeMask( SG_NODEMASK_CASTSHADOW_BIT | node->getNodeMask());
@@ -2015,12 +2014,12 @@ SGShadowAnimation::SGShadowAnimation(simgear::SGTransientModelData &modelData) :
 {
 }
 
-osg::Group*
-SGShadowAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGShadowAnimation::createAnimationGroup(vsg::Group& parent)
 {
   SGSharedPtr<SGCondition const> condition = getCondition();
 
-  osg::Group* group = new osg::Group;
+  vsg::Group* group = new vsg::Group;
   group->setName("shadow animation");
   if (condition)
     group->setUpdateCallback(new UpdateCallback(condition));
@@ -2044,7 +2043,7 @@ public:
   { }
   void setValue(double value)
   { _value = value; }
-  virtual void transform(osg::Matrix&) = 0;
+  virtual void transform(vsg::mat4&) = 0;
 protected:
   double _value;
 };
@@ -2055,9 +2054,9 @@ public:
   Translation(const SGVec3d& axis) :
     _axis(axis)
   { }
-  virtual void transform(osg::Matrix& matrix)
+  virtual void transform(vsg::mat4& matrix)
   {
-    osg::Matrix tmp;
+    vsg::mat4 tmp;
     set_translation(tmp, _value, _axis);
     matrix.preMult(tmp);
   }
@@ -2072,9 +2071,9 @@ public:
     _axis(axis),
     _center(center)
   { }
-  virtual void transform(osg::Matrix& matrix)
+  virtual void transform(vsg::mat4& matrix)
   {
-    osg::Matrix tmp;
+    vsg::mat4 tmp;
     SGRotateTransform::set_rotation(tmp, SGMiscd::deg2rad(_value), _center,
                                     _axis);
     matrix.preMult(tmp);
@@ -2093,7 +2092,7 @@ public:
   Trapezoid(Side side):
     _side(side)
   { }
-  virtual void transform(osg::Matrix& matrix)
+  virtual void transform(vsg::mat4& matrix)
   {
     VGfloat sx0 = 0, sy0 = 0,
             sx1 = 1, sy1 = 0,
@@ -2127,7 +2126,7 @@ public:
     if( err != VGU_NO_ERROR )
       return;
 
-    matrix.preMult( osg::Matrix(
+    matrix.preMult( vsg::mat4(
       mat[0][0], mat[0][1], 0, mat[0][2],
       mat[1][0], mat[1][1], 0, mat[1][2],
               0,         0, 1,         0,
@@ -2181,8 +2180,8 @@ private:
   typedef std::vector<Entry> TransformList;
   TransformList _transforms;
   SGSharedPtr<const SGCondition> _condition;
-  osg::Matrix _matrix;
-  osg::ref_ptr<osg::Uniform> _uniform;
+  vsg::mat4 _matrix;
+  vsg::ref_ptr<osg::Uniform> _uniform;
 };
 
 SGTexTransformAnimation::SGTexTransformAnimation(simgear::SGTransientModelData &modelData) :
@@ -2190,19 +2189,19 @@ SGTexTransformAnimation::SGTexTransformAnimation(simgear::SGTransientModelData &
 {
 }
 
-osg::Group*
-SGTexTransformAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGTexTransformAnimation::createAnimationGroup(vsg::Group& parent)
 {
-  osg::Group* group = new osg::Group;
+  vsg::Group* group = new vsg::Group;
   group->setName("texture transform group");
   osg::StateSet* stateSet = group->getOrCreateStateSet();
-  stateSet->setDataVariance(osg::Object::STATIC);
+  stateSet->setDataVariance(vsg::Object::STATIC);
 
   // Core profile alternative to osg::TexMat. There is no fixed-function
   // texture matrix available, so use an uniform instead.
   //
   // NOTE: Uniforms are not positional like StateAttributes. The top-level
-  // osg::StateSet (usually the one from an osg::Camera) must set this uniform
+  // osg::StateSet (usually the one from an vsg::Camera) must set this uniform
   // to the identity matrix. Otherwise, the texture matrix will "leak" into
   // other nodes that do not belong to this animation. This issue is caused by
   // the matrix not being set to identity after the objects in the animation
@@ -2210,7 +2209,7 @@ SGTexTransformAnimation::createAnimationGroup(osg::Group& parent)
   osg::Uniform* texmat_uniform = stateSet->getOrCreateUniform(
     "fg_TextureMatrix", osg::Uniform::FLOAT_MAT4);
   // Initialize to identity
-  texmat_uniform->set(osg::Matrix());
+  texmat_uniform->set(vsg::mat4());
 
   osg::TexMat* texMat = new osg::TexMat;
   UpdateCallback* updateCallback = new UpdateCallback(getCondition(), texmat_uniform);
@@ -2333,7 +2332,7 @@ SGTexTransformAnimation::appendTexTrapezoid( const SGPropertyNode& cfg,
   updateCallback->appendTransform(trapezoid, readValue(cfg));
 }
 
-SGSharedPtr<SGExpressiond const> TransformExpression(osg::Transform* transform)
+SGSharedPtr<SGExpressiond const> TransformExpression(vsg::Transform* transform)
 {
     SGSharedPtr<SGExpressiond const>    ret;
     if (auto rot_anim_transform = dynamic_cast<SGRotAnimTransform*>(transform)) {

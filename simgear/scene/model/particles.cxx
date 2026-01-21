@@ -17,69 +17,62 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
+#include <mutex>
+
+#include <osg/Geode>
+#include <osg/MatrixTransform>
+#include <osgParticle/ConnectedParticleSystem>
+#include <osgParticle/ConstantRateCounter>
+#include <osgParticle/FireEffect>
+#include <osgParticle/FluidProgram>
+#include <osgParticle/MultiSegmentPlacer>
+#include <osgParticle/ParticleSystem>
+#include <osgParticle/SectorPlacer>
+#include <osgParticle/SmokeTrailEffect>
+#include <osgUtil/CullVisitor>
+
 #include <simgear_config.h>
+#include <simgear/misc/sg_path.hxx>
+#include <simgear/props/props.hxx>
+#include <simgear/props/props_io.hxx>
+#include <simgear/scene/model/animation.hxx>
+#include <simgear/scene/util/OsgMath.hxx>
 
 #include "particles.hxx"
 
 
-#include <mutex>
-
-#include <simgear/misc/sg_path.hxx>
-#include <simgear/props/props.hxx>
-#include <simgear/props/props_io.hxx>
-#include <simgear/scene/util/OsgMath.hxx>
-
-#include <osgParticle/SmokeTrailEffect>
-#include <osgParticle/FireEffect>
-#include <osgParticle/ConnectedParticleSystem>
-#include <osgParticle/MultiSegmentPlacer>
-#include <osgParticle/SectorPlacer>
-#include <osgParticle/ConstantRateCounter>
-#include <osgParticle/ParticleSystem>
-#include <osgParticle/FluidProgram>
-
-#include <osgUtil/CullVisitor>
-#include <osg/Geode>
-#include <osg/Group>
-#include <osg/MatrixTransform>
-#include <osg/Node>
+using ParticleSystemRef = vsg::ref_ptr<osgParticle::ParticleSystem>;
 
 
-#include <simgear/scene/model/animation.hxx>
-
-using ParticleSystemRef = osg::ref_ptr<osgParticle::ParticleSystem>;
-
-
-namespace simgear
-{
+namespace simgear {
 
 class ParticlesGlobalManager::ParticlesGlobalManagerPrivate : public osg::NodeCallback
 {
 public:
     ParticlesGlobalManagerPrivate();
 
-    void operator()(osg::Node* node, osg::NodeVisitor* nv) override;
+    void operator()(vsg::Node* node, osg::NodeVisitor* nv) override;
 
     // only call this with the lock held!
-    osg::Group* internalGetCommonRoot();
+    vsg::Group* internalGetCommonRoot();
 
     void updateParticleSystemsFromCullCallback(int currentFrameNumber, osg::NodeVisitor* nv);
 
-    void addParticleSystem(osgParticle::ParticleSystem* ps, const osg::ref_ptr<osg::Group>& frame);
+    void addParticleSystem(osgParticle::ParticleSystem* ps, const vsg::ref_ptr<vsg::Group>& frame);
 
-    void registerNewLocalParticleSystem(osg::Node* node, ParticleSystemRef ps);
-    void registerNewWorldParticleSystem(osg::Node* node, ParticleSystemRef ps, osg::Group* frame);
+    void registerNewLocalParticleSystem(vsg::Node* node, ParticleSystemRef ps);
+    void registerNewWorldParticleSystem(vsg::Node* node, ParticleSystemRef ps, vsg::Group* frame);
 
     std::mutex _lock;
     bool _inited = false;
     bool _frozen = false;
     double _simulationDt = 0.0;
-    osg::ref_ptr<osg::Group> _commonRoot;
-    osg::ref_ptr<osg::Geode> _commonGeode;
-    osg::Vec3 _wind;
+    vsg::ref_ptr<vsg::Group> _commonRoot;
+    vsg::ref_ptr<osg::Geode> _commonGeode;
+    vsg::vec3 _wind;
     bool _enabled = true;
-    osg::Vec3 _gravity;
-    //  osg::Vec3 _localWind;
+    vsg::vec3 _gravity;
+    //  vsg::vec3 _localWind;
     SGGeod _currentPosition;
 
     SGConstPropertyNode_ptr _enabledNode;
@@ -90,9 +83,9 @@ public:
     using ParticleSystemsStrongRefVec = std::vector<ParticleSystemRef>;
 
     ParticleSystemsWeakRefVec _systems;
-    osg::ref_ptr<ParticlesGlobalManager::UpdaterCallback> _cullCallback;
+    vsg::ref_ptr<ParticlesGlobalManager::UpdaterCallback> _cullCallback;
 
-    using GroupRefVec = std::vector<osg::ref_ptr<osg::Group>>;
+    using GroupRefVec = std::vector<vsg::ref_ptr<vsg::Group>>;
     GroupRefVec _newWorldParticles;
 };
 
@@ -107,7 +100,7 @@ public:
     {
     }
 
-    void operator()(osg::Node* node, osg::NodeVisitor* nv) override
+    void operator()(vsg::Node* node, osg::NodeVisitor* nv) override
     {
         osgUtil::CullVisitor* cv = dynamic_cast<osgUtil::CullVisitor*>(nv);
         if (cv && nv->getFrameStamp()) {
@@ -135,7 +128,7 @@ public:
 class ParticlesGlobalManager::RegistrationCallback : public osg::NodeCallback
 {
 public:
-    void operator()(osg::Node* node, osg::NodeVisitor* nv) override
+    void operator()(vsg::Node* node, osg::NodeVisitor* nv) override
     {
         auto d = ParticlesGlobalManager::instance()->d;
         d->addParticleSystem(_system, _frame);
@@ -143,7 +136,7 @@ public:
     }
 
     ParticleSystemRef _system;
-    osg::ref_ptr<osg::Group> _frame;
+    vsg::ref_ptr<vsg::Group> _frame;
 };
 
 ParticlesGlobalManager::ParticlesGlobalManagerPrivate::ParticlesGlobalManagerPrivate() : _commonGeode(new osg::Geode),
@@ -153,7 +146,7 @@ ParticlesGlobalManager::ParticlesGlobalManagerPrivate::ParticlesGlobalManagerPri
     // this constructor might be called from an osgDB thread
 }
 
-void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::addParticleSystem(osgParticle::ParticleSystem* ps, const osg::ref_ptr<osg::Group>& frame)
+void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::addParticleSystem(osgParticle::ParticleSystem* ps, const vsg::ref_ptr<vsg::Group>& frame)
 {
     std::lock_guard<std::mutex> g(_lock);
     _systems.push_back(ps);
@@ -165,14 +158,14 @@ void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::addParticleSystem(os
     }
 }
 
-void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::registerNewLocalParticleSystem(osg::Node* node, ParticleSystemRef ps)
+void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::registerNewLocalParticleSystem(vsg::Node* node, ParticleSystemRef ps)
 {
     auto cb = new RegistrationCallback;
     cb->_system = ps;
     node->addUpdateCallback(cb);
 }
 
-void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::registerNewWorldParticleSystem(osg::Node* node, ParticleSystemRef ps, osg::Group* frame)
+void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::registerNewWorldParticleSystem(vsg::Node* node, ParticleSystemRef ps, vsg::Group* frame)
 {
     auto cb = new RegistrationCallback;
     cb->_system = ps;
@@ -211,7 +204,7 @@ void ParticlesGlobalManager::update(double dt, const SGGeod& pos)
 // this is called from the main thread, since it's an update callback
 // lock any state used by updateParticleSystemsFromCullCallback, which
 // runs during culling, potentialy on a different thread
-void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::operator()(osg::Node* node, osg::NodeVisitor* nv)
+void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::operator()(vsg::Node* node, osg::NodeVisitor* nv)
 {
     std::lock_guard<std::mutex> g(_lock);
     _enabled = !_enabledNode || _enabledNode->getBoolValue();
@@ -220,13 +213,13 @@ void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::operator()(osg::Node
         return;
 
     const auto q = SGQuatd::fromLonLat(_currentPosition);
-    osg::Matrix om(toOsg(q));
-    osg::Vec3 v(0, 0, 9.81);
+    vsg::mat4 om(toOsg(q));
+    vsg::vec3 v(0, 0, 9.81);
     _gravity = om.preMult(v);
 
     // NOTE: THIS WIND COMPUTATION DOESN'T SEEM TO AFFECT PARTICLES
-    // const osg::Vec3& zUpWind = _wind;
-    // osg::Vec3 w(zUpWind.y(), zUpWind.x(), -zUpWind.z());
+    // const vsg::vec3& zUpWind = _wind;
+    // vsg::vec3 w(zUpWind.y(), zUpWind.x(), -zUpWind.z());
     // _localWind = om.preMult(w);
 
     // while we have the lock, remove all expired systems
@@ -237,10 +230,10 @@ void ParticlesGlobalManager::ParticlesGlobalManagerPrivate::operator()(osg::Node
 }
 
 // only call this with the lock held!
-osg::Group* ParticlesGlobalManager::ParticlesGlobalManagerPrivate::internalGetCommonRoot()
+vsg::Group* ParticlesGlobalManager::ParticlesGlobalManagerPrivate::internalGetCommonRoot()
 {
     if (!_commonRoot.valid()) {
-        _commonRoot = new osg::Group;
+        _commonRoot = new vsg::Group;
         _commonRoot->setName("common particle system root");
         _commonGeode->setName("common particle system geode");
         _commonRoot->addChild(_commonGeode);
@@ -331,28 +324,30 @@ bool ParticlesGlobalManager::isFrozen() const
     return d->_frozen;
 }
 
-osg::Vec3 ParticlesGlobalManager::getWindVector() const
+vsg::vec3 ParticlesGlobalManager::getWindVector() const
 {
     std::lock_guard<std::mutex> g(d->_lock);
     return d->_wind;
 }
 
 template <typename Object>
-class PointerGuard{
+class PointerGuard
+{
 public:
     Object* get() { return _ptr; }
-    Object* operator () ()
+    Object* operator()()
     {
         if (!_ptr)
             _ptr = new Object;
         return _ptr;
     }
+
 private:
     Object* _ptr = nullptr;
 };
 
 void transformParticles(osgParticle::ParticleSystem* particleSys,
-                        const osg::Matrix& mat)
+                        const vsg::mat4& mat)
 {
     const int numParticles = particleSys->numParticles();
     if (particleSys->areAllParticlesDead())
@@ -365,7 +360,7 @@ void transformParticles(osgParticle::ParticleSystem* particleSys,
     }
 }
 
-void Particles::operator()(osg::Node* node, osg::NodeVisitor* nv)
+void Particles::operator()(vsg::Node* node, osg::NodeVisitor* nv)
 {
     auto globalManager = ParticlesGlobalManager::instance();
 
@@ -524,7 +519,7 @@ ParticlesGlobalManager::~ParticlesGlobalManager()
     }
 }
 
-void ParticlesGlobalManager::setWindVector(const osg::Vec3& wind)
+void ParticlesGlobalManager::setWindVector(const vsg::vec3& wind)
 {
     std::lock_guard<std::mutex> g(d->_lock);
     d->_wind = wind;
@@ -542,33 +537,33 @@ void ParticlesGlobalManager::setWindFrom(const double from_deg, const double spe
 }
 
 
-osg::Group* ParticlesGlobalManager::getCommonRoot()
+vsg::Group* ParticlesGlobalManager::getCommonRoot()
 {
     std::lock_guard<std::mutex> g(d->_lock);
     return d->internalGetCommonRoot();
 }
 
-osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropertyNode* configNode, SGPropertyNode* modelRoot, const osgDB::Options* options)
+vsg::ref_ptr<vsg::Group> ParticlesGlobalManager::appendParticles(const SGPropertyNode* configNode, SGPropertyNode* modelRoot, const osgDB::Options* options)
 {
     SG_LOG(SG_PARTICLES, SG_DEBUG,
            "Setting up a particle system." << std::boolalpha
-        << "\n  Name: " << configNode->getStringValue("name", "")
-        << "\n  Type: " << configNode->getStringValue("type", "point")
-        << "\n  Attach: " << configNode->getStringValue("attach", "")
-        << "\n  Texture: " << configNode->getStringValue("texture", "")
-        << "\n  Emissive: " << configNode->getBoolValue("emissive")
-        << "\n  Lighting: " << configNode->getBoolValue("lighting")
-        << "\n  Align: " << configNode->getStringValue("align", "")
-        << "\n  Placer: " << configNode->hasChild("placer")
-        << "\n  Shooter: " << configNode->hasChild("shooter")
-        << "\n  Particle: " << configNode->hasChild("particle")
-        << "\n  Program: " << configNode->hasChild("program")
-        << "\n    Fluid: " << configNode->getChild("program")->getStringValue("fluid", "air")
-        << "\n    Gravity: " << configNode->getChild("program")->getBoolValue("gravity", true)
-        << "\n    Wind: " << configNode->getChild("program")->getBoolValue("wind", true)
-        << std::noboolalpha);
+                                           << "\n  Name: " << configNode->getStringValue("name", "")
+                                           << "\n  Type: " << configNode->getStringValue("type", "point")
+                                           << "\n  Attach: " << configNode->getStringValue("attach", "")
+                                           << "\n  Texture: " << configNode->getStringValue("texture", "")
+                                           << "\n  Emissive: " << configNode->getBoolValue("emissive")
+                                           << "\n  Lighting: " << configNode->getBoolValue("lighting")
+                                           << "\n  Align: " << configNode->getStringValue("align", "")
+                                           << "\n  Placer: " << configNode->hasChild("placer")
+                                           << "\n  Shooter: " << configNode->hasChild("shooter")
+                                           << "\n  Particle: " << configNode->hasChild("particle")
+                                           << "\n  Program: " << configNode->hasChild("program")
+                                           << "\n    Fluid: " << configNode->getChild("program")->getStringValue("fluid", "air")
+                                           << "\n    Gravity: " << configNode->getChild("program")->getBoolValue("gravity", true)
+                                           << "\n    Wind: " << configNode->getChild("program")->getBoolValue("wind", true)
+                                           << std::noboolalpha);
 
-    osg::ref_ptr<osgParticle::ParticleSystem> particleSys;
+    vsg::ref_ptr<osgParticle::ParticleSystem> particleSys;
 
     //create a generic particle system
     std::string type = configNode->getStringValue("type", "normal");
@@ -587,17 +582,17 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
 
     // Set up the alignment node ("stolen" from animation.cxx)
     // XXX Order of rotations is probably not correct.
-    osg::ref_ptr<osg::MatrixTransform> align = new osg::MatrixTransform;
-    osg::Matrix res_matrix;
+    vsg::ref_ptr<osg::MatrixTransform> align = new osg::MatrixTransform;
+    vsg::mat4 res_matrix;
     res_matrix.makeRotate(
-        configNode->getFloatValue("offsets/pitch-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-        osg::Vec3(0, 1, 0),
-        configNode->getFloatValue("offsets/roll-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-        osg::Vec3(1, 0, 0),
-        configNode->getFloatValue("offsets/heading-deg", 0.0)*SG_DEGREES_TO_RADIANS,
-        osg::Vec3(0, 0, 1));
+        configNode->getFloatValue("offsets/pitch-deg", 0.0) * SG_DEGREES_TO_RADIANS,
+        vsg::vec3(0, 1, 0),
+        configNode->getFloatValue("offsets/roll-deg", 0.0) * SG_DEGREES_TO_RADIANS,
+        vsg::vec3(1, 0, 0),
+        configNode->getFloatValue("offsets/heading-deg", 0.0) * SG_DEGREES_TO_RADIANS,
+        vsg::vec3(0, 0, 1));
 
-    osg::Matrix tmat;
+    vsg::mat4 tmat;
     tmat.makeTranslate(configNode->getFloatValue("offsets/x-m", 0.0),
                        configNode->getFloatValue("offsets/y-m", 0.0),
                        configNode->getFloatValue("offsets/z-m", 0.0));
@@ -625,9 +620,9 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
     if (configNode->hasValue("texture")) {
         //SG_LOG(SG_PARTICLES, SG_ALERT,
         //       "requested:"<<configNode->getStringValue("texture","")<<"\n");
-        textureFile= osgDB::findFileInPath(configNode->getStringValue("texture",
-                                                                      ""),
-                                           options->getDatabasePathList());
+        textureFile = osgDB::findFileInPath(configNode->getStringValue("texture",
+                                                                       ""),
+                                            options->getDatabasePathList());
         //SG_LOG(SG_PARTICLES, SG_ALERT, "found:"<<textureFile<<"\n");
 
         //for(unsigned i = 0; i < options->getDatabasePathList().size(); ++i)
@@ -652,31 +647,27 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
         std::string emitterType = placernode->getStringValue("type", "point");
 
         if (emitterType == "sector") {
-            osgParticle::SectorPlacer *splacer = new  osgParticle::SectorPlacer;
+            osgParticle::SectorPlacer* splacer = new osgParticle::SectorPlacer;
             float minRadius, maxRadius, minPhi, maxPhi;
 
-            minRadius = placernode->getFloatValue("radius-min-m",0);
-            maxRadius = placernode->getFloatValue("radius-max-m",1);
-            minPhi = (placernode->getFloatValue("phi-min-deg",0)
-                      * SG_DEGREES_TO_RADIANS);
-            maxPhi = (placernode->getFloatValue("phi-max-deg",360.0f)
-                      * SG_DEGREES_TO_RADIANS);
+            minRadius = placernode->getFloatValue("radius-min-m", 0);
+            maxRadius = placernode->getFloatValue("radius-max-m", 1);
+            minPhi = (placernode->getFloatValue("phi-min-deg", 0) * SG_DEGREES_TO_RADIANS);
+            maxPhi = (placernode->getFloatValue("phi-max-deg", 360.0f) * SG_DEGREES_TO_RADIANS);
 
             splacer->setRadiusRange(minRadius, maxRadius);
             splacer->setPhiRange(minPhi, maxPhi);
             emitter->setPlacer(splacer);
         } else if (emitterType == "segments") {
-            std::vector<SGPropertyNode_ptr> segments
-                = placernode->getChildren("vertex");
-            if (segments.size()>1) {
-                osgParticle::MultiSegmentPlacer *msplacer
-                    = new osgParticle::MultiSegmentPlacer();
-                float x,y,z;
+            std::vector<SGPropertyNode_ptr> segments = placernode->getChildren("vertex");
+            if (segments.size() > 1) {
+                osgParticle::MultiSegmentPlacer* msplacer = new osgParticle::MultiSegmentPlacer();
+                float x, y, z;
 
                 for (unsigned i = 0; i < segments.size(); ++i) {
-                    x = segments[i]->getFloatValue("x-m",0);
-                    y = segments[i]->getFloatValue("y-m",0);
-                    z = segments[i]->getFloatValue("z-m",0);
+                    x = segments[i]->getFloatValue("x-m", 0);
+                    y = segments[i]->getFloatValue("y-m", 0);
+                    z = segments[i]->getFloatValue("z-m", 0);
                     msplacer->addVertex(x, y, z);
                 }
                 emitter->setPlacer(msplacer);
@@ -692,15 +683,12 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
     if (shnode) {
         float minTheta, maxTheta, minPhi, maxPhi, speed, spread;
 
-        minTheta = (shnode->getFloatValue("theta-min-deg",0)
-                    * SG_DEGREES_TO_RADIANS);
-        maxTheta = (shnode->getFloatValue("theta-max-deg",360.0f)
-                    * SG_DEGREES_TO_RADIANS);
-        minPhi = shnode->getFloatValue("phi-min-deg",0)* SG_DEGREES_TO_RADIANS;
-        maxPhi = (shnode->getFloatValue("phi-max-deg",360.0f)
-                  * SG_DEGREES_TO_RADIANS); 
+        minTheta = (shnode->getFloatValue("theta-min-deg", 0) * SG_DEGREES_TO_RADIANS);
+        maxTheta = (shnode->getFloatValue("theta-max-deg", 360.0f) * SG_DEGREES_TO_RADIANS);
+        minPhi = shnode->getFloatValue("phi-min-deg", 0) * SG_DEGREES_TO_RADIANS;
+        maxPhi = (shnode->getFloatValue("phi-max-deg", 360.0f) * SG_DEGREES_TO_RADIANS);
 
-        osgParticle::RadialShooter *shooter = new osgParticle::RadialShooter;
+        osgParticle::RadialShooter* shooter = new osgParticle::RadialShooter;
         emitter->setShooter(shooter);
 
         shooter->setThetaRange(minTheta, maxTheta);
@@ -710,9 +698,9 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
 
         if (speednode) {
             if (speednode->hasValue("value")) {
-                speed = speednode->getFloatValue("value",0);
-                spread = speednode->getFloatValue("spread",0);
-                shooter->setInitialSpeedRange(speed-spread, speed+spread);
+                speed = speednode->getFloatValue("value", 0);
+                spread = speednode->getFloatValue("spread", 0);
+                shooter->setInitialSpeedRange(speed - spread, speed + spread);
             } else {
                 callback()->setupShooterSpeedData(speednode, modelRoot);
             }
@@ -721,14 +709,14 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
         const SGPropertyNode* rotspeednode = shnode->getChild("rotation-speed");
 
         if (rotspeednode) {
-            float x1,y1,z1,x2,y2,z2;
-            x1 = rotspeednode->getFloatValue("x-min-deg-sec",0) * SG_DEGREES_TO_RADIANS;
-            y1 = rotspeednode->getFloatValue("y-min-deg-sec",0) * SG_DEGREES_TO_RADIANS;
-            z1 = rotspeednode->getFloatValue("z-min-deg-sec",0) * SG_DEGREES_TO_RADIANS;
-            x2 = rotspeednode->getFloatValue("x-max-deg-sec",0) * SG_DEGREES_TO_RADIANS;
-            y2 = rotspeednode->getFloatValue("y-max-deg-sec",0) * SG_DEGREES_TO_RADIANS;
-            z2 = rotspeednode->getFloatValue("z-max-deg-sec",0) * SG_DEGREES_TO_RADIANS;
-            shooter->setInitialRotationalSpeedRange(osg::Vec3f(x1,y1,z1), osg::Vec3f(x2,y2,z2));
+            float x1, y1, z1, x2, y2, z2;
+            x1 = rotspeednode->getFloatValue("x-min-deg-sec", 0) * SG_DEGREES_TO_RADIANS;
+            y1 = rotspeednode->getFloatValue("y-min-deg-sec", 0) * SG_DEGREES_TO_RADIANS;
+            z1 = rotspeednode->getFloatValue("z-min-deg-sec", 0) * SG_DEGREES_TO_RADIANS;
+            x2 = rotspeednode->getFloatValue("x-max-deg-sec", 0) * SG_DEGREES_TO_RADIANS;
+            y2 = rotspeednode->getFloatValue("y-max-deg-sec", 0) * SG_DEGREES_TO_RADIANS;
+            z2 = rotspeednode->getFloatValue("z-max-deg-sec", 0) * SG_DEGREES_TO_RADIANS;
+            shooter->setInitialRotationalSpeedRange(vsg::vec3(x1, y1, z1), vsg::vec3(x2, y2, z2));
         }
     } //else ModularEmitter uses the default RadialShooter
 
@@ -737,8 +725,7 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
     const SGPropertyNode* counternode = configNode->getChild("counter");
 
     if (conditionNode || counternode) {
-        osgParticle::RandomRateCounter* counter
-            = new osgParticle::RandomRateCounter;
+        osgParticle::RandomRateCounter* counter = new osgParticle::RandomRateCounter;
         emitter->setCounter(counter);
         float pps = 0.0f, spread = 0.0f;
 
@@ -746,9 +733,9 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
             const SGPropertyNode* ppsnode = counternode->getChild("particles-per-sec");
             if (ppsnode) {
                 if (ppsnode->hasValue("value")) {
-                    pps = ppsnode->getFloatValue("value",0);
-                    spread = ppsnode->getFloatValue("spread",0);
-                    counter->setRateRange(pps-spread, pps+spread);
+                    pps = ppsnode->getFloatValue("value", 0);
+                    spread = ppsnode->getFloatValue("spread", 0);
+                    counter->setRateRange(pps - spread, pps + spread);
                 } else {
                     callback()->setupCounterData(ppsnode, modelRoot);
                 }
@@ -759,22 +746,19 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
             callback()->setupCounterCondition(conditionNode, modelRoot);
             callback()->setupCounterCondition(pps, spread);
         }
-    } //TODO: else perhaps set higher values than default? 
+    } //TODO: else perhaps set higher values than default?
 
     const SGPropertyNode* particlenode = configNode->getChild("particle");
     if (particlenode) {
-        osgParticle::Particle &particle
-            = particleSys->getDefaultParticleTemplate();
-        float r1=0, g1=0, b1=0, a1=1, r2=0, g2=0, b2=0, a2=1;
-        const SGPropertyNode* startcolornode
-            = particlenode->getNode("start/color");
+        osgParticle::Particle& particle = particleSys->getDefaultParticleTemplate();
+        float r1 = 0, g1 = 0, b1 = 0, a1 = 1, r2 = 0, g2 = 0, b2 = 0, a2 = 1;
+        const SGPropertyNode* startcolornode = particlenode->getNode("start/color");
         if (startcolornode) {
-            const SGPropertyNode* componentnode
-                = startcolornode->getChild("red");
+            const SGPropertyNode* componentnode = startcolornode->getChild("red");
             if (componentnode) {
                 if (componentnode->hasValue("value"))
-                    r1 = componentnode->getFloatValue("value",0);
-                else 
+                    r1 = componentnode->getFloatValue("value", 0);
+                else
                     callback()->setupColorComponent(componentnode, modelRoot,
                                                     0, 0);
             }
@@ -789,7 +773,7 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
             componentnode = startcolornode->getChild("blue");
             if (componentnode) {
                 if (componentnode->hasValue("value"))
-                    b1 = componentnode->getFloatValue("value",0);
+                    b1 = componentnode->getFloatValue("value", 0);
                 else
                     callback()->setupColorComponent(componentnode, modelRoot,
                                                     0, 2);
@@ -797,7 +781,7 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
             componentnode = startcolornode->getChild("alpha");
             if (componentnode) {
                 if (componentnode->hasValue("value"))
-                    a1 = componentnode->getFloatValue("value",0);
+                    a1 = componentnode->getFloatValue("value", 0);
                 else
                     callback()->setupColorComponent(componentnode, modelRoot,
                                                     0, 3);
@@ -809,7 +793,7 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
 
             if (componentnode) {
                 if (componentnode->hasValue("value"))
-                    r2 = componentnode->getFloatValue("value",0);
+                    r2 = componentnode->getFloatValue("value", 0);
                 else
                     callback()->setupColorComponent(componentnode, modelRoot,
                                                     1, 0);
@@ -817,7 +801,7 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
             componentnode = endcolornode->getChild("green");
             if (componentnode) {
                 if (componentnode->hasValue("value"))
-                    g2 = componentnode->getFloatValue("value",0);
+                    g2 = componentnode->getFloatValue("value", 0);
                 else
                     callback()->setupColorComponent(componentnode, modelRoot,
                                                     1, 1);
@@ -825,7 +809,7 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
             componentnode = endcolornode->getChild("blue");
             if (componentnode) {
                 if (componentnode->hasValue("value"))
-                    b2 = componentnode->getFloatValue("value",0);
+                    b2 = componentnode->getFloatValue("value", 0);
                 else
                     callback()->setupColorComponent(componentnode, modelRoot,
                                                     1, 2);
@@ -833,60 +817,60 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
             componentnode = endcolornode->getChild("alpha");
             if (componentnode) {
                 if (componentnode->hasValue("value"))
-                    a2 = componentnode->getFloatValue("value",0);
+                    a2 = componentnode->getFloatValue("value", 0);
                 else
                     callback()->setupColorComponent(componentnode, modelRoot,
                                                     1, 3);
             }
         }
-        particle.setColorRange(osgParticle::rangev4(osg::Vec4(r1,g1,b1,a1),
-                                                    osg::Vec4(r2,g2,b2,a2)));
+        particle.setColorRange(osgParticle::rangev4(vsg::vec4(r1, g1, b1, a1),
+                                                    vsg::vec4(r2, g2, b2, a2)));
 
-        float startsize=1, endsize=0.1f;
+        float startsize = 1, endsize = 0.1f;
         const SGPropertyNode* startsizenode = particlenode->getNode("start/size");
         if (startsizenode) {
             if (startsizenode->hasValue("value"))
-                startsize = startsizenode->getFloatValue("value",0);
+                startsize = startsizenode->getFloatValue("value", 0);
             else
                 callback()->setupStartSizeData(startsizenode, modelRoot);
         }
         const SGPropertyNode* endsizenode = particlenode->getNode("end/size");
         if (endsizenode) {
             if (endsizenode->hasValue("value"))
-                endsize = endsizenode->getFloatValue("value",0);
+                endsize = endsizenode->getFloatValue("value", 0);
             else
                 callback()->setupEndSizeData(endsizenode, modelRoot);
         }
         particle.setSizeRange(osgParticle::rangef(startsize, endsize));
-        float life=5;
+        float life = 5;
         const SGPropertyNode* lifenode = particlenode->getChild("life-sec");
         if (lifenode) {
             if (lifenode->hasValue("value"))
-                life =  lifenode->getFloatValue("value",0);
+                life = lifenode->getFloatValue("value", 0);
             else
                 callback()->setupLifeData(lifenode, modelRoot);
         }
 
         particle.setLifeTime(life);
         if (particlenode->hasValue("radius-m"))
-            particle.setRadius(particlenode->getFloatValue("radius-m",0));
+            particle.setRadius(particlenode->getFloatValue("radius-m", 0));
         if (particlenode->hasValue("mass-kg"))
-            particle.setMass(particlenode->getFloatValue("mass-kg",0));
+            particle.setMass(particlenode->getFloatValue("mass-kg", 0));
         if (callback.get()) {
             callback.get()->setupStaticColorComponent(r1, g1, b1, a1,
                                                       r2, g2, b2, a2);
             callback.get()->setupStaticSizeData(startsize, endsize);
         }
-        //particle.setColorRange(osgParticle::rangev4( osg::Vec4(r1, g1, b1, a1), osg::Vec4(r2, g2, b2, a2)));
+        //particle.setColorRange(osgParticle::rangev4( vsg::vec4(r1, g1, b1, a1), vsg::vec4(r2, g2, b2, a2)));
     }
 
     const SGPropertyNode* programnode = configNode->getChild("program");
-    osgParticle::FluidProgram *program = new osgParticle::FluidProgram();
+    osgParticle::FluidProgram* program = new osgParticle::FluidProgram();
 
     if (programnode) {
         std::string fluid = programnode->getStringValue("fluid", "air");
 
-        if (fluid=="air")
+        if (fluid == "air")
             program->setFluidToAir();
         else
             program->setFluidToWater();
@@ -894,19 +878,19 @@ osg::ref_ptr<osg::Group> ParticlesGlobalManager::appendParticles(const SGPropert
         if (programnode->getBoolValue("gravity", true)) {
             program->setToGravity();
         } else
-            program->setAcceleration(osg::Vec3(0,0,0));
+            program->setAcceleration(vsg::vec3(0, 0, 0));
 
         if (programnode->getBoolValue("wind", true))
             callback()->setupProgramWind(true);
         else
-            program->setWind(osg::Vec3(0,0,0));
+            program->setWind(vsg::vec3(0, 0, 0));
 
         align->addChild(program);
 
         program->setParticleSystem(particleSys);
     }
 
-    if (callback.get()) {  //this means we want property-driven changes
+    if (callback.get()) { //this means we want property-driven changes
         SG_LOG(SG_PARTICLES, SG_DEBUG, "Setting up particle system user data and callback.");
         //setup data and callback
         callback.get()->setGeneralData(dynamic_cast<osgParticle::RadialShooter*>(emitter->getShooter()),

@@ -62,7 +62,7 @@ void EffectGeode::resizeGLObjectBuffers(unsigned int maxSize)
     Geode::resizeGLObjectBuffers(maxSize);
 }
 
-void EffectGeode::releaseGLObjects(osg::State* state) const
+void EffectGeode::releaseGLObjects(vsg::State* state) const
 {
     if (_effect.valid())
         _effect->releaseGLObjects(state);
@@ -70,11 +70,11 @@ void EffectGeode::releaseGLObjects(osg::State* state) const
 }
 
 // Generates tangent space vectors or other data from geom, as defined by effect
-void EffectGeode::runGenerators(osg::Geometry *geometry)
+void EffectGeode::runGenerators(vsg::Geometry *geometry)
 {
     if(geometry && _effect.valid()) {
         // Generate tangent vectors for the geometry
-        osg::ref_ptr<osgUtil::TangentSpaceGenerator> tsg = new osgUtil::TangentSpaceGenerator;
+        vsg::ref_ptr<osgUtil::TangentSpaceGenerator> tsg = new osgUtil::TangentSpaceGenerator;
         tsg->generate(geometry,0);  
         // Generating only tangent vector should be enough
         // since the binormal is a cross product of normal and tangent
@@ -84,7 +84,7 @@ void EffectGeode::runGenerators(osg::Geometry *geometry)
 #if OSG_MIN_VERSION_REQUIRED(3,1,8)
             geometry->setVertexAttribArray(n, tsg->getTangentArray(), osg::Array::BIND_PER_VERTEX);
 #else
-            geometry->setVertexAttribData(n, osg::Geometry::ArrayData(tsg->getTangentArray(), osg::Geometry::BIND_PER_VERTEX,GL_FALSE));
+            geometry->setVertexAttribData(n, vsg::Geometry::ArrayData(tsg->getTangentArray(), vsg::Geometry::BIND_PER_VERTEX,GL_FALSE));
 #endif
         }
         n = _effect->getGenerator(Effect::BINORMAL);
@@ -92,7 +92,7 @@ void EffectGeode::runGenerators(osg::Geometry *geometry)
 #if OSG_MIN_VERSION_REQUIRED(3,1,8)
             geometry->setVertexAttribArray(n, tsg->getBinormalArray(), osg::Array::BIND_PER_VERTEX);
 #else
-            geometry->setVertexAttribData(n, osg::Geometry::ArrayData(tsg->getBinormalArray(), osg::Geometry::BIND_PER_VERTEX,GL_FALSE));
+            geometry->setVertexAttribData(n, vsg::Geometry::ArrayData(tsg->getBinormalArray(), vsg::Geometry::BIND_PER_VERTEX,GL_FALSE));
 #endif
 
         n = _effect->getGenerator(Effect::NORMAL);
@@ -103,7 +103,7 @@ void EffectGeode::runGenerators(osg::Geometry *geometry)
 #if OSG_MIN_VERSION_REQUIRED(3,1,8)
             geometry->setVertexAttribArray(n, new_normals, osg::Array::BIND_PER_VERTEX);
 #else
-            geometry->setVertexAttribData(n, osg::Geometry::ArrayData(new_normals, osg::Geometry::BIND_PER_VERTEX,GL_FALSE));
+            geometry->setVertexAttribData(n, vsg::Geometry::ArrayData(new_normals, vsg::Geometry::BIND_PER_VERTEX,GL_FALSE));
 #endif
         }
     }

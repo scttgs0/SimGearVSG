@@ -29,11 +29,11 @@
 
 using namespace simgear;
 
-CheckSceneryVisitor::CheckSceneryVisitor(osgDB::DatabasePager* dbp, const osg::Vec3 &position, double range,
+CheckSceneryVisitor::CheckSceneryVisitor(osgDB::DatabasePager* dbp, const vsg::vec3 &position, double range,
                                          osg::FrameStamp* framestamp)
 :osg::NodeVisitor(osg::NodeVisitor::NODE_VISITOR,
                   osg::NodeVisitor::TRAVERSE_ACTIVE_CHILDREN),
- _position(position), _range(range), _loaded(true), _matrix(osg::Matrix::identity())
+ _position(position), _range(range), _loaded(true), _matrix(vsg::mat4::identity())
 {
     setDatabaseRequestHandler(dbp);
     setFrameStamp(framestamp);
@@ -43,14 +43,14 @@ CheckSceneryVisitor::~CheckSceneryVisitor()
 {
 }
 
-void CheckSceneryVisitor::apply(osg::Node& node)
+void CheckSceneryVisitor::apply(vsg::Node& node)
 {
     traverse(node);
 }
 
 void CheckSceneryVisitor::apply(osg::ProxyNode& node)
 {
-    osg::Vec3 pos = node.getCenter() * _matrix;
+    vsg::vec3 pos = node.getCenter() * _matrix;
     double dist = (pos - _position).length();
     if (dist < _range) {
         for (unsigned i = 0; i < node.getNumFileNames(); ++i) {
@@ -76,7 +76,7 @@ void CheckSceneryVisitor::apply(osg::ProxyNode& node)
 
 void CheckSceneryVisitor::apply(osg::PagedLOD& node)
 {
-    osg::Vec3 pos = node.getCenter() * _matrix;
+    vsg::vec3 pos = node.getCenter() * _matrix;
     double dist = (pos - _position).length();
     if (dist < _range) {
         for (unsigned i = 0; i < node.getNumFileNames(); ++i) {
@@ -102,9 +102,9 @@ void CheckSceneryVisitor::apply(osg::PagedLOD& node)
     traverse(node);
 }
 
-void CheckSceneryVisitor::apply(osg::Transform &node)
+void CheckSceneryVisitor::apply(vsg::Transform &node)
 {
-    osg::Matrix matrix = _matrix;
+    vsg::mat4 matrix = _matrix;
     node.computeLocalToWorldMatrix(_matrix, this);
     traverse(node);
     _matrix = matrix;

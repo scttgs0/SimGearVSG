@@ -4,18 +4,19 @@
 #pragma once
 
 #include <string>
-#include <osg/Group>
+
+#include <vsg/all.h>
+
 #include <osg/NodeVisitor>
 
-namespace simgear
-{
+namespace simgear {
 
 class FindGroupVisitor : public osg::NodeVisitor
 {
 public:
     FindGroupVisitor(const std::string& name);
 
-    osg::Group* getGroup() const
+    vsg::Group* getGroup() const
     {
         return _group.get();
     }
@@ -25,11 +26,11 @@ public:
         return _duplicates;
     }
 
-    virtual void apply(osg::Group& group);
+    virtual void apply(vsg::Group& group);
 
 protected:
     std::string _name;
-    osg::ref_ptr<osg::Group> _group;
+    vsg::ref_ptr<vsg::Group> _group;
     bool _duplicates;
 };
 

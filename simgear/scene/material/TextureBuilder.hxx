@@ -16,27 +16,29 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/StateSet>
 #include <osg/Texture>
+
 #include "EffectBuilder.hxx"
 
-namespace simgear
-{
+
+namespace simgear {
 class TextureBuilder : public EffectBuilder<osg::Texture>
 {
 public:
     // Hack to force inclusion of TextureBuilder.cxx in library
     static osg::Texture* buildFromType(Effect* effect, const std::string& type,
-                                       const SGPropertyNode*props,
+                                       const SGPropertyNode* props,
                                        const SGReaderWriterOptions* options);
 };
 
-struct TextureUnitBuilder : public PassAttributeBuilder
-{
+struct TextureUnitBuilder : public PassAttributeBuilder {
     void buildAttribute(Effect* effect, Pass* pass, const SGPropertyNode* prop,
                         const SGReaderWriterOptions* options);
 };
 
 
 bool makeTextureParameters(SGPropertyNode* paramRoot, const osg::StateSet* ss);
-}
+} // namespace simgear

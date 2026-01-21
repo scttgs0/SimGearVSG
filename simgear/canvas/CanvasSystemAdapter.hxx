@@ -28,9 +28,9 @@ namespace canvas
 
       virtual ~SystemAdapter() {}
       virtual FontPtr getFont(const std::string& name) const = 0;
-      virtual void addCamera(osg::Camera* camera) const = 0;
-      virtual void removeCamera(osg::Camera* camera) const = 0;
-      virtual osg::ref_ptr<osg::Image> getImage(const std::string& path) const = 0;
+      virtual void addCamera(vsg::Camera* camera) const = 0;
+      virtual void removeCamera(vsg::Camera* camera) const = 0;
+      virtual vsg::ref_ptr<vsg::Image> getImage(const std::string& path) const = 0;
       virtual SGSubsystem* getSubsystem(const std::string& name) const = 0;
       virtual HTTP::Client* getHTTPClient() const = 0;
   };

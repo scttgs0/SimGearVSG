@@ -61,7 +61,7 @@ SGMesh::SGMesh( const SGDemPtr dem,
                 unsigned eo, unsigned no,
                 unsigned heightLevel,
                 unsigned widthLevel,
-                const osg::Matrixd& transform,
+                const vsg::dmat4& transform,
                 TextureMethod tm,
                 const osgDB::Options* options )
 {
@@ -119,7 +119,7 @@ SGMesh::SGMesh( const SGDemPtr dem,
     double incv = ( no*1.0/(180*8) - so*1.0/(180*8) ) / (grid_height - 3);
 
     // try to use native mesh res 
-    vertices  = new osg::Vec3Array( grid_width*grid_height );
+    vertices  = new vsg::vec3Array( grid_width*grid_height );
     normals   = NULL;
     texCoords = new osg::Vec2Array( grid_width*grid_height );
 
@@ -210,39 +210,39 @@ SGMesh::SGMesh( const SGDemPtr dem,
 
     osg::Vec4Array* colors = new osg::Vec4Array;
     if ( tm == SGMesh::TEXTURE_DEBUG ) {
-        osg::Vec4 lvlColor;
+        vsg::vec4 lvlColor;
         switch( heightLevel ) {
-            case 9: lvlColor = osg::Vec4(0.5, 0.7, 0.9, 1); break;
-            case 8: lvlColor = osg::Vec4(1, 1, 0, 1); break;
-            case 7: lvlColor = osg::Vec4(0, 1, 0, 1); break;
-            case 6: lvlColor = osg::Vec4(0, 1, 1, 1); break;
+            case 9: lvlColor = vsg::vec4(0.5, 0.7, 0.9, 1); break;
+            case 8: lvlColor = vsg::vec4(1, 1, 0, 1); break;
+            case 7: lvlColor = vsg::vec4(0, 1, 0, 1); break;
+            case 6: lvlColor = vsg::vec4(0, 1, 1, 1); break;
 
-            case 5: lvlColor = osg::Vec4(0, 0, 1, 1); break;
-            case 4: lvlColor = osg::Vec4(1, 1, 1, 1); break;
-            case 3: lvlColor = osg::Vec4(1, 0, 1, 1); break;
+            case 5: lvlColor = vsg::vec4(0, 0, 1, 1); break;
+            case 4: lvlColor = vsg::vec4(1, 1, 1, 1); break;
+            case 3: lvlColor = vsg::vec4(1, 0, 1, 1); break;
 
-            case 2: lvlColor = osg::Vec4(0.5, 0.5, 0.5, 1); break;
-            case 1: lvlColor = osg::Vec4(0.5, 0, 0.5, 1); break;
+            case 2: lvlColor = vsg::vec4(0.5, 0.5, 0.5, 1); break;
+            case 1: lvlColor = vsg::vec4(0.5, 0, 0.5, 1); break;
         }
 
         // special colors - green, and ref
         if ( Debug1 ) {
-            lvlColor = osg::Vec4(0.0, 0.7, 0.0, 1);
+            lvlColor = vsg::vec4(0.0, 0.7, 0.0, 1);
         } else if ( Debug2 ) {
-            lvlColor = osg::Vec4(0.7, 0.0, 0.0, 1);
+            lvlColor = vsg::vec4(0.7, 0.0, 0.0, 1);
         }
 
         for ( unsigned int v=0; v<getVertices()->size(); v++ ) {
             colors->push_back(lvlColor);
         }
     } else if ( tm == SGMesh::TEXTURE_BLUEMARBLE ) {
-        colors->push_back(osg::Vec4(1, 1, 1, 1));
+        colors->push_back(vsg::vec4(1, 1, 1, 1));
     } else if ( tm == SGMesh::TEXTURE_RASTER ) {
         // TODO
     }
 
     geode = new osg::Geode;
-    osg::Geometry* geometry = new osg::Geometry;
+    vsg::Geometry* geometry = new vsg::Geometry;
 
     char geoName[64];
     snprintf( geoName, sizeof(geoName), "tilemesh (%u,%u)-(%u,%u):level%u,%u", 
@@ -250,18 +250,18 @@ SGMesh::SGMesh( const SGDemPtr dem,
                 widthLevel, heightLevel );
     geometry->setName(geoName);
 
-    geometry->setDataVariance(osg::Object::STATIC);
+    geometry->setDataVariance(vsg::Object::STATIC);
     geometry->setUseVertexBufferObjects(true);
     geometry->setVertexArray( getVertices() );
 
     geometry->setNormalArray( getNormals() );
-    geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+    geometry->setNormalBinding(vsg::Geometry::BIND_PER_VERTEX);
     geometry->setColorArray(colors);
 
     if ( tm == SGMesh::TEXTURE_DEBUG ) {
-        geometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+        geometry->setColorBinding(vsg::Geometry::BIND_PER_VERTEX);
     } else {
-        geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+        geometry->setColorBinding(vsg::Geometry::BIND_OVERALL);
         geometry->setTexCoordArray(0, getTexCoords() );
     }
 
@@ -270,7 +270,7 @@ SGMesh::SGMesh( const SGDemPtr dem,
     geometry->addPrimitiveSet(indices);
 
     if ( geometry ) {
-        geode->setDataVariance(osg::Object::STATIC);
+        geode->setDataVariance(vsg::Object::STATIC);
         geode->addDrawable(geometry);
 
         if ( tm == SGMesh::TEXTURE_DEBUG ) {
@@ -296,7 +296,7 @@ SGMesh::SGMesh( const SGDemPtr dem,
                 imageFileName = osgDB::concatPaths(imageFileName, "Globe");
                 imageFileName = osgDB::concatPaths(imageFileName, "world.topo.bathy.200407.3x4096x2048.png");
             }
-            if (osg::Image* image = osgDB::readImageFile(imageFileName, options)) {
+            if (vsg::Image* image = osgDB::readImageFile(imageFileName, options)) {
                 osg::Texture2D* texture = new osg::Texture2D;
                 texture->setImage(image);
                 texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::REPEAT);
@@ -339,7 +339,7 @@ void SGMesh::need_normals()
 {
     if ( normals == NULL )
     {
-        normals = new osg::Vec3Array( vertices->size() );
+        normals = new vsg::vec3Array( vertices->size() );
 
         // need_faces();
         if ( !faces.empty() ) {
@@ -347,16 +347,16 @@ void SGMesh::need_normals()
             long nf = faces.size();
 #pragma omp parallel for
             for (long i = 0; i < nf; i++) {
-                const osg::Vec3 &p0 = (*vertices)[faces[i][0]];
-                const osg::Vec3 &p1 = (*vertices)[faces[i][1]];
-                const osg::Vec3 &p2 = (*vertices)[faces[i][2]];
+                const vsg::vec3 &p0 = (*vertices)[faces[i][0]];
+                const vsg::vec3 &p1 = (*vertices)[faces[i][1]];
+                const vsg::vec3 &p2 = (*vertices)[faces[i][2]];
 
-                osg::Vec3 a = p0-p1, b = p1-p2, c = p2-p0;
+                vsg::vec3 a = p0-p1, b = p1-p2, c = p2-p0;
                 float l2a = a.length2(), l2b = b.length2(), l2c = c.length2();
                 if (!l2a || !l2b || !l2c) {
                     continue;
                 }
-                osg::Vec3 facenormal = a ^ b;
+                vsg::vec3 facenormal = a ^ b;
                 (*normals)[faces[i][0]] += facenormal * (1.0f / (l2a * l2c));
                 (*normals)[faces[i][1]] += facenormal * (1.0f / (l2b * l2a));
                 (*normals)[faces[i][2]] += facenormal * (1.0f / (l2c * l2b));
@@ -388,7 +388,7 @@ osg::DrawElementsUInt* SGMesh::getIndices(void)
             indices->push_back( (i+1)*grid_height + (j+0) );  // 1,0
         }
     }
-    indices->setDataVariance(osg::Object::STATIC);
+    indices->setDataVariance(vsg::Object::STATIC);
 
     return indices;
 }

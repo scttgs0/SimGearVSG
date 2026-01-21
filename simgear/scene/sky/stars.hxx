@@ -10,21 +10,22 @@
 
 #pragma once
 
-#include <osg/ref_ptr>
-#include <osg/Node>
+#include <vsg/all.h>
 
 #include <simgear/ephemeris/stardata.hxx>
 #include <simgear/structure/SGReferenced.hxx>
+
 
 namespace simgear {
 class SGReaderWriterOptions;
 }
 
-class SGStars : public SGReferenced {
+class SGStars : public SGReferenced
+{
 public:
     SGStars() = default;
 
     // initialize the stars structure
-    osg::Node* build(int num, const SGStarData::Star* star_data, double star_dist,
+    vsg::Node* build(int num, const SGStarData::Star* star_data, double star_dist,
                      const simgear::SGReaderWriterOptions* options);
 };

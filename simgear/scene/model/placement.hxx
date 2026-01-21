@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <osg/ref_ptr>
-#include <osg/Node>
-#include <osg/Switch>
+#include <vsg/all.h>
+
 #include <osg/PositionAttitudeTransform>
+#include <osg/Switch>
 
 #include <simgear/math/SGMath.hxx>
 
@@ -24,49 +24,48 @@
 class SGModelPlacement
 {
 public:
+    SGModelPlacement();
+    virtual ~SGModelPlacement();
 
-  SGModelPlacement ();
-  virtual ~SGModelPlacement ();
+    virtual void init(vsg::Node* model);
+    void clear();
+    void add(vsg::Node* model);
 
-  virtual void init( osg::Node* model );
-  void clear();
-  void add( osg::Node* model );
+    virtual void update();
 
-  virtual void update();
+    vsg::ref_ptr<vsg::Node> getSceneGraph() const;
 
-  osg::ref_ptr<osg::Node> getSceneGraph() const;
+    virtual bool getVisible() const;
+    virtual void setVisible(bool visible);
 
-  virtual bool getVisible () const;
-  virtual void setVisible (bool visible);
+    void setPosition(const SGGeod& position);
+    const SGGeod& getPosition() const { return _position; }
 
-  void setPosition(const SGGeod& position);
-  const SGGeod& getPosition() const { return _position; }
+    virtual double getRollDeg() const { return _roll_deg; }
+    virtual double getPitchDeg() const { return _pitch_deg; }
+    virtual double getHeadingDeg() const { return _heading_deg; }
+    SGQuatd getGlobalOrientation() const;
 
-  virtual double getRollDeg () const { return _roll_deg; }
-  virtual double getPitchDeg () const { return _pitch_deg; }
-  virtual double getHeadingDeg () const { return _heading_deg; }
-  SGQuatd getGlobalOrientation() const;
+    virtual void setRollDeg(double roll_deg);
+    virtual void setPitchDeg(double pitch_deg);
+    virtual void setHeadingDeg(double heading_deg);
+    virtual void setOrientation(double roll_deg, double pitch_deg,
+                                double heading_deg);
+    void setOrientation(const SGQuatd& orientation);
 
-  virtual void setRollDeg (double roll_deg);
-  virtual void setPitchDeg (double pitch_deg);
-  virtual void setHeadingDeg (double heading_deg);
-  virtual void setOrientation (double roll_deg, double pitch_deg,
-                               double heading_deg);
-  void setOrientation(const SGQuatd& orientation);
-
-  void setReferenceTime(const double& referenceTime);
-  void setBodyLinearVelocity(const SGVec3d& velocity);
-  void setBodyAngularVelocity(const SGVec3d& velocity);
+    void setReferenceTime(const double& referenceTime);
+    void setBodyLinearVelocity(const SGVec3d& velocity);
+    void setBodyAngularVelocity(const SGVec3d& velocity);
 
 private:
-                                // Geodetic position
-  SGGeod _position;
+    // Geodetic position
+    SGGeod _position;
 
-                                // Orientation
-  double _roll_deg;
-  double _pitch_deg;
-  double _heading_deg;
+    // Orientation
+    double _roll_deg;
+    double _pitch_deg;
+    double _heading_deg;
 
-  osg::ref_ptr<osg::Switch> _selector;
-  osg::ref_ptr<osg::PositionAttitudeTransform> _transform;
+    vsg::ref_ptr<osg::Switch> _selector;
+    vsg::ref_ptr<osg::PositionAttitudeTransform> _transform;
 };

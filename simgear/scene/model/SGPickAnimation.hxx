@@ -19,15 +19,15 @@ public:
   SGPickAnimation(simgear::SGTransientModelData &modelData);
 
   // override so we can treat object-name specially
-  void apply(osg::Group& group) override;
+  void apply(vsg::Group& group) override;
 
-  void apply(osg::Node* node);
+  void apply(vsg::Node* node);
 
   protected:
-  virtual osg::Group* createMainGroup(osg::Group* pr);
+  virtual vsg::Group* createMainGroup(vsg::Group* pr);
   SGSharedPtr<SGCondition const> _condition;
 
-  virtual void setupCallbacks(SGSceneUserData* ud, osg::Group* parent);
+  virtual void setupCallbacks(SGSceneUserData* ud, vsg::Group* parent);
 
   /**
    * Can the animation be safely repeated / nested without changing the
@@ -75,10 +75,10 @@ public:
 
 
 protected:
-    virtual osg::Group* createMainGroup(osg::Group* pr);
+    virtual vsg::Group* createMainGroup(vsg::Group* pr);
     SGSharedPtr<SGCondition const> _condition;
 
-    virtual void setupCallbacks(SGSceneUserData* ud, osg::Group* parent);
+    virtual void setupCallbacks(SGSceneUserData* ud, vsg::Group* parent);
 
     bool isRepeatable() const override;
 
@@ -97,9 +97,9 @@ public:
 
 
 protected:
-    virtual osg::Group* createMainGroup(osg::Group* pr);
+    virtual vsg::Group* createMainGroup(vsg::Group* pr);
 
-    virtual void setupCallbacks(SGSceneUserData* ud, osg::Group* parent);
+    virtual void setupCallbacks(SGSceneUserData* ud, vsg::Group* parent);
 
     bool isRepeatable() const override;
 
@@ -117,9 +117,9 @@ public:
 
 
 protected:
-    virtual osg::Group* createMainGroup(osg::Group* pr);
+    virtual vsg::Group* createMainGroup(vsg::Group* pr);
 
-    virtual void setupCallbacks(SGSceneUserData* ud, osg::Group* parent);
+    virtual void setupCallbacks(SGSceneUserData* ud, vsg::Group* parent);
 
 private:
 };

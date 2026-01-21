@@ -18,29 +18,27 @@
 
 #pragma once
 
-#include <simgear/props/PropertyInterpolator.hxx>
-
-#include <osg/Vec4>
 #include <string>
 
-namespace simgear
-{
+#include <vsg/all.h>
 
-  /**
+#include <simgear/props/PropertyInterpolator.hxx>
+
+
+namespace simgear {
+
+/**
    * Interpolate a string property containing containing a %CSS color.
    */
-  class ColorInterpolator:
-    public PropertyInterpolator
-  {
-    protected:
-      osg::Vec4 _color_end,
-                _color_diff;
+class ColorInterpolator : public PropertyInterpolator
+{
+protected:
+    vsg::vec4 _color_end,
+        _color_diff;
 
-      virtual void setTarget(const SGPropertyNode& target);
-      virtual void init(const SGPropertyNode& prop);
-      virtual void write(SGPropertyNode& prop, double t);
-
-
-  };
+    virtual void setTarget(const SGPropertyNode& target);
+    virtual void init(const SGPropertyNode& prop);
+    virtual void write(SGPropertyNode& prop, double t);
+};
 
 } // namespace simgear

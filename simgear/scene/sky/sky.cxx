@@ -52,7 +52,7 @@ SGSky::SGSky( void ) {
     clouds_3d_enabled = false;
     clouds_3d_density = 0.8;
 
-    pre_root = new osg::Group;
+    pre_root = new vsg::Group;
     pre_root->setName("SGSky-pre-root");
     pre_root->setNodeMask(simgear::BACKGROUND_BIT);
     osg::StateSet* preStateSet = new osg::StateSet;
@@ -63,7 +63,7 @@ SGSky::SGSky( void ) {
     cloud_root->setNodeMask(simgear::MODEL_BIT);
     cloud_root->setName("SGSky-cloud-root");
 
-    pre_transform = new osg::Group;
+    pre_transform = new vsg::Group;
     pre_transform->setName("SGSky-pre-transform");
 
     _ephTransform = new osg::MatrixTransform;
@@ -157,7 +157,7 @@ bool SGSky::reposition( const SGSkyState &st, const SGEphemeris& eph, double dt 
     
     dome->reposition( zero_elev, alt, lon, lat, st.spin );
 
-    osg::Matrix m = osg::Matrix::rotate(angleRad, osg::Vec3(0, 0, -1));
+    vsg::mat4 m = vsg::mat4::rotate(angleRad, vsg::vec3(0, 0, -1));
     m.postMultTranslate(toOsg(st.pos));
     _ephTransform->setMatrix(m);
 

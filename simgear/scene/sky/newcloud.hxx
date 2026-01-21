@@ -22,89 +22,93 @@
 
 #pragma once
 
-#include <simgear/compiler.h>
 #include <string>
 #include <vector>
+
+#include <vsg/all.h>
+
 #include <osg/Fog>
 
+#include <simgear/compiler.h>
 #include <simgear/math/sg_random.hxx>
 #include <simgear/scene/material/Effect.hxx>
 #include <simgear/scene/material/EffectGeode.hxx>
 
-using std::string;
+
+using std::string; // TODO: no using statements in include files
 using std::vector;
+
 
 /**
  * 3D cloud class.
  */
-class SGNewCloud final {
-
+class SGNewCloud final
+{
 public:
-        SGNewCloud(const SGPath &texture_root, const SGPropertyNode *cld_def, mt* s);
+    SGNewCloud(const SGPath& texture_root, const SGPropertyNode* cld_def, mt* s);
 
-        ~SGNewCloud();  // non-virtual intentional
+    ~SGNewCloud(); // non-virtual intentional
 
-        // Generate a Cloud
-        osg::ref_ptr<simgear::EffectGeode> genCloud ();
+    // Generate a Cloud
+    vsg::ref_ptr<simgear::EffectGeode> genCloud();
 
-        static float getDensity(void)
-        {
-            return sprite_density;
-        }
-    
-        // Set the sprite density
-        static void setDensity(double d)
-        {
-            sprite_density = d;
-        }
-        
+    static float getDensity(void)
+    {
+        return sprite_density;
+    }
+
+    // Set the sprite density
+    static void setDensity(double d)
+    {
+        sprite_density = d;
+    }
+
 
 private:
+    float min_width;
+    float max_width;
+    float min_height;
+    float max_height;
+    float min_sprite_width;
+    float max_sprite_width;
+    float min_sprite_height;
+    float max_sprite_height;
 
-        float min_width;
-        float max_width;
-        float min_height;
-        float max_height;
-        float min_sprite_width;
-        float max_sprite_width;
-        float min_sprite_height;
-        float max_sprite_height;
-        
-        // Minimum and maximum bottom, middle, top, sunny, shade lighting
-        // factors. For individual clouds we choose a bottom/middle/top
-        // shade from between each min/max value
-        float min_bottom_lighting_factor;
-        float max_bottom_lighting_factor;
-        float min_middle_lighting_factor;
-        float max_middle_lighting_factor;
-        float min_top_lighting_factor;
-        float max_top_lighting_factor;
-        float min_shade_lighting_factor;
-        float max_shade_lighting_factor;
-        
-        // The density of the cloud is the shading applied
-        // to cloud sprites on the opposite side of the cloud
-        // from the sun. For an individual cloud instance a value
-        // between min_density and max_density is chosen.
-        float min_density;
-        float max_density;
-        
-        // zscale indicates how sprites should be scaled vertically
-        // after billboarding. 
-        float zscale;
-        // alpha_factor is the transparency adjustment of the clouds
-        float alpha_factor;
-        bool height_map_texture;
-        int num_sprites;
-        int num_textures_x;
-        int num_textures_y;
-        string texture;
-        osg::Geometry* quad;
-        osg::ref_ptr<simgear::Effect> effect;
-        static float sprite_density;
-        
-        // RNG seed for this cloud
-        mt* seed;
+    // Minimum and maximum bottom, middle, top, sunny, shade lighting
+    // factors. For individual clouds we choose a bottom/middle/top
+    // shade from between each min/max value
+    float min_bottom_lighting_factor;
+    float max_bottom_lighting_factor;
+    float min_middle_lighting_factor;
+    float max_middle_lighting_factor;
+    float min_top_lighting_factor;
+    float max_top_lighting_factor;
+    float min_shade_lighting_factor;
+    float max_shade_lighting_factor;
 
-        osg::Geometry* createOrthQuad(float w, float h, int varieties_x, int varieties_y);
+    // The density of the cloud is the shading applied
+    // to cloud sprites on the opposite side of the cloud
+    // from the sun. For an individual cloud instance a value
+    // between min_density and max_density is chosen.
+    float min_density;
+    float max_density;
+
+    // zscale indicates how sprites should be scaled vertically
+    // after billboarding.
+    float zscale;
+    // alpha_factor is the transparency adjustment of the clouds
+    float alpha_factor;
+    bool height_map_texture;
+    int num_sprites;
+    int num_textures_x;
+    int num_textures_y;
+    string texture;
+    vsg::Geometry* quad;
+    vsg::ref_ptr<simgear::Effect> effect;
+    static float sprite_density;
+
+    // RNG seed for this cloud
+    mt* seed;
+
+    vsg::Geometry* createOrthQuad(float w, float h, int varieties_x, int varieties_y);
 };

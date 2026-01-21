@@ -19,46 +19,43 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#  include <simgear_config.h>
-#endif
-
 #include <algorithm>
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
 #include <thread>
+#include <vector>
+
+#include <vsg/all.h>
 
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <osg/Math>
 #include <osg/MatrixTransform>
-#include <osg/Matrix>
 #include <osg/NodeVisitor>
-
-#include <osgDB/ReadFile>
 #include <osgDB/FileUtils>
+#include <osgDB/ReadFile>
 
+#include <simgear_config.h>
 #include <simgear/debug/logstream.hxx>
 #include <simgear/io/iostreams/sgstream.hxx>
 #include <simgear/math/sg_random.hxx>
 #include <simgear/misc/sg_path.hxx>
+#include <simgear/props/props.hxx>
 #include <simgear/scene/material/Effect.hxx>
 #include <simgear/scene/material/EffectGeode.hxx>
-#include <simgear/props/props.hxx>
-#include <simgear/scene/util/RenderConstants.hxx>
-#include <simgear/scene/util/StateAttributeFactory.hxx>
-#include <simgear/scene/util/SGReaderWriterOptions.hxx>
 #include <simgear/scene/util/OsgUtils.hxx>
+#include <simgear/scene/util/RenderConstants.hxx>
+#include <simgear/scene/util/SGReaderWriterOptions.hxx>
+#include <simgear/scene/util/StateAttributeFactory.hxx>
 
 #include "TreeBin.hxx"
 
-const int TREE_INSTANCE_POSITIONS = 6;  // (x,y,z) See also tree.eff
+
+const int TREE_INSTANCE_POSITIONS = 6; // (x,y,z) See also tree.eff
 
 using namespace osg;
 
-namespace simgear
-{
+namespace simgear {
 
 // Tree instance scheme:
 // vertex - local position of quad vertex.
@@ -81,18 +78,18 @@ struct TreeInstanceBoundingBoxCallback : public Drawable::ComputeBoundingBoxCall
         const Vec3Array* instancePositions = static_cast<const Vec3Array*>(geometry->getVertexAttribArray(TREE_INSTANCE_POSITIONS));
 
         const Vec3Array* normals = static_cast<const Vec3Array*>(geometry->getNormalArray());
-        const osg::Vec3f normal = static_cast<const Vec3f>((*normals)[0]);
+        const vsg::vec3 normal = static_cast<const Vec3f>((*normals)[0]);
 
-        float maxScaleX = (float) normal[0];
-        float maxScaleY = (float) normal[1];
+        float maxScaleX = (float)normal[0];
+        float maxScaleY = (float)normal[1];
 
         for (unsigned int v = 0; v < instancePositions->size(); ++v) {
             Vec3 pt = (*instancePositions)[v];
             bb.expandBy(pt);
         }
 
-        bb = BoundingBox(bb._min - osg::Vec3(maxScaleX, maxScaleX, maxScaleY),
-                         bb._max + osg::Vec3(maxScaleX, maxScaleX, maxScaleY));
+        bb = BoundingBox(bb._min - vsg::vec3(maxScaleX, maxScaleX, maxScaleY),
+                         bb._max + vsg::vec3(maxScaleX, maxScaleX, maxScaleY));
 
         return bb;
     }
@@ -101,9 +98,8 @@ struct TreeInstanceBoundingBoxCallback : public Drawable::ComputeBoundingBoxCall
 
 EffectGeode* createTreeGeode(TreeBin* forest)
 {
-
     Vec3Array* vertexArray = new Vec3Array;
-    Vec2Array* texCoords   = new Vec2Array;
+    Vec2Array* texCoords = new Vec2Array;
 
     // Create a number of quads rotated evenly in the z-axis around the origin.
     const int NUM_QUADS = 3;
@@ -112,29 +108,37 @@ EffectGeode* createTreeGeode(TreeBin* forest)
     texCoords->reserve(NUM_QUADS * 6);
 
     for (int i = 0; i < NUM_QUADS; ++i) {
-        const double x1 = sin(((double) i) * PI / (double) NUM_QUADS) * 0.5f;
-        const double y1 = cos(((double) i) * PI / (double) NUM_QUADS) * 0.5f;
+        const double x1 = sin(((double)i) * PI / (double)NUM_QUADS) * 0.5f;
+        const double y1 = cos(((double)i) * PI / (double)NUM_QUADS) * 0.5f;
         const double x2 = -x1;
         const double y2 = -y1;
 
-        const osg::Vec3 v0(x1, y1, 0.0f);
-        const osg::Vec3 v1(x2, y2, 0.0f);
-        const osg::Vec3 v2(x2, y2, 1.0f);
-        const osg::Vec3 v3(x1, y1, 1.0f);
-        vertexArray->push_back(v0); vertexArray->push_back(v1); vertexArray->push_back(v2); // 1st triangle
-        vertexArray->push_back(v0); vertexArray->push_back(v2); vertexArray->push_back(v3); // 2nd triangle
+        const vsg::vec3 v0(x1, y1, 0.0f);
+        const vsg::vec3 v1(x2, y2, 0.0f);
+        const vsg::vec3 v2(x2, y2, 1.0f);
+        const vsg::vec3 v3(x1, y1, 1.0f);
+        vertexArray->push_back(v0);
+        vertexArray->push_back(v1);
+        vertexArray->push_back(v2); // 1st triangle
+        vertexArray->push_back(v0);
+        vertexArray->push_back(v2);
+        vertexArray->push_back(v3); // 2nd triangle
 
         // The texture coordinate range is not the entire coordinate
         // space, as the texture has a number of different trees on
         // it. We let the shader choose the variety.
-        // Y-value chosen so that we definitely won't get artifacts from the tree trunk on the 
+        // Y-value chosen so that we definitely won't get artifacts from the tree trunk on the
         // subtexture above in the tree atlas
-        const osg::Vec2 t0(0.0f, 0.0f);
-        const osg::Vec2 t1(1.0f, 0.0f);
-        const osg::Vec2 t2(1.0f, 0.234f);
-        const osg::Vec2 t3(0.0f, 0.234f);
-        texCoords->push_back(t0); texCoords->push_back(t1); texCoords->push_back(t2); // 1st triangle
-        texCoords->push_back(t0); texCoords->push_back(t2); texCoords->push_back(t3); // 2nd triangle
+        const vsg::vec2 t0(0.0f, 0.0f);
+        const vsg::vec2 t1(1.0f, 0.0f);
+        const vsg::vec2 t2(1.0f, 0.234f);
+        const vsg::vec2 t3(0.0f, 0.234f);
+        texCoords->push_back(t0);
+        texCoords->push_back(t1);
+        texCoords->push_back(t2); // 1st triangle
+        texCoords->push_back(t0);
+        texCoords->push_back(t2);
+        texCoords->push_back(t3); // 2nd triangle
     }
 
     Geometry* geometry = new Geometry;
@@ -149,7 +153,7 @@ EffectGeode* createTreeGeode(TreeBin* forest)
     params->push_back(Vec3(forest->width, forest->height, (float)forest->texture_varieties));
     geometry->setNormalArray(params, Array::BIND_OVERALL);
 
-    osg::Vec3Array* positions = new osg::Vec3Array;
+    vsg::vec3Array* positions = new vsg::vec3Array;
     positions->reserve(forest->getNumTrees());
 
     for (auto i = forest->_trees.begin(); i != forest->_trees.end(); ++i) {
@@ -173,7 +177,7 @@ EffectGeode* createTreeGeode(TreeBin* forest)
     return result;
 }
 
-typedef std::map<std::string, osg::observer_ptr<Effect> > EffectMap;
+typedef std::map<std::string, osg::observer_ptr<Effect>> EffectMap;
 
 static EffectMap treeEffectMap;
 inline static std::mutex treeEffectMapMutex; // Protects the treeEffectMap for multi-threaded access
@@ -182,7 +186,7 @@ inline static std::mutex treeEffectMapMutex; // Protects the treeEffectMap for m
 // forest into the local Z-up coordinate system we can reuse the
 // primitive tree geometry for all the forests of the same type.
 
-Group* createForest(SGTreeBinList& forestList, osg::ref_ptr<simgear::SGReaderWriterOptions> options)
+Group* createForest(SGTreeBinList& forestList, vsg::ref_ptr<simgear::SGReaderWriterOptions> options)
 {
     // Set up some shared structures.
     Group* group = new Group;
@@ -195,21 +199,18 @@ Group* createForest(SGTreeBinList& forestList, osg::ref_ptr<simgear::SGReaderWri
         // No point generating anything if there aren't any trees.
         if (forest->getNumTrees() == 0) continue;
 
-        osg::ref_ptr<Effect> effect;
+        vsg::ref_ptr<Effect> effect;
 
         {
             const std::lock_guard<std::mutex> lock(treeEffectMapMutex); // Lock the treeEffectMap for this scope
             EffectMap::iterator iter = treeEffectMap.find(forest->texture);
-            if (iter == treeEffectMap.end() || (!iter->second.lock(effect)))
-            {
+            if (iter == treeEffectMap.end() || (!iter->second.lock(effect))) {
                 SGPropertyNode_ptr effectProp = new SGPropertyNode;
                 makeChild(effectProp, "inherits-from")->setStringValue(forest->teffect);
                 SGPropertyNode* params = makeChild(effectProp, "parameters");
                 // emphasize n = 0
-                params->getChild("texture", 0, true)->getChild("image", 0, true)
-                    ->setStringValue(forest->texture);
-                params->getChild("texture", 1, true)->getChild("image", 0, true)
-                    ->setStringValue(forest->normal_map);
+                params->getChild("texture", 0, true)->getChild("image", 0, true)->setStringValue(forest->texture);
+                params->getChild("texture", 1, true)->getChild("image", 0, true)->setStringValue(forest->normal_map);
                 effect = makeEffect(effectProp, true, options);
 
                 if (iter == treeEffectMap.end()) {
@@ -233,7 +234,7 @@ Group* createForest(SGTreeBinList& forestList, osg::ref_ptr<simgear::SGReaderWri
     return group;
 }
 
-TreeBin::TreeBin(const SGMaterial *mat)
+TreeBin::TreeBin(const SGMaterial* mat)
 {
     texture_varieties = mat->get_tree_varieties();
     range = mat->get_tree_range();
@@ -245,8 +246,7 @@ TreeBin::TreeBin(const SGMaterial *mat)
 };
 
 
-TreeBin::TreeBin(const SGPath& absoluteFileName, const SGMaterial *mat) : 
-TreeBin(mat)
+TreeBin::TreeBin(const SGPath& absoluteFileName, const SGMaterial* mat) : TreeBin(mat)
 {
     sg_gzifstream stream(absoluteFileName);
     if (!stream.is_open()) {
@@ -283,7 +283,7 @@ TreeBin(mat)
         // these might fail, so check them after we look at failbit
         in >> a >> b >> c;
 
-        osg::Vec3d loc = osg::Vec3d(x,y,z);
+        vsg::dvec3 loc = vsg::dvec3(x, y, z);
         insert(loc);
     }
 
@@ -291,4 +291,4 @@ TreeBin(mat)
 };
 
 
-}
+} // namespace simgear

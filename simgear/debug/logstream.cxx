@@ -92,6 +92,7 @@ const std::initializer_list<LogClassMapping> log_class_mappings = {
     LogClassMapping(SG_PARTICLES, "particles"),
     LogClassMapping(SG_HEADLESS, "headless"),
     LogClassMapping(SG_OSG, "osg", {"openscenegraph"}),
+    LogClassMapping(SG_VSG, "vsg", {"vulkanscenegraph"}),
     LogClassMapping(SG_UNDEFD, "")};
 
 } // namespace
@@ -318,7 +319,7 @@ public:
          */
         if (m_stdout_isRedirectedAlready){
 			if (!m_stderr_isRedirectedAlready) {
-				MessageBox(0, "Redirection only works when you use 2>&1 before using > or |\r\n(e.g. fgfs 2>&1 | more)", "Simgear Error", MB_OK | MB_ICONERROR);
+				MessageBox(0, "Redirection only works when you use 2>&1 before using > or |\r\n(e.g. fgfs 2>&1 | more)", "SimGear Error", MB_OK | MB_ICONERROR);
 				exit(3);
 			}
         } else {
@@ -556,6 +557,10 @@ public:
         // SG_OSG (OSG notify) - will always be displayed regardless of FG log settings as OSG log level is configured
         // separately and thus it makes more sense to allow these message through.
         if (static_cast<unsigned>(p) == static_cast<unsigned>(SG_OSG)) return true;
+
+        // SG_VSG (VSG notify) - will always be displayed regardless of FG log settings as VSG log level is configured
+        // separately and thus it makes more sense to allow these message through.
+        if (static_cast<unsigned>(p) == static_cast<unsigned>(SG_VSG)) return true;
 
         p = translatePriority(p, file, line, function, freeFilename);
         if (p >= SG_INFO) return true;
@@ -854,7 +859,7 @@ sglog()
     static std::ios_base::Init initializer;
 
     // http://www.aristeia.com/Papers/DDJ_Jul_Aug_2004_revised.pdf
-    // in the absence of portable memory barrier ops in Simgear,
+    // in the absence of portable memory barrier ops in SimGear,
     // let's keep this correct & safe
     std::lock_guard<std::mutex> g(global_logStreamLock);
 
@@ -914,7 +919,7 @@ void logstream::requestConsole(bool ignoreErrors)
         }
     } else {
         if (!ignoreErrors)
-            MessageBox(0, "--console ignored because stdout or stderr redirected with > or 2>", "Simgear Error", MB_OK | MB_ICONERROR);
+            MessageBox(0, "--console ignored because stdout or stderr redirected with > or 2>", "SimGear Error", MB_OK | MB_ICONERROR);
     }
 #endif
 }

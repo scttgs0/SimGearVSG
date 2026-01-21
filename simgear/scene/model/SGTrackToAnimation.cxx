@@ -27,8 +27,8 @@
 /**
  *
  */
-static osg::NodePath requireNodePath( osg::Node* node,
-                                      osg::Node* haltTraversalAtNode = 0 )
+static osg::NodePath requireNodePath( vsg::Node* node,
+                                      vsg::Node* haltTraversalAtNode = 0 )
 {
   const osg::NodePathList node_paths =
     node->getParentalNodePaths(haltTraversalAtNode);
@@ -81,7 +81,7 @@ class SGTrackToAnimation::UpdateCallback:
   public osg::NodeCallback
 {
   public:
-    UpdateCallback( osg::Group* target,
+    UpdateCallback( vsg::Group* target,
                     const SGTrackToAnimation* anim,
                     osg::MatrixTransform* slave_tf ):
       _target(target),
@@ -112,7 +112,7 @@ class SGTrackToAnimation::UpdateCallback:
         _lock_axis.set(0, 1, 0);
       }
 
-      if( _slave_center != osg::Vec3() )
+      if( _slave_center != vsg::vec3() )
       {
         _root_length = (_slave_center - _node_center).length();
         _slave_length = (_target_center - _slave_center).length();
@@ -164,7 +164,7 @@ class SGTrackToAnimation::UpdateCallback:
       _slave_initial_angle2 = std::asin(target_offset / _slave_length);
     }
 
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+    virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
     {
       // TODO prevent invalid animation from being added?
 
@@ -210,13 +210,13 @@ class SGTrackToAnimation::UpdateCallback:
         root_angle = -_root_initial_angle;
         slave_angle = -_slave_initial_angle;
 
-        osg::Vec3 target_pos = ( osg::computeLocalToWorld(_target_path)
+        vsg::vec3 target_pos = ( osg::computeLocalToWorld(_target_path)
                              * osg::computeWorldToLocal(_node_path)
                              ).preMult(_target_center),
                   dir = target_pos - _node_center;
 
         // Ensure direction is perpendicular to lock axis
-        osg::Vec3 lock_proj = _lock_axis * (_lock_axis * dir);
+        vsg::vec3 lock_proj = _lock_axis * (_lock_axis * dir);
         dir -= lock_proj;
 
         // Track to target
@@ -246,9 +246,9 @@ class SGTrackToAnimation::UpdateCallback:
             // If the distance is too large we need to manually calculate the
             // distance of the slave to the target, as it is not possible
             // anymore to rotate the objects to reach the target.
-            osg::Vec3 root_dir = target_pos - _node_center;
+            vsg::vec3 root_dir = target_pos - _node_center;
             root_dir.normalize();
-            osg::Vec3 slave_pos = _node_center + root_dir * _root_length;
+            vsg::vec3 slave_pos = _node_center + root_dir * _root_length;
             slave_target_dist = (target_pos - slave_pos).length();
           }
 
@@ -273,7 +273,7 @@ class SGTrackToAnimation::UpdateCallback:
       tf->setAngleRad( root_angle );
       if( _slave_tf )
       {
-        osg::Matrix mat_tf;
+        vsg::mat4 mat_tf;
         SGRotateTransform::set_rotation
         (
           mat_tf,
@@ -285,7 +285,7 @@ class SGTrackToAnimation::UpdateCallback:
         // Slave rotation around second axis
         if( slave_angle2 != 0 )
         {
-          osg::Matrix mat_tf2;
+          vsg::mat4 mat_tf2;
           SGRotateTransform::set_rotation
           (
             mat_tf2,
@@ -303,14 +303,14 @@ class SGTrackToAnimation::UpdateCallback:
     }
   protected:
 
-    osg::Vec3           _node_center,
+    vsg::vec3           _node_center,
                         _slave_center,
                         _target_center,
                         _lock_axis,
                         _track_axis,
                         _up_axis,
                         _slave_axis2; ///!< 2nd axis for 2dof slave
-    osg::Group         *_target;
+    vsg::Group         *_target;
     osg::MatrixTransform *_slave_tf;
     osg::NodePath       _node_path,
                         _target_path;
@@ -355,7 +355,7 @@ SGTrackToAnimation::SGTrackToAnimation(simgear::SGTransientModelData &modelData)
 }
 
 //------------------------------------------------------------------------------
-osg::Group* SGTrackToAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group* SGTrackToAnimation::createAnimationGroup(vsg::Group& parent)
 {
   if( !_target_group )
     return 0;
@@ -366,7 +366,7 @@ osg::Group* SGTrackToAnimation::createAnimationGroup(osg::Group& parent)
     slave_tf = new osg::MatrixTransform;
     slave_tf->setName("locked-track slave animation");
 
-    osg::Group* parent = _slave_group->getParent(0);
+    vsg::Group* parent = _slave_group->getParent(0);
     slave_tf->addChild(_slave_group);
     parent->removeChild(_slave_group);
     parent->addChild(slave_tf);

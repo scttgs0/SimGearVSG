@@ -19,10 +19,12 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/NodeCallback>
 
-namespace simgear
-{
+
+namespace simgear {
 class UpdateOnceCallback : public osg::NodeCallback
 {
 public:
@@ -32,12 +34,12 @@ public:
     {
     }
 
-    META_Object(simgear,UpdateOnceCallback);
+    META_Object(simgear, UpdateOnceCallback);
 
-    virtual void doUpdate(osg::Node* node, osg::NodeVisitor* nv);
+    virtual void doUpdate(vsg::Node* node, osg::NodeVisitor* nv);
     /**
      * Do not override; use doUpdate instead!
      */
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
+    virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv);
 };
-}
+} // namespace simgear

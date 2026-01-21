@@ -27,11 +27,11 @@ public:
         _sw->setValue(0, node->getBoolValue());
     }
 private:
-    osg::ref_ptr<osg::Switch> _sw;
+    vsg::ref_ptr<osg::Switch> _sw;
 };
 
 void
-SGLight::UpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
+SGLight::UpdateCallback::operator()(vsg::Node* node, osg::NodeVisitor* nv)
 {
     auto light = dynamic_cast<SGLight*>(node);
     assert(light);
@@ -78,7 +78,7 @@ SGLight::SGLight(const bool legacy) :
 }
 
 SGLight::SGLight(const SGLight& l, const osg::CopyOp& copyop) :
-    osg::Node(l, copyop),
+    vsg::Node(l, copyop),
     _legacyPropertyNames(l._legacyPropertyNames),
     _type(l._type),
     _priority(l._priority),
@@ -102,13 +102,13 @@ SGLight::SGLight(const SGLight& l, const osg::CopyOp& copyop) :
     _quadratic_attenuation_value = l._quadratic_attenuation_value;
 }
 
-osg::ref_ptr<osg::Node>
+vsg::ref_ptr<vsg::Node>
 SGLight::appendLight(const SGPropertyNode* configNode,
                      SGPropertyNode* modelRoot,
                      bool legacy)
 {
     //-- create return variable
-    osg::ref_ptr<osg::MatrixTransform> align = new osg::MatrixTransform;
+    vsg::ref_ptr<osg::MatrixTransform> align = new osg::MatrixTransform;
 
     SGLight* light = new SGLight{legacy};
     light->_transform = align;
@@ -132,11 +132,11 @@ SGLight::appendLight(const SGPropertyNode* configNode,
     //-- debug visualisation --
     osg::Shape *debug_shape = nullptr;
     if (light->getType() == SGLight::Type::POINT) {
-        debug_shape = new osg::Sphere(osg::Vec3f(0.0f, 0.0f, 0.0f), light->getRange());
+        debug_shape = new osg::Sphere(vsg::vec3(0.0f, 0.0f, 0.0f), light->getRange());
     } else if (light->getType() == SGLight::Type::SPOT) {
         debug_shape = new osg::Cone(
             // Origin of the cone is at its center of mass
-            osg::Vec3f(0.0f, 0.0f, -0.75f * light->getRange()),
+            vsg::vec3(0.0f, 0.0f, -0.75f * light->getRange()),
             tan(light->getSpotCutoff() * SG_DEGREES_TO_RADIANS) * light->getRange(),
             light->getRange());
     } else {
@@ -145,7 +145,7 @@ SGLight::appendLight(const SGPropertyNode* configNode,
 
     osg::ShapeDrawable *debug_drawable = new osg::ShapeDrawable(debug_shape);
     debug_drawable->setColor(
-        osg::Vec4(configNode->getFloatValue("debug-color/r", 1.0f),
+        vsg::vec4(configNode->getFloatValue("debug-color/r", 1.0f),
                   configNode->getFloatValue("debug-color/g", 0.0f),
                   configNode->getFloatValue("debug-color/b", 0.0f),
                   configNode->getFloatValue("debug-color/a", 1.0f)));
@@ -186,7 +186,7 @@ SGLight::buildValue(const SGPropertyNode* node, double defaultVal)
 }
 
 simgear::RGBColorValue_ptr
-SGLight::buildRGBColorValue(const SGPropertyNode *node, const osg::Vec3f &defaultVal)
+SGLight::buildRGBColorValue(const SGPropertyNode *node, const vsg::vec3 &defaultVal)
 {
     if (!node) {
         // Node does not exist: use a fixed color
@@ -197,7 +197,7 @@ SGLight::buildRGBColorValue(const SGPropertyNode *node, const osg::Vec3f &defaul
 }
 
 simgear::RGBAColorValue_ptr
-SGLight::buildRGBAColorValue(const SGPropertyNode *node, const osg::Vec4f &defaultVal)
+SGLight::buildRGBAColorValue(const SGPropertyNode *node, const vsg::vec4 &defaultVal)
 {
     if (!node) {
         // Node does not exist: use a fixed color
@@ -236,59 +236,59 @@ SGLight::configure(const SGPropertyNode* configNode)
 
     _dim_factor_value = buildValue(configNode->getChild("dim-factor"), 1.0f);
     _range_value = buildValue(configNode->getChild(_legacyPropertyNames ? "far-m" : "range-m"), 1.0f);
-    _ambient_value = buildRGBAColorValue(configNode->getChild("ambient"), osg::Vec4f(0.05f, 0.05f, 0.05f, 1.0f));
-    _diffuse_value = buildRGBAColorValue(configNode->getChild("diffuse"), osg::Vec4f(0.8f, 0.8f, 0.8f, 1.0f));
-    _specular_value = buildRGBAColorValue(configNode->getChild("specular"), osg::Vec4f(0.05f, 0.05f, 0.05f, 1.0f));
+    _ambient_value = buildRGBAColorValue(configNode->getChild("ambient"), vsg::vec4(0.05f, 0.05f, 0.05f, 1.0f));
+    _diffuse_value = buildRGBAColorValue(configNode->getChild("diffuse"), vsg::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+    _specular_value = buildRGBAColorValue(configNode->getChild("specular"), vsg::vec4(0.05f, 0.05f, 0.05f, 1.0f));
     _constant_attenuation_value = buildValue(configNode->getNode("attenuation/c"), 1.0f);
     _linear_attenuation_value = buildValue(configNode->getNode("attenuation/l"), 0.0f);
     _quadratic_attenuation_value = buildValue(configNode->getNode("attenuation/q"), 0.0f);
     _spot_exponent_value = buildValue(configNode->getNode(_legacyPropertyNames ? "exponent" : "spot-exponent"), 0.0f);
     _spot_cutoff_value = buildValue(configNode->getNode(_legacyPropertyNames ? "cutoff" : "spot-cutoff"), 180.0f);
 
-    _color_value = buildRGBColorValue(configNode->getChild("color"), osg::Vec3f(1.0f, 1.0f, 1.0f));
+    _color_value = buildRGBColorValue(configNode->getChild("color"), vsg::vec3(1.0f, 1.0f, 1.0f));
     _intensity_value = buildValue(configNode->getNode("intensity"), 1.0f);
 
-    osg::Matrixf t;
-    osg::Vec3f pos;
+    vsg::mat4 t;
+    vsg::vec3 pos;
     if (const SGPropertyNode* posNode = configNode->getNode("position")) {
         // use the legacy node names for x,y,z when in legacy mode and at least one is specified as this is the most compatible
         // because sometimes modellers omit any node that has a zero value as a shortcut.
         if (_legacyPropertyNames && (posNode->hasValue("x") || posNode->hasValue("y") || posNode->hasValue("z")) ) {
-            pos = osg::Vec3(posNode->getFloatValue("x"),
+            pos = vsg::vec3(posNode->getFloatValue("x"),
                           posNode->getFloatValue("y"),
                           posNode->getFloatValue("z"));
             t.makeTranslate(pos);
         } else {
-            pos = osg::Vec3(posNode->getFloatValue("x-m"),
+            pos = vsg::vec3(posNode->getFloatValue("x-m"),
                           posNode->getFloatValue("y-m"),
                           posNode->getFloatValue("z-m"));
             t.makeTranslate(pos);
         }
     }
-    osg::Matrixf r;
+    vsg::mat4 r;
     if (const SGPropertyNode *dirNode = configNode->getNode("direction")) {
         if (dirNode->hasValue("pitch-deg")) {
             r.makeRotate(
                 dirNode->getFloatValue("pitch-deg")*SG_DEGREES_TO_RADIANS,
-                osg::Vec3f(0.0f, 1.0f, 0.0f),
+                vsg::vec3(0.0f, 1.0f, 0.0f),
                 dirNode->getFloatValue("roll-deg")*SG_DEGREES_TO_RADIANS,
-                osg::Vec3f(1.0f, 0.0f, 0.0f),
+                vsg::vec3(1.0f, 0.0f, 0.0f),
                 dirNode->getFloatValue("heading-deg")*SG_DEGREES_TO_RADIANS,
-                osg::Vec3f(0.0f, 0.0f, 1.0f));
+                vsg::vec3(0.0f, 0.0f, 1.0f));
         } else if (dirNode->hasValue("lookat-x-m")) {
-            osg::Vec3f lookAt(dirNode->getFloatValue("lookat-x-m"),
+            vsg::vec3 lookAt(dirNode->getFloatValue("lookat-x-m"),
                              dirNode->getFloatValue("lookat-y-m"),
                              dirNode->getFloatValue("lookat-z-m"));
-            osg::Vec3f dir = lookAt - pos;
-            r.makeRotate(osg::Vec3(0.0f, 0.0f, -1.0f), dir);
+            vsg::vec3 dir = lookAt - pos;
+            r.makeRotate(vsg::vec3(0.0f, 0.0f, -1.0f), dir);
         } else if (dirNode->hasValue("pointing_x")) { // ALS compatible
-            r.makeRotate(osg::Vec3(0.0f, 0.0f, -1.0f),
-                         osg::Vec3(-dirNode->getFloatValue("pointing_x"),
+            r.makeRotate(vsg::vec3(0.0f, 0.0f, -1.0f),
+                         vsg::vec3(-dirNode->getFloatValue("pointing_x"),
                                    -dirNode->getFloatValue("pointing_y"),
                                    -dirNode->getFloatValue("pointing_z")));
         } else {
-            r.makeRotate(osg::Vec3(0.0f, 0.0f, -1.0f),
-                         osg::Vec3(dirNode->getFloatValue("x"),
+            r.makeRotate(vsg::vec3(0.0f, 0.0f, -1.0f),
+                         vsg::vec3(dirNode->getFloatValue("x"),
                                    dirNode->getFloatValue("y"),
                                    dirNode->getFloatValue("z")));
         }

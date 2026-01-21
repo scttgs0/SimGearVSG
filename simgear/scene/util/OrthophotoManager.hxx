@@ -21,89 +21,104 @@
 
 #include <unordered_map>
 
-#include <osg/Image>
-#include <osg/Texture2D>
+#include <vsg/all.h>
+
 #include <osg/Referenced>
-#include <osg/ref_ptr>
+#include <osg/Texture2D>
 #include <osg/observer_ptr>
-#include <osgDB/ReaderWriter>
 #include <osgDB/ReadFile>
-#include <simgear/misc/sg_dir.hxx>
-#include <simgear/misc/sg_path.hxx>
+#include <osgDB/ReaderWriter>
+
 #include <simgear/bucket/newbucket.hxx>
 #include <simgear/debug/logstream.hxx>
 #include <simgear/math/SGLimits.hxx>
-#include "SGSceneFeatures.hxx"
+#include <simgear/misc/sg_dir.hxx>
+#include <simgear/misc/sg_path.hxx>
+
 #include "OsgSingleton.hxx"
 #include "SGImageUtils.hxx"
+#include "SGSceneFeatures.hxx"
+
 
 namespace simgear {
 
-    using ImageRef = osg::ref_ptr<osg::Image>;
-    using Texture2DRef = osg::ref_ptr<osg::Texture2D>;
+using ImageRef = vsg::ref_ptr<vsg::Image>;
+using Texture2DRef = vsg::ref_ptr<osg::Texture2D>;
 
-    class Orthophoto;
-    using OrthophotoRef = osg::ref_ptr<Orthophoto>;
-    using OrthophotoWeakRef = osg::observer_ptr<Orthophoto>;
+class Orthophoto;
+using OrthophotoRef = vsg::ref_ptr<Orthophoto>;
+using OrthophotoWeakRef = osg::observer_ptr<Orthophoto>;
 
-    class OrthophotoBounds {
-    private:
-        double _minNegLon = SGLimitsd::max();
-        double _minPosLon = SGLimitsd::max();
-        double _maxNegLon = SGLimitsd::lowest();
-        double _maxPosLon = SGLimitsd::lowest();
-        double _minLat = SGLimitsd::max();
-        double _maxLat = SGLimitsd::lowest();
+class OrthophotoBounds
+{
+private:
+    double _minNegLon = SGLimitsd::max();
+    double _minPosLon = SGLimitsd::max();
+    double _maxNegLon = SGLimitsd::lowest();
+    double _maxPosLon = SGLimitsd::lowest();
+    double _minLat = SGLimitsd::max();
+    double _maxLat = SGLimitsd::lowest();
 
-        enum Hemisphere {Eastern, Western, StraddlingPm, StraddlingIdl, Invalid} _hemisphere = Invalid;
-        void _updateHemisphere();
+    enum Hemisphere { Eastern,
+                      Western,
+                      StraddlingPm,
+                      StraddlingIdl,
+                      Invalid } _hemisphere = Invalid;
+    void _updateHemisphere();
 
-    public:
-        static OrthophotoBounds fromBucket(const SGBucket& bucket);
+public:
+    static OrthophotoBounds fromBucket(const SGBucket& bucket);
 
-        double getWidth() const;
-        double getHeight() const;
-        SGVec2f getTexCoord(const SGGeod& geod) const;
-        double getLonOffset(const OrthophotoBounds& other) const;
-        double getLatOffset(const OrthophotoBounds& other) const;
+    double getWidth() const;
+    double getHeight() const;
+    SGVec2f getTexCoord(const SGGeod& geod) const;
+    double getLonOffset(const OrthophotoBounds& other) const;
+    double getLatOffset(const OrthophotoBounds& other) const;
 
-        void expandToInclude(const SGBucket& bucket);
-        void expandToInclude(const double lon, const double lat);
-        void expandToInclude(const OrthophotoBounds& bounds);
-    };
+    void expandToInclude(const SGBucket& bucket);
+    void expandToInclude(const double lon, const double lat);
+    void expandToInclude(const OrthophotoBounds& bounds);
+};
 
-    class Orthophoto : public osg::Referenced {
-    private:
-        Texture2DRef _texture;
-        OrthophotoBounds _bbox;
+class Orthophoto : public osg::Referenced
+{
+private:
+    Texture2DRef _texture;
+    OrthophotoBounds _bbox;
 
-    public:
-        static OrthophotoRef fromBucket(const SGBucket& bucket, const PathList& scenery_paths);
+public:
+    static OrthophotoRef fromBucket(const SGBucket& bucket, const PathList& scenery_paths);
 
-        Orthophoto(const Texture2DRef& texture, const OrthophotoBounds& bbox) { _texture = texture; _bbox = bbox; }
-        Orthophoto(const std::vector<OrthophotoRef>& orthophotos);
+    Orthophoto(const Texture2DRef& texture, const OrthophotoBounds& bbox)
+    {
+        _texture = texture;
+        _bbox = bbox;
+    }
+    Orthophoto(const std::vector<OrthophotoRef>& orthophotos);
 
-        Texture2DRef getTexture() const { return _texture; };
-        OrthophotoBounds getBbox() const { return _bbox; };
-    };
+    Texture2DRef getTexture() const { return _texture; };
+    OrthophotoBounds getBbox() const { return _bbox; };
+};
 
-    class OrthophotoManager : public osg::Referenced {
-    private:
-        std::unordered_map<long, OrthophotoWeakRef> _orthophotos;
-    public:
-        static OrthophotoManager* instance();
+class OrthophotoManager : public osg::Referenced
+{
+private:
+    std::unordered_map<long, OrthophotoWeakRef> _orthophotos;
 
-        void registerOrthophoto(const long bucket_idx, const OrthophotoRef& orthophoto);
+public:
+    static OrthophotoManager* instance();
 
-        /**
+    void registerOrthophoto(const long bucket_idx, const OrthophotoRef& orthophoto);
+
+    /**
          * Get an orthophoto by bucket index
          **/
-        OrthophotoRef getOrthophoto(const long bucket_idx);
+    OrthophotoRef getOrthophoto(const long bucket_idx);
 
-        /**
+    /**
          * Get an orthophoto given a set of nodes.
          * Used for airports, since they are not buckets.
          **/
-        OrthophotoRef getOrthophoto(const std::vector<SGVec3d>& nodes, const SGVec3d& center);
-    };
-}
+    OrthophotoRef getOrthophoto(const std::vector<SGVec3d>& nodes, const SGVec3d& center);
+};
+} // namespace simgear

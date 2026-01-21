@@ -11,14 +11,14 @@
 
 #define VERIFY_COLOR(str, r, g, b, a) \
   SG_VERIFY(simgear::parseColor(str, color)) \
-  SG_CHECK_EQUAL_NOSTREAM(color, osg::Vec4(r, g, b, a))
+  SG_CHECK_EQUAL_NOSTREAM(color, vsg::vec4(r, g, b, a))
 
 #define VERIFY_NODE_STR(node, str) \
   SG_CHECK_EQUAL(node.getStringValue(), std::string(str))
 
 int main (int ac, char ** av)
 {
-  osg::Vec4 color;
+  vsg::vec4 color;
   VERIFY_COLOR("#ff0000", 1,0,0,1);
   VERIFY_COLOR("#00ff00", 0,1,0,1);
   VERIFY_COLOR("#0000ff", 0,0,1,1);

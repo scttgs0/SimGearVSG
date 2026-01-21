@@ -30,7 +30,7 @@ public:
     virtual void operator()(osg::Uniform *uniform, osg::NodeVisitor *nv) {
         assert(dynamic_cast<SGUpdateVisitor*>(nv));
         SGUpdateVisitor* uv = static_cast<SGUpdateVisitor*>(nv);
-        osg::Vec3f l = toOsg(uv->getLightDirection());
+        vsg::vec3 l = toOsg(uv->getLightDirection());
         l.normalize();
         uniform->set(l);
     }
@@ -41,7 +41,7 @@ public:
     virtual void operator()(osg::Uniform *uniform, osg::NodeVisitor *nv) {
         assert(dynamic_cast<SGUpdateVisitor*>(nv));
         SGUpdateVisitor* uv = static_cast<SGUpdateVisitor*>(nv);
-        osg::Vec3f l = toOsg(uv->getSecondLightDirection());
+        vsg::vec3 l = toOsg(uv->getSecondLightDirection());
         l.normalize();
         uniform->set(l);
     }
@@ -142,32 +142,32 @@ Compositor::Compositor(osg::View *view,
     _viewport(viewport),
     _mvr{ mvr_info ? mvr_info->views : 1 },
     _uniforms{
-    new osg::Uniform("fg_TextureMatrix", osg::Matrixf()),
+    new osg::Uniform("fg_TextureMatrix", vsg::mat4()),
     new osg::Uniform(osg::Uniform::FLOAT_VEC4, "fg_Viewport", _mvr.views),
-    new osg::Uniform("fg_PixelSize", osg::Vec2f()),
+    new osg::Uniform("fg_PixelSize", vsg::vec2()),
     new osg::Uniform("fg_AspectRatio", 0.0f),
     new osg::Uniform(osg::Uniform::FLOAT_MAT4, "fg_ViewMatrix", _mvr.views),
     new osg::Uniform(osg::Uniform::FLOAT_MAT4, "fg_ViewMatrixInverse", _mvr.views),
     new osg::Uniform(osg::Uniform::FLOAT_MAT4, "fg_ProjectionMatrix", _mvr.views),
     new osg::Uniform(osg::Uniform::FLOAT_MAT4, "fg_ProjectionMatrixInverse", _mvr.views),
-    new osg::Uniform("fg_PrevViewMatrix", osg::Matrixf()),
-    new osg::Uniform("fg_PrevViewMatrixInverse", osg::Matrixf()),
-    new osg::Uniform("fg_PrevProjectionMatrix", osg::Matrixf()),
-    new osg::Uniform("fg_PrevProjectionMatrixInverse", osg::Matrixf()),
-    new osg::Uniform("fg_CameraPositionCart", osg::Vec3f()),
-    new osg::Uniform("fg_CameraPositionGeod", osg::Vec3f()),
+    new osg::Uniform("fg_PrevViewMatrix", vsg::mat4()),
+    new osg::Uniform("fg_PrevViewMatrixInverse", vsg::mat4()),
+    new osg::Uniform("fg_PrevProjectionMatrix", vsg::mat4()),
+    new osg::Uniform("fg_PrevProjectionMatrixInverse", vsg::mat4()),
+    new osg::Uniform("fg_CameraPositionCart", vsg::vec3()),
+    new osg::Uniform("fg_CameraPositionGeod", vsg::vec3()),
     new osg::Uniform("fg_CameraDistanceToEarthCenter", 0.0f),
-    new osg::Uniform("fg_CameraWorldUp", osg::Vec3f()),
+    new osg::Uniform("fg_CameraWorldUp", vsg::vec3()),
     new osg::Uniform(osg::Uniform::FLOAT_VEC3, "fg_CameraViewUp", _mvr.views),
-    new osg::Uniform("fg_NearFar", osg::Vec2f()),
+    new osg::Uniform("fg_NearFar", vsg::vec2()),
     new osg::Uniform("fg_Fcoef", 0.0f),
     new osg::Uniform(osg::Uniform::FLOAT_VEC2, "fg_FOVScale", _mvr.views),
     new osg::Uniform(osg::Uniform::FLOAT_VEC2, "fg_FOVCenter", _mvr.views),
     new osg::Uniform(osg::Uniform::FLOAT_VEC3, "fg_SunDirection", _mvr.views),
-    new osg::Uniform("fg_SunDirectionWorld", osg::Vec3f()),
+    new osg::Uniform("fg_SunDirectionWorld", vsg::vec3()),
     new osg::Uniform("fg_SunZenithCosTheta", 0.0f),
     new osg::Uniform(osg::Uniform::FLOAT_VEC3, "fg_MoonDirection", _mvr.views),
-    new osg::Uniform("fg_MoonDirectionWorld", osg::Vec3f()),
+    new osg::Uniform("fg_MoonDirectionWorld", vsg::vec3()),
     new osg::Uniform("fg_MoonZenithCosTheta", 0.0f),
     new osg::Uniform("fg_EarthRadius", 0.0f),
     }
@@ -185,7 +185,7 @@ Compositor::~Compositor()
 {
     // Remove slave cameras from the viewer
     for (const auto &pass : _passes) {
-        osg::Camera *camera = pass->camera;
+        vsg::Camera *camera = pass->camera;
         // Remove all children before removing the slave to prevent the graphics
         // window from automatically cleaning up all associated OpenGL objects.
         camera->removeChildren(0, camera->getNumChildren());
@@ -196,9 +196,9 @@ Compositor::~Compositor()
 }
 
 void Compositor::updateSubView(unsigned int sub_view_index,
-                               const osg::Matrix &view_matrix,
-                               const osg::Matrix &proj_matrix,
-                               const osg::Vec4 &viewport)
+                               const vsg::mat4 &view_matrix,
+                               const vsg::mat4 &proj_matrix,
+                               const vsg::vec4 &viewport)
 {
     for (auto &pass : _passes) {
         if (pass->update_callback.valid())
@@ -206,15 +206,15 @@ void Compositor::updateSubView(unsigned int sub_view_index,
     }
 
     // Update uniforms
-    osg::Matrixd view_inverse = osg::Matrix::inverse(view_matrix);
-    osg::Vec4d camera_pos4 = osg::Vec4d(0.0, 0.0, 0.0, 1.0) * view_inverse;
-    osg::Vec3d camera_pos = osg::Vec3d(camera_pos4.x(),
+    vsg::dmat4 view_inverse = vsg::mat4::inverse(view_matrix);
+    vsg::dvec4 camera_pos4 = vsg::dvec4(0.0, 0.0, 0.0, 1.0) * view_inverse;
+    vsg::dvec3 camera_pos = vsg::dvec3(camera_pos4.x(),
                                        camera_pos4.y(),
                                        camera_pos4.z());
 
-    osg::Vec3d world_up = camera_pos;
+    vsg::dvec3 world_up = camera_pos;
     world_up.normalize();
-    osg::Vec3d view_up = world_up * view_matrix;
+    vsg::dvec3 view_up = world_up * view_matrix;
     view_up.normalize();
 
     double left = -1.0, right = 1.0, bottom = -1.0, top = 1.0,
@@ -222,16 +222,16 @@ void Compositor::updateSubView(unsigned int sub_view_index,
     proj_matrix.getFrustum(left, right, bottom, top, zNear, zFar);
 
     _uniforms[SG_UNIFORM_VIEWPORT]->setElement(sub_view_index,
-                                               osg::Vec4f(viewport.x(),
+                                               vsg::vec4(viewport.x(),
                                                           viewport.y(),
                                                           viewport.z(),
                                                           viewport.w()));
     _uniforms[SG_UNIFORM_VIEW_MATRIX]->setElement(sub_view_index, view_matrix);
     _uniforms[SG_UNIFORM_VIEW_MATRIX_INV]->setElement(sub_view_index, view_inverse);
     _uniforms[SG_UNIFORM_PROJECTION_MATRIX]->setElement(sub_view_index, proj_matrix);
-    _uniforms[SG_UNIFORM_PROJECTION_MATRIX_INV]->setElement(sub_view_index, osg::Matrix::inverse(proj_matrix));
+    _uniforms[SG_UNIFORM_PROJECTION_MATRIX_INV]->setElement(sub_view_index, vsg::mat4::inverse(proj_matrix));
 
-    _uniforms[SG_UNIFORM_CAMERA_VIEW_UP]->setElement(sub_view_index, osg::Vec3f(view_up));
+    _uniforms[SG_UNIFORM_CAMERA_VIEW_UP]->setElement(sub_view_index, vsg::vec3(view_up));
 
     float aspect_ratio = proj_matrix(1, 1) / proj_matrix(0, 0);
     float tan_fov_y = 1.0f / proj_matrix(1, 1);
@@ -239,43 +239,43 @@ void Compositor::updateSubView(unsigned int sub_view_index,
     // The forward vector UV coordinate may not be at 0.5 due to side-by-side
     // multiview viewports, and also asymmetric FOV (especially for VR HMDs).
     if (_mvr.views > 1) {
-        _uniforms[SG_UNIFORM_FOV_SCALE]->setElement(sub_view_index, osg::Vec2f(
+        _uniforms[SG_UNIFORM_FOV_SCALE]->setElement(sub_view_index, vsg::vec2(
             tan_fov_x * _viewport->width() / viewport.z(),
             tan_fov_y * _viewport->height() / viewport.w()) * 2.0f);
-        _uniforms[SG_UNIFORM_FOV_CENTER]->setElement(sub_view_index, osg::Vec2f(
+        _uniforms[SG_UNIFORM_FOV_CENTER]->setElement(sub_view_index, vsg::vec2(
             (viewport.x() + viewport.z() * (-left / (right - left))) / _viewport->width(),
             (viewport.y() + viewport.w() * (-bottom / (top - bottom))) / _viewport->height()));
     } else {
-        _uniforms[SG_UNIFORM_FOV_SCALE]->setElement(sub_view_index, osg::Vec2f(
+        _uniforms[SG_UNIFORM_FOV_SCALE]->setElement(sub_view_index, vsg::vec2(
             tan_fov_x,
             tan_fov_y) * 2.0f);
-        _uniforms[SG_UNIFORM_FOV_CENTER]->setElement(sub_view_index, osg::Vec2f(
+        _uniforms[SG_UNIFORM_FOV_CENTER]->setElement(sub_view_index, vsg::vec2(
             -left / (right - left),
             -bottom / (top - bottom)));
     }
 
-    osg::Vec3f sun_dir_world;
+    vsg::vec3 sun_dir_world;
     _uniforms[SG_UNIFORM_SUN_DIRECTION_WORLD]->get(sun_dir_world);
-    osg::Vec4f sun_dir_view = osg::Vec4f(
+    vsg::vec4 sun_dir_view = vsg::vec4(
         sun_dir_world.x(), sun_dir_world.y(), sun_dir_world.z(), 0.0f) * view_matrix;
-    _uniforms[SG_UNIFORM_SUN_DIRECTION]->setElement(sub_view_index, osg::Vec3f(sun_dir_view.x(), sun_dir_view.y(), sun_dir_view.z()));
+    _uniforms[SG_UNIFORM_SUN_DIRECTION]->setElement(sub_view_index, vsg::vec3(sun_dir_view.x(), sun_dir_view.y(), sun_dir_view.z()));
 
-    osg::Vec3f moon_dir_world;
+    vsg::vec3 moon_dir_world;
     _uniforms[SG_UNIFORM_MOON_DIRECTION_WORLD]->get(moon_dir_world);
-    osg::Vec4f moon_dir_view = osg::Vec4f(
+    vsg::vec4 moon_dir_view = vsg::vec4(
         moon_dir_world.x(), moon_dir_world.y(), moon_dir_world.z(), 0.0f) * view_matrix;
-    _uniforms[SG_UNIFORM_MOON_DIRECTION]->setElement(sub_view_index, osg::Vec3f(moon_dir_view.x(), moon_dir_view.y(), moon_dir_view.z()));
+    _uniforms[SG_UNIFORM_MOON_DIRECTION]->setElement(sub_view_index, vsg::vec3(moon_dir_view.x(), moon_dir_view.y(), moon_dir_view.z()));
 }
 
 void
-Compositor::update(const osg::Matrix &view_matrix,
-                   const osg::Matrix &proj_matrix)
+Compositor::update(const vsg::mat4 &view_matrix,
+                   const vsg::mat4 &proj_matrix)
 {
     // Enable/disable passes by setting or unsetting their graphics context.
     // XXX: Check if this causes threading-related crashes.
     // Also run the update callback for enabled passes.
     for (auto &pass : _passes) {
-        osg::Camera* camera = pass->camera;
+        vsg::Camera* camera = pass->camera;
         bool should_render = (!pass->render_condition || pass->render_condition->test())
             && (!pass->render_once || !pass->has_ever_rendered);
         if (should_render) {
@@ -293,27 +293,27 @@ Compositor::update(const osg::Matrix &view_matrix,
     }
 
     // Update uniforms
-    osg::Matrixd view_inverse = osg::Matrix::inverse(view_matrix);
-    osg::Vec4d camera_pos4 = osg::Vec4d(0.0, 0.0, 0.0, 1.0) * view_inverse;
-    osg::Vec3d camera_pos = osg::Vec3d(camera_pos4.x(),
+    vsg::dmat4 view_inverse = vsg::mat4::inverse(view_matrix);
+    vsg::dvec4 camera_pos4 = vsg::dvec4(0.0, 0.0, 0.0, 1.0) * view_inverse;
+    vsg::dvec3 camera_pos = vsg::dvec3(camera_pos4.x(),
                                        camera_pos4.y(),
                                        camera_pos4.z());
     SGGeod camera_pos_geod = SGGeod::fromCart(
         SGVec3d(camera_pos.x(), camera_pos.y(), camera_pos.z()));
 
-    osg::Vec3d world_up = camera_pos;
+    vsg::dvec3 world_up = camera_pos;
     world_up.normalize();
-    osg::Vec3d view_up = world_up * view_matrix;
+    vsg::dvec3 view_up = world_up * view_matrix;
     view_up.normalize();
 
     double left = 0.0, right = 0.0, bottom = 0.0, top = 0.0,
         zNear = 0.0, zFar = 0.0;
     proj_matrix.getFrustum(left, right, bottom, top, zNear, zFar);
 
-    osg::Matrixf prev_view_matrix, prev_view_matrix_inv;
+    vsg::mat4 prev_view_matrix, prev_view_matrix_inv;
     _uniforms[SG_UNIFORM_VIEW_MATRIX]->getElement(0, prev_view_matrix);
     _uniforms[SG_UNIFORM_VIEW_MATRIX_INV]->getElement(0, prev_view_matrix_inv);
-    osg::Matrixf prev_proj_matrix, prev_proj_matrix_inv;
+    vsg::mat4 prev_proj_matrix, prev_proj_matrix_inv;
     _uniforms[SG_UNIFORM_PROJECTION_MATRIX]->get(prev_proj_matrix);
     _uniforms[SG_UNIFORM_PROJECTION_MATRIX_INV]->get(prev_proj_matrix_inv);
 
@@ -322,14 +322,14 @@ Compositor::update(const osg::Matrix &view_matrix,
     _uniforms[SG_UNIFORM_PREV_PROJECTION_MATRIX]->set(prev_proj_matrix);
     _uniforms[SG_UNIFORM_PREV_PROJECTION_MATRIX_INV]->set(prev_proj_matrix_inv);
 
-    osg::Vec3f sun_dir_world;
+    vsg::vec3 sun_dir_world;
     _uniforms[SG_UNIFORM_SUN_DIRECTION_WORLD]->get(sun_dir_world);
-    osg::Vec4f sun_dir_view = osg::Vec4f(
+    vsg::vec4 sun_dir_view = vsg::vec4(
         sun_dir_world.x(), sun_dir_world.y(), sun_dir_world.z(), 0.0f) * view_matrix;
 
-    osg::Vec3f moon_dir_world;
+    vsg::vec3 moon_dir_world;
     _uniforms[SG_UNIFORM_MOON_DIRECTION_WORLD]->get(moon_dir_world);
-    osg::Vec4f moon_dir_view = osg::Vec4f(
+    vsg::vec4 moon_dir_view = vsg::vec4(
         moon_dir_world.x(), moon_dir_world.y(), moon_dir_world.z(), 0.0f) * view_matrix;
 
     float aspect_ratio = proj_matrix(1,1) / proj_matrix(0,0);
@@ -337,7 +337,7 @@ Compositor::update(const osg::Matrix &view_matrix,
     float tan_fov_x = tan_fov_y * aspect_ratio;
 
     for (int i = 0; i < SG_TOTAL_BUILTIN_UNIFORMS; ++i) {
-        osg::ref_ptr<osg::Uniform> u = _uniforms[i];
+        vsg::ref_ptr<osg::Uniform> u = _uniforms[i];
         switch (i) {
         case SG_UNIFORM_VIEW_MATRIX:
             u->setElement(0, view_matrix);
@@ -349,13 +349,13 @@ Compositor::update(const osg::Matrix &view_matrix,
             u->setElement(0, proj_matrix);
             break;
         case SG_UNIFORM_PROJECTION_MATRIX_INV:
-            u->setElement(0, osg::Matrix::inverse(proj_matrix));
+            u->setElement(0, vsg::mat4::inverse(proj_matrix));
             break;
         case SG_UNIFORM_CAMERA_POSITION_CART:
-            u->set(osg::Vec3f(camera_pos));
+            u->set(vsg::vec3(camera_pos));
             break;
         case SG_UNIFORM_CAMERA_POSITION_GEOD:
-            u->set(osg::Vec3f(camera_pos_geod.getLongitudeRad(),
+            u->set(vsg::vec3(camera_pos_geod.getLongitudeRad(),
                               camera_pos_geod.getLatitudeRad(),
                               camera_pos_geod.getElevationM()));
             break;
@@ -363,32 +363,32 @@ Compositor::update(const osg::Matrix &view_matrix,
             u->set(float(camera_pos.length()));
             break;
         case SG_UNIFORM_CAMERA_WORLD_UP:
-            u->set(osg::Vec3f(world_up));
+            u->set(vsg::vec3(world_up));
             break;
         case SG_UNIFORM_CAMERA_VIEW_UP:
-            u->setElement(0, osg::Vec3f(view_up));
+            u->setElement(0, vsg::vec3(view_up));
             break;
         case SG_UNIFORM_NEAR_FAR:
-            u->set(osg::Vec2f(zNear, zFar));
+            u->set(vsg::vec2(zNear, zFar));
             break;
         case SG_UNIFORM_FCOEF:
             u->set(float(2.0 / log2(zFar + 1.0)));
             break;
         case SG_UNIFORM_FOV_SCALE:
-            u->setElement(0, osg::Vec2f(tan_fov_x, tan_fov_y) * 2.0f);
+            u->setElement(0, vsg::vec2(tan_fov_x, tan_fov_y) * 2.0f);
             break;
         case SG_UNIFORM_FOV_CENTER:
-            u->setElement(0, osg::Vec2f(-left / (right - left),
+            u->setElement(0, vsg::vec2(-left / (right - left),
                                         -bottom / (top - bottom)));
             break;
         case SG_UNIFORM_SUN_DIRECTION:
-            u->setElement(0, osg::Vec3f(sun_dir_view.x(), sun_dir_view.y(), sun_dir_view.z()));
+            u->setElement(0, vsg::vec3(sun_dir_view.x(), sun_dir_view.y(), sun_dir_view.z()));
             break;
         case SG_UNIFORM_SUN_ZENITH_COSTHETA:
             u->setElement(0, float(sun_dir_world * world_up));
             break;
         case SG_UNIFORM_MOON_DIRECTION:
-            u->setElement(0, osg::Vec3f(moon_dir_view.x(), moon_dir_view.y(), moon_dir_view.z()));
+            u->setElement(0, vsg::vec3(moon_dir_view.x(), moon_dir_view.y(), moon_dir_view.z()));
             break;
         case SG_UNIFORM_MOON_ZENITH_COSTHETA:
             u->set(float(moon_dir_world * world_up));
@@ -411,7 +411,7 @@ Compositor::resized()
     // ignored. Here we resize RTT cameras that need to match the physical
     // viewport size.
     for (const auto &pass : _passes) {
-        osg::Camera *camera = pass->camera;
+        vsg::Camera *camera = pass->camera;
         if (!camera)
             continue;
 
@@ -447,7 +447,7 @@ Compositor::resized()
             (pass->compute_global_scale[0] != 0.0f ||
              pass->compute_global_scale[1] != 0.0f)) {
             auto* computeNode = static_cast<osg::DispatchCompute*>(pass->compute_node.get());
-            osg::Vec2f screenSize(_viewport->width(), _viewport->height());
+            vsg::vec2 screenSize(_viewport->width(), _viewport->height());
             osg::Vec3i groups;
             computeNode->getComputeGroups(groups[0], groups[1], groups[2]);
             for (int dim = 0; dim < 2; ++dim) {
@@ -463,12 +463,12 @@ Compositor::resized()
 
         // Update the uniforms even if it isn't a RTT camera
         _uniforms[SG_UNIFORM_VIEWPORT]->setElement(0,
-            osg::Vec4f(viewport->x(),
+            vsg::vec4(viewport->x(),
                        viewport->y(),
                        viewport->width(),
                        viewport->height()));
         _uniforms[SG_UNIFORM_PIXEL_SIZE]->set(
-            osg::Vec2f(1.0f / viewport->width(),
+            vsg::vec2(1.0f / viewport->width(),
                        1.0f / viewport->height()));
         _uniforms[SG_UNIFORM_ASPECT_RATIO]->set(
             float(viewport->width() / viewport->height()));
@@ -573,10 +573,10 @@ Compositor::resized()
 }
 
 void
-Compositor::setCullMask(osg::Node::NodeMask cull_mask)
+Compositor::setCullMask(vsg::Node::NodeMask cull_mask)
 {
     for (auto &pass : _passes) {
-        osg::Camera *camera = pass->camera;
+        vsg::Camera *camera = pass->camera;
         if (pass->inherit_cull_mask) {
             camera->setCullMask(pass->cull_mask & cull_mask);
             camera->setCullMaskLeft(pass->cull_mask & cull_mask & ~RIGHT_BIT);
@@ -633,7 +633,7 @@ Pass *
 Compositor::getPass(const std::string &name) const
 {
     auto it = std::find_if(_passes.begin(), _passes.end(),
-                           [&name](const osg::ref_ptr<Pass> &p) {
+                           [&name](const vsg::ref_ptr<Pass> &p) {
                                return p->name == name;
                            });
     if (it == _passes.end())

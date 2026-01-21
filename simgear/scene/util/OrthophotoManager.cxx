@@ -234,7 +234,7 @@ namespace simgear {
                 ImageRef image = osgDB::readRefImageFile(dds_path.str());
                 if (image) {
                     if (!image->isCompressed()) {
-                        SG_LOG(SG_OSG, SG_WARN, "Loading uncompressed DDS orthophoto. This is known to cause problems on some systems.");
+                        SG_LOG(SG_VSG, SG_WARN, "Loading uncompressed DDS orthophoto. This is known to cause problems on some systems.");
                     }
                     const Texture2DRef texture = textureFromImage(image);
                     const OrthophotoBounds bbox = OrthophotoBounds::fromBucket(bucket);
@@ -278,7 +278,7 @@ namespace simgear {
         GLenum data_type = some_image->getDataType();
         int packing = some_image->getPacking();
 
-        ImageRef composite_image = new osg::Image();
+        ImageRef composite_image = new vsg::Image();
         composite_image->allocateImage(total_width, total_height, depth, pixel_format, data_type, packing);
 
         for (const auto& orthophoto : orthophotos) {
@@ -292,22 +292,22 @@ namespace simgear {
             ImageRef sub_image = orthophoto->_texture->getImage();
 
             if (sub_image->s() != width || sub_image->t() != height) {
-                SG_LOG(SG_OSG, SG_INFO, "Orthophoto resolution mismatch. Automatic scaling will be performed.");
+                SG_LOG(SG_VSG, SG_INFO, "Orthophoto resolution mismatch. Automatic scaling will be performed.");
                 ImageRef scaled_image;
                 bool success = ImageUtils::resizeImage(sub_image, width, height, scaled_image);
                 if (success) {
                     sub_image = scaled_image;
                 } else {
-                    SG_LOG(SG_OSG, SG_ALERT, "Failed to scale part of composite orthophoto. The image on the airport may be distorted.");
+                    SG_LOG(SG_VSG, SG_ALERT, "Failed to scale part of composite orthophoto. The image on the airport may be distorted.");
                 }
             }
 
             if (sub_image->getPixelFormat() != pixel_format || sub_image->getDataType() != data_type) {
-                SG_LOG(SG_OSG, SG_INFO, "Pixel format or data type mismatch. Attempting to convert component of composite orthophoto.");
+                SG_LOG(SG_VSG, SG_INFO, "Pixel format or data type mismatch. Attempting to convert component of composite orthophoto.");
                 if (ImageUtils::canConvert(sub_image, pixel_format, data_type)) {
                     sub_image = ImageUtils::convert(sub_image, pixel_format, data_type);
                 } else {
-                    SG_LOG(SG_OSG, SG_ALERT, "Failed to convert component of composite orthophoto. Part of the image on the airport may be missing.");
+                    SG_LOG(SG_VSG, SG_ALERT, "Failed to convert component of composite orthophoto. Part of the image on the airport may be missing.");
                 }
             }
 
@@ -328,13 +328,13 @@ namespace simgear {
             new_height /= factor;
         }
         if (total_width != new_width || total_height != new_height) {
-            SG_LOG(SG_OSG, SG_INFO, "Composite orthophoto exceeds the maximum texture size of your GPU. Automatic scaling will be performed.");
+            SG_LOG(SG_VSG, SG_INFO, "Composite orthophoto exceeds the maximum texture size of your GPU. Automatic scaling will be performed.");
             ImageRef scaled_image;
             bool success = ImageUtils::resizeImage(composite_image, new_width, new_height, scaled_image);
             if (success) {
                 composite_image = scaled_image;
             } else {
-                SG_LOG(SG_OSG, SG_ALERT, "Failed to scale composite orthophoto. You may encounter errors due to the oversize texture.");
+                SG_LOG(SG_VSG, SG_ALERT, "Failed to scale composite orthophoto. You may encounter errors due to the oversize texture.");
             }
         }
 

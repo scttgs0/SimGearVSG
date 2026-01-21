@@ -28,7 +28,7 @@ namespace simgear::canvas
       virtual ~Path();
 
       osg::BoundingBox
-      getTransformedBounds(const osg::Matrix& m) const override;
+      getTransformedBounds(const vsg::mat4& m) const override;
 
       /** Add a segment with the given command and coordinates */
       Path& addSegment(uint8_t cmd, std::initializer_list<float> coords = {});
@@ -67,7 +67,7 @@ namespace simgear::canvas
       };
 
       class PathDrawable;
-      typedef osg::ref_ptr<PathDrawable> PathDrawableRef;
+      typedef vsg::ref_ptr<PathDrawable> PathDrawableRef;
       PathDrawableRef _path;
 
       bool _hasSVG : 1;

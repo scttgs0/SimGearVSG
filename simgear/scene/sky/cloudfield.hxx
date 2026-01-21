@@ -22,101 +22,100 @@
 
 #pragma once
 
-#include <simgear/compiler.h>
-#include <vector>
 #include <map>
+#include <vector>
+
+#include <vsg/all.h>
 
 #include <osgDB/ReaderWriter>
 
-#include <osg/ref_ptr>
 #include <osg/Array>
 #include <osg/Geometry>
-#include <osg/Group>
 #include <osg/Switch>
 
-namespace osg
-{
-        class StateSet;
-        class Vec4f;
-}
-
+#include <simgear/compiler.h>
+#include <simgear/math/SGMath.hxx>
 #include <simgear/misc/sg_path.hxx>
 #include <simgear/structure/Singleton.hxx>
-#include <simgear/math/SGMath.hxx>
+
+
+namespace osg {
+class StateSet;
+class Vec4f;
+} // namespace osg
 
 using std::vector;
 
 class SGNewCloud;
 
-namespace simgear
-{
-    class EffectGeode;
+namespace simgear {
+class EffectGeode;
 }
 
-typedef std::map<int, osg::ref_ptr<osg::PositionAttitudeTransform> > CloudHash;
+typedef std::map<int, vsg::ref_ptr<osg::PositionAttitudeTransform>> CloudHash;
 
 /**
  * A layer of 3D clouds, defined by lat/long/alt.
  */
-class SGCloudField {
-
+class SGCloudField
+{
 private:
-	class Cloud  {
-	public:
-		SGNewCloud	*aCloud;
-		SGVec3f		pos;
-		bool		visible;
-	};
+    class Cloud
+    {
+    public:
+        SGNewCloud* aCloud;
+        SGVec3f pos;
+        bool visible;
+    };
 
-  float Rnd(float);
-        
-  // Theoretical maximum cloud depth, used for fudging the LoD
-  // ranges to ensure that clouds become visible at maximum range
-  static float MAX_CLOUD_DEPTH;
+    float Rnd(float);
 
-  // this is a relative position only, with that we can move all clouds at once
-  SGVec3f relative_position;
+    // Theoretical maximum cloud depth, used for fudging the LoD
+    // ranges to ensure that clouds become visible at maximum range
+    static float MAX_CLOUD_DEPTH;
 
-  osg::ref_ptr<osg::Group> field_root;
-  osg::ref_ptr<osg::Group> placed_root;
-  osg::ref_ptr<osg::PositionAttitudeTransform> field_transform;
-  osg::ref_ptr<osg::PositionAttitudeTransform> altitude_transform;
-  osg::ref_ptr<osg::LOD> field_lod;
+    // this is a relative position only, with that we can move all clouds at once
+    SGVec3f relative_position;
 
-  osg::Vec3f old_pos;
-  osg::Vec3f old_pos_accumulated;
-  CloudHash cloud_hash;
+    vsg::ref_ptr<vsg::Group> field_root;
+    vsg::ref_ptr<vsg::Group> placed_root;
+    vsg::ref_ptr<osg::PositionAttitudeTransform> field_transform;
+    vsg::ref_ptr<osg::PositionAttitudeTransform> altitude_transform;
+    vsg::ref_ptr<osg::LOD> field_lod;
 
-  void removeCloudFromTree(osg::ref_ptr<osg::PositionAttitudeTransform> transform);
-  void addCloudToTree(osg::ref_ptr<osg::PositionAttitudeTransform> transform, float lon, float lat, float alt, float x, float y, bool auto_reposition = false);
-  void addCloudToTree(osg::ref_ptr<osg::PositionAttitudeTransform> transform, SGGeod loc, float x, float y, bool auto_reposition = false);
-  void addCloudToTree(osg::ref_ptr<osg::PositionAttitudeTransform> transform, SGGeod loc, bool auto_reposition = false);
-  void applyVisRangeAndCoverage(void);
+    vsg::vec3 old_pos;
+    vsg::vec3 old_pos_accumulated;
+    CloudHash cloud_hash;
+
+    void removeCloudFromTree(vsg::ref_ptr<osg::PositionAttitudeTransform> transform);
+    void addCloudToTree(vsg::ref_ptr<osg::PositionAttitudeTransform> transform, float lon, float lat, float alt, float x, float y, bool auto_reposition = false);
+    void addCloudToTree(vsg::ref_ptr<osg::PositionAttitudeTransform> transform, SGGeod loc, float x, float y, bool auto_reposition = false);
+    void addCloudToTree(vsg::ref_ptr<osg::PositionAttitudeTransform> transform, SGGeod loc, bool auto_reposition = false);
+    void applyVisRangeAndCoverage(void);
 
 public:
+    SGCloudField();
+    virtual ~SGCloudField();
 
-	SGCloudField();
-	virtual ~SGCloudField();
+    void clear(void);
+    bool isDefined3D(void);
 
-	void clear(void);
-	bool isDefined3D(void);
+    // add one cloud, data is not copied, ownership given
+    void addCloud(SGVec3f& pos, vsg::ref_ptr<simgear::EffectGeode> cloud);
 
-	// add one cloud, data is not copied, ownership given
-	void addCloud( SGVec3f& pos, osg::ref_ptr<simgear::EffectGeode> cloud);
-
-        /**
+    /**
 	 * Add a new cloud with a given index at a specific point defined by lon/lat and an x/y offset
 	 */
-	bool addCloud(float lon, float lat, float alt, int index, osg::ref_ptr<simgear::EffectGeode> geode);
-	bool addCloud(float lon, float lat, float alt, float x, float y, int index, osg::ref_ptr<simgear::EffectGeode> geode);
+    bool addCloud(float lon, float lat, float alt, int index, vsg::ref_ptr<simgear::EffectGeode> geode);
+    bool addCloud(float lon, float lat, float alt, float x, float y, int index, vsg::ref_ptr<simgear::EffectGeode> geode);
 
-	// Cloud handling functions.
-  bool deleteCloud(int identifier);
-  bool repositionCloud(int identifier, float lon, float lat, float alt);
-  bool repositionCloud(int identifier, float lon, float lat, float alt, float x, float y);
+    // Cloud handling functions.
+    bool deleteCloud(int identifier);
+    bool repositionCloud(int identifier, float lon, float lat, float alt);
+    bool repositionCloud(int identifier, float lon, float lat, float alt, float x, float y);
 
 
-  /**
+    /**
     * reposition the cloud layer at the specified origin and
     * orientation.
     * @param p position vector
@@ -128,38 +127,38 @@ public:
     * @param speed of cloud layer movement (due to wind)
     * @param direction of cloud layer movement (due to wind)
     */
-  bool reposition( const SGVec3f& p, const SGVec3f& up,
-            double lon, double lat, double dt, int asl, float speed, float direction);
+    bool reposition(const SGVec3f& p, const SGVec3f& up,
+                    double lon, double lat, double dt, int asl, float speed, float direction);
 
-  osg::Group* getNode() { return field_root.get(); }
+    vsg::Group* getNode() { return field_root.get(); }
 
-  // visibility distance for clouds in meters
-  static float CloudVis;
+    // visibility distance for clouds in meters
+    static float CloudVis;
 
-  static SGVec3f view_vec, view_X, view_Y;
+    static SGVec3f view_vec, view_X, view_Y;
 
-  static float view_distance;
-  static float impostor_distance;
-  static float lod1_range;
-  static float lod2_range;
-  static bool use_impostors;
-  static double timer_dt;
-  static float fieldSize;
-  static bool wrap;
+    static float view_distance;
+    static float impostor_distance;
+    static float lod1_range;
+    static float lod2_range;
+    static bool use_impostors;
+    static double timer_dt;
+    static float fieldSize;
+    static bool wrap;
 
-  static bool getWrap(void) { return wrap; }
-  static void setWrap(bool w) { wrap = w; }
+    static bool getWrap(void) { return wrap; }
+    static void setWrap(bool w) { wrap = w; }
 
-  static float getImpostorDistance(void) { return impostor_distance; }
-  static void setImpostorDistance(float d) { impostor_distance = d; }
-  static float getLoD1Range(void) { return lod1_range; }
-  static void setLoD1Range(int d) { lod1_range = d; }
-  static float getLoD2Range(void) { return lod2_range; }
-  static void setLoD2Range(int d) { lod2_range = d; }
-  static void setUseImpostors(bool b) { use_impostors = b; }
-  static bool getUseImpostors(void) { return use_impostors; }
-  
-  static float getVisRange(void) { return view_distance; }
-  static void setVisRange(float d) { view_distance = d; }
-  void applyVisAndLoDRange(void);
+    static float getImpostorDistance(void) { return impostor_distance; }
+    static void setImpostorDistance(float d) { impostor_distance = d; }
+    static float getLoD1Range(void) { return lod1_range; }
+    static void setLoD1Range(int d) { lod1_range = d; }
+    static float getLoD2Range(void) { return lod2_range; }
+    static void setLoD2Range(int d) { lod2_range = d; }
+    static void setUseImpostors(bool b) { use_impostors = b; }
+    static bool getUseImpostors(void) { return use_impostors; }
+
+    static float getVisRange(void) { return view_distance; }
+    static void setVisRange(float d) { view_distance = d; }
+    void applyVisAndLoDRange(void);
 };

@@ -101,10 +101,10 @@ double irradiance_from_magnitude(double magnitude)
 
 } // anonymous namespace
 
-osg::Node* SGStars::build(int num, const SGStarData::Star* star_data, double star_dist,
+vsg::Node* SGStars::build(int num, const SGStarData::Star* star_data, double star_dist,
                           const SGReaderWriterOptions* options)
 {
-    osg::ref_ptr<EffectGeode> geode = new EffectGeode;
+    vsg::ref_ptr<EffectGeode> geode = new EffectGeode;
     geode->setName("Stars");
 
     Effect* effect = makeEffect("Effects/stars", true, options);
@@ -112,14 +112,14 @@ osg::Node* SGStars::build(int num, const SGStarData::Star* star_data, double sta
         geode->setEffect(effect);
     }
 
-    osg::ref_ptr<osg::Vec3Array> vl = new osg::Vec3Array;
-    osg::ref_ptr<osg::Vec4Array> il = new osg::Vec4Array;
+    vsg::ref_ptr<vsg::vec3Array> vl = new vsg::vec3Array;
+    vsg::ref_ptr<osg::Vec4Array> il = new osg::Vec4Array;
     vl->reserve(num);
     il->reserve(num);
 
     for (int i = 0; i < num; ++i) {
         // Position the star arbitrarily far away
-        osg::Vec3 pos(star_dist * std::cos(star_data[i].ra) * std::cos(star_data[i].dec),
+        vsg::vec3 pos(star_dist * std::cos(star_data[i].ra) * std::cos(star_data[i].dec),
                       star_dist * std::sin(star_data[i].ra) * std::cos(star_data[i].dec),
                       star_dist * std::sin(star_data[i].dec));
         vl->push_back(pos);
@@ -136,10 +136,10 @@ osg::Node* SGStars::build(int num, const SGStarData::Star* star_data, double sta
 
         double irradiance = irradiance_from_magnitude(star_data[i].mag);
         std::array<double, 4> si = spectral_radiance_vec4(irradiance, temperature);
-        il->push_back(osg::Vec4(si[0], si[1], si[2], si[3]));
+        il->push_back(vsg::vec4(si[0], si[1], si[2], si[3]));
     }
 
-    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
+    vsg::ref_ptr<vsg::Geometry> geometry = new vsg::Geometry;
     geometry->setUseVertexBufferObjects(true);
     geometry->setVertexArray(vl);
     geometry->setVertexAttribArray(1, il, osg::Array::BIND_PER_VERTEX);

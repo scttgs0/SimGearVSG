@@ -47,6 +47,6 @@ SGEnlargeBoundingBox::computeBound(const osg::Drawable& drawable) const
 
   if (!bound.valid())
     return bound;
-  return osg::BoundingBox(bound._min - osg::Vec3(_offset, _offset, _offset),
-                          bound._max + osg::Vec3(_offset, _offset, _offset));
+  return osg::BoundingBox(bound._min - vsg::vec3(_offset, _offset, _offset),
+                          bound._max + vsg::vec3(_offset, _offset, _offset));
 }

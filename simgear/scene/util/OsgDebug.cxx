@@ -17,13 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
 
 #include "OsgDebug.hxx"
-#include <osg/Node>
 
 namespace simgear
 {
 
   //----------------------------------------------------------------------------
-  std::string getNodePathString(const osg::Node* node)
+  std::string getNodePathString(const vsg::Node* node)
   {
     if( !node )
       return "(nullptr)";
@@ -47,7 +46,7 @@ namespace simgear
       std::string str;
       const auto sz = np.size();
       for (size_t j = 0; j < sz; ++j) {
-          const osg::Node* node = np[j];
+          const vsg::Node* node = np[j];
           str += "/'" + node->getName() + "'";
       }
       return str;

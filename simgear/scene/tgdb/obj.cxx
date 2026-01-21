@@ -46,7 +46,7 @@
 
 using namespace simgear;
 
-osg::Node*
+vsg::Node*
 SGLoadBTG(const std::string& path, const simgear::SGReaderWriterOptions* options)
 {
     SGBinObject tile;
@@ -54,7 +54,7 @@ SGLoadBTG(const std::string& path, const simgear::SGReaderWriterOptions* options
       return NULL;
 
     SGMaterialLibPtr matlib;
-    osg::ref_ptr<SGMaterialCache> matcache;
+    vsg::ref_ptr<SGMaterialCache> matcache;
     double object_range = SG_OBJECT_RANGE_ROUGH;
     double tile_min_expiry = SG_TILE_MIN_EXPIRY;
     bool usePhotoscenery = false;
@@ -77,7 +77,7 @@ SGLoadBTG(const std::string& path, const simgear::SGReaderWriterOptions* options
     std::vector<SGVec3d> nodes = tile.get_wgs84_nodes();
 
     std::vector<SGVec2f> satellite_overlay_coords;
-    osg::ref_ptr<Orthophoto> orthophoto = nullptr;
+    vsg::ref_ptr<Orthophoto> orthophoto = nullptr;
 
     if (usePhotoscenery) {
       try {
@@ -114,18 +114,18 @@ SGLoadBTG(const std::string& path, const simgear::SGReaderWriterOptions* options
     tile.set_normals(normals);
 
     // tile surface    
-    osg::ref_ptr<SGTileGeometryBin> tileGeometryBin = new SGTileGeometryBin();
+    vsg::ref_ptr<SGTileGeometryBin> tileGeometryBin = new SGTileGeometryBin();
 
     if (!tileGeometryBin->insertSurfaceGeometry(tile, matcache))
       return NULL;
 
-    osg::ref_ptr<osg::Node> node = tileGeometryBin->getSurfaceGeometry(matcache);
+    vsg::ref_ptr<vsg::Node> node = tileGeometryBin->getSurfaceGeometry(matcache);
 
     if (node) {
       // Get base node stateset
       osg::StateSet *stateSet = node->getOrCreateStateSet();
 
-      osg::ref_ptr<osg::Uniform> orthophotoAvailable = new osg::Uniform("orthophotoAvailable", false);
+      vsg::ref_ptr<osg::Uniform> orthophotoAvailable = new osg::Uniform("orthophotoAvailable", false);
       stateSet->addUniform(orthophotoAvailable, osg::StateAttribute::ON);
 
       // Add satellite texture (if orthophoto exists)
@@ -133,15 +133,15 @@ SGLoadBTG(const std::string& path, const simgear::SGReaderWriterOptions* options
         stateSet->setTextureAttributeAndModes(15, orthophoto->getTexture(), osg::StateAttribute::ON);
         orthophotoAvailable->set(true);
 
-        SG_LOG(SG_OSG, SG_DEBUG, "Applying satellite orthophoto to terrain object with path " << path);
+        SG_LOG(SG_VSG, SG_DEBUG, "Applying satellite orthophoto to terrain object with path " << path);
       }
     }
 
     // The toplevel transform for that tile.
     osg::MatrixTransform* transform = new osg::MatrixTransform;
     transform->setName(path);
-    transform->setMatrix(osg::Matrix::rotate(toOsg(hlOr))*
-                         osg::Matrix::translate(toOsg(center)));
+    transform->setMatrix(vsg::mat4::rotate(toOsg(hlOr))*
+                         vsg::mat4::translate(toOsg(center)));
 
     if (node) {
       // tile points
@@ -154,12 +154,12 @@ SGLoadBTG(const std::string& path, const simgear::SGReaderWriterOptions* options
       pagedLOD->setCenterMode(osg::PagedLOD::USE_BOUNDING_SPHERE_CENTER);
       pagedLOD->setName("pagedObjectLOD");
 
-      osg::Group* terrainGroup = new osg::Group;
+      vsg::Group* terrainGroup = new vsg::Group;
       terrainGroup->setName("BTGTerrainGroup");
       terrainGroup->addChild(node);
       transform->addChild(terrainGroup);
 
-      osg::ref_ptr<SGReaderWriterOptions> opt;
+      vsg::ref_ptr<SGReaderWriterOptions> opt;
       opt = SGReaderWriterOptions::copyOrCreate(options);
 
       // we just need to know about the read file callback that itself holds the data
@@ -170,7 +170,7 @@ SGLoadBTG(const std::string& path, const simgear::SGReaderWriterOptions* options
       tileDetailsCallback->_randomSurfaceLightsComputed = false;
       tileDetailsCallback->_tileRandomObjectsComputed = false;
     
-      osg::ref_ptr<osgDB::Options> callbackOptions = new osgDB::Options;
+      vsg::ref_ptr<osgDB::Options> callbackOptions = new osgDB::Options;
       callbackOptions->setObjectCacheHint(osgDB::Options::CACHE_ALL);
       callbackOptions->setReadFileCallback(tileDetailsCallback);
       pagedLOD->setDatabaseOptions(callbackOptions.get());

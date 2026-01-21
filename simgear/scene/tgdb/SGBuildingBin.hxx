@@ -5,37 +5,36 @@
 #pragma once
 
 #include <math.h>
-
-#include <vector>
 #include <string>
+#include <vector>
 
+#include <vsg/all.h>
+
+#include <osg/CullFace>
 #include <osg/Geode>
 #include <osg/Geometry>
+#include <osg/Material>
 #include <osg/Math>
 #include <osg/MatrixTransform>
-#include <osg/Matrix>
 #include <osg/ShadeModel>
-#include <osg/Material>
-#include <osg/CullFace>
 #include <osg/VertexAttribDivisor>
-
-#include <simgear/scene/util/OsgMath.hxx>
-#include <simgear/scene/material/mat.hxx>
 
 #include <simgear/scene/material/Effect.hxx>
 #include <simgear/scene/material/EffectGeode.hxx>
-
+#include <simgear/scene/material/mat.hxx>
+#include <simgear/scene/util/OsgMath.hxx>
+#include <simgear/scene/util/OsgUtils.hxx>
 #include <simgear/scene/util/QuadTreeBuilder.hxx>
 #include <simgear/scene/util/RenderConstants.hxx>
 #include <simgear/scene/util/StateAttributeFactory.hxx>
-#include <simgear/scene/util/OsgUtils.hxx>
+
 
 #define SG_BUILDING_QUAD_TREE_DEPTH 2
 #define SG_BUILDING_FADE_OUT_LEVELS 4
 
 // these correspond to building.eff
-const int BUILDING_POSITION_ATTR = 6;  // (x,y,z)
-const int BUILDING_SCALE_ATTR = 7; // (width, depth, height)
+const int BUILDING_POSITION_ATTR = 6; // (x,y,z)
+const int BUILDING_SCALE_ATTR = 7;    // (width, depth, height)
 const int BUILDING_ATTR1 = 10;
 const int BUILDING_ATTR2 = 11;
 // XXX: Using OSG vertex aliasing and indices higher than 12 results in a crash.
@@ -45,11 +44,9 @@ const int BUILDING_ATTR4 = 13;
 
 using namespace osg;
 
-namespace simgear
-{
+namespace simgear {
 
-struct BuildingBoundingBoxCallback : public Drawable::ComputeBoundingBoxCallback
-{
+struct BuildingBoundingBoxCallback : public Drawable::ComputeBoundingBoxCallback {
     BuildingBoundingBoxCallback() {}
     BuildingBoundingBoxCallback(const BuildingBoundingBoxCallback&, const CopyOp&) {}
     META_Object(simgear, BuildingBoundingBoxCallback);
@@ -59,7 +56,7 @@ struct BuildingBoundingBoxCallback : public Drawable::ComputeBoundingBoxCallback
         const Geometry* geom = static_cast<const Geometry*>(&drawable);
         const Vec3Array* pos = static_cast<const Vec3Array*>(geom->getVertexAttribArray(BUILDING_POSITION_ATTR));
 
-        for (unsigned int v=0; v<pos->size(); ++v) {
+        for (unsigned int v = 0; v < pos->size(); ++v) {
             Vec3 pt = (*pos)[v];
             bb.expandBy(pt);
         }
@@ -85,65 +82,67 @@ struct BuildingBoundingBoxCallback : public Drawable::ComputeBoundingBoxCallback
     }
 };
 
-class SGBuildingBin final {
+class SGBuildingBin final
+{
 public:
-
-  enum BuildingType {
-    SMALL = 0,
-    MEDIUM,
-    LARGE };
+    enum BuildingType {
+        SMALL = 0,
+        MEDIUM,
+        LARGE
+    };
 
     struct BuildingInstance {
-      BuildingInstance(Vec3f p, float w, float d, float h, float ph, float r, Vec2f wt0, Vec2f rt0, Vec3f t1, Vec2f rs) :
-        position(p),
-        width(w),
-        depth(d),
-        height(h),
-        pitch_height(ph),
-        rotation(r),
-        walltex0(wt0),
-        rooftex0(rt0),
-        tex1(t1),
-        rooftop_scale(rs)
-      { }
+        BuildingInstance(Vec3f p, float w, float d, float h, float ph, float r, Vec2f wt0, Vec2f rt0, Vec3f t1, Vec2f rs) : position(p),
+                                                                                                                            width(w),
+                                                                                                                            depth(d),
+                                                                                                                            height(h),
+                                                                                                                            pitch_height(ph),
+                                                                                                                            rotation(r),
+                                                                                                                            walltex0(wt0),
+                                                                                                                            rooftex0(rt0),
+                                                                                                                            tex1(t1),
+                                                                                                                            rooftop_scale(rs)
+        {
+        }
 
-      BuildingInstance(Vec3f p, BuildingInstance b) :
-        position(p),
-        width(b.width),
-        depth(b.depth),
-        height(b.height),
-        pitch_height(b.pitch_height),
-        rotation(b.rotation),
-        walltex0(b.walltex0),
-        rooftex0(b.rooftex0),
-        tex1(b.tex1),
-        rooftop_scale(b.rooftop_scale)
-      { }
+        BuildingInstance(Vec3f p, BuildingInstance b) : position(p),
+                                                        width(b.width),
+                                                        depth(b.depth),
+                                                        height(b.height),
+                                                        pitch_height(b.pitch_height),
+                                                        rotation(b.rotation),
+                                                        walltex0(b.walltex0),
+                                                        rooftex0(b.rooftex0),
+                                                        tex1(b.tex1),
+                                                        rooftop_scale(b.rooftop_scale)
+        {
+        }
 
 
-      Vec3f position;
-      float width;
-      float depth;
-      float height;
-      float pitch_height;
-      float rotation;
+        Vec3f position;
+        float width;
+        float depth;
+        float height;
+        float pitch_height;
+        float rotation;
 
-      Vec2f walltex0;
-      Vec2f rooftex0;
-      Vec3f tex1; // Texture gains for the front, roof and sides
+        Vec2f walltex0;
+        Vec2f rooftex0;
+        Vec3f tex1; // Texture gains for the front, roof and sides
 
-      Vec2f rooftop_scale;
+        Vec2f rooftop_scale;
 
-      // References to allow the QuadTreeBuilder to work
-      //const BuildingList* buildingList;
-      //ref_ptr<Geometry> sharedGeometry;
+        // References to allow the QuadTreeBuilder to work
+        //const BuildingList* buildingList;
+        //ref_ptr<Geometry> sharedGeometry;
 
-      Vec3f getPosition() { return position; }
-      float getRotation() { return rotation; }
+        Vec3f getPosition() { return position; }
+        float getRotation() { return rotation; }
 
-      float getDistSqr(Vec3f p) {
-        return (p - position) * (p - position);
-      }
+        float getDistSqr(Vec3f p)
+        {
+            return (p - position) * (p - position);
+        }
     };
 
 private:
@@ -164,47 +163,45 @@ private:
     BuildingInstanceList buildingLocations;
 
 public:
+    SGBuildingBin(const SGMaterial* mat);
+    SGBuildingBin(const SGPath& absoluteFileName, const SGMaterial* mat);
 
-  SGBuildingBin(const SGMaterial *mat);
-  SGBuildingBin(const SGPath& absoluteFileName, const SGMaterial *mat);
+    ~SGBuildingBin(); // non-virtual intentional
 
-  ~SGBuildingBin();   // non-virtual intentional
+    // Generate a building specifying the exact position, dimensions and texture index.
+    void insert(SGVec3f p,
+                float r,
+                BuildingType buildingtype,
+                float width,
+                float depth,
+                float height,
+                float pitch_height,
+                int floors,
+                int roof_shape,
+                int roof_orientation,
+                int wall_tex_index,
+                int roof_tex_index);
 
-  // Generate a building specifying the exact position, dimensions and texture index.
-  void insert(SGVec3f p,
-              float r,
-              BuildingType buildingtype,
-              float width,
-              float depth,
-              float height,
-              float pitch_height,
-              int floors,
-              int roof_shape,
-              int roof_orientation,
-              int wall_tex_index,
-              int roof_tex_index);
+    // Generate a building of a given type at a specified position, using the random building material definition to determine the dimensions and texture index.
+    void insert(SGVec3f p, float r, BuildingType type);
+    int getNumBuildings();
 
-  // Generate a building of a given type at a specified position, using the random building material definition to determine the dimensions and texture index.
-  void insert(SGVec3f p, float r, BuildingType type);
-  int getNumBuildings();
+    bool checkMinDist(SGVec3f p, float radius);
 
-  bool checkMinDist (SGVec3f p, float radius);
+    const std::string& getMaterialName() const { return _materialName; }
+    bool setTextureParameters(SGPropertyNode* texParamsNode, int textureIndex, std::string textureName);
 
-  const std::string& getMaterialName() const { return _materialName; }
-  bool setTextureParameters(SGPropertyNode* texParamsNode, int textureIndex, std::string textureName);
+    BuildingType getBuildingType(float roll);
+    float getBuildingMaxRadius(BuildingType);
+    float getBuildingMaxDepth(BuildingType);
 
-  BuildingType getBuildingType(float roll);
-  float getBuildingMaxRadius(BuildingType);
-  float getBuildingMaxDepth(BuildingType);
-
-  ref_ptr<Group> createBuildingsGroup(Matrix transInv, const SGReaderWriterOptions* options);
-
+    ref_ptr<Group> createBuildingsGroup(Matrix transInv, const SGReaderWriterOptions* options);
 };
 
 // List of buildings
 typedef std::list<SGBuildingBin*> SGBuildingBinList;
 
 
-osg::Group* createRandomBuildings(SGBuildingBinList& buildinglist, const osg::Matrix& transform,
-                         const SGReaderWriterOptions* options);
-}
+vsg::Group* createRandomBuildings(SGBuildingBinList& buildinglist, const vsg::mat4& transform,
+                                  const SGReaderWriterOptions* options);
+} // namespace simgear

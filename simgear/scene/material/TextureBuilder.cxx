@@ -231,7 +231,7 @@ bool setAttrs(const TexTuple& attrs, Texture* tex,
     }
 
     options->setLoadOriginHint(origLOH);
-    osg::ref_ptr<osg::Image> image;
+    vsg::ref_ptr<vsg::Image> image;
     if (result.success())
         image = result.getImage();
     if (image.valid())
@@ -254,7 +254,7 @@ bool setAttrs(const TexTuple& attrs, Texture* tex,
         return false;
     }
 
-    // texture->setDataVariance(osg::Object::STATIC);
+    // texture->setDataVariance(vsg::Object::STATIC);
     tex->setFilter(Texture::MIN_FILTER, std::get<1>(attrs));
     tex->setFilter(Texture::MAG_FILTER, std::get<2>(attrs));
     tex->setWrap(Texture::WRAP_S, std::get<3>(attrs));
@@ -403,7 +403,7 @@ protected:
     Mutex lightMutex;
     void setPointSpriteImage(unsigned char* data, unsigned log2resolution,
                     unsigned charsPerPixel);
-    osg::Image* getPointSpriteImage(int logResolution);
+    vsg::Image* getPointSpriteImage(int logResolution);
 };
 
 Texture* LightSpriteBuilder::build(Effect* effect, const SGPropertyNode* props,
@@ -412,7 +412,7 @@ Texture* LightSpriteBuilder::build(Effect* effect, const SGPropertyNode* props,
     ScopedLock<Mutex> lock(lightMutex);
 
     // Always called from when the lightMutex is already taken
-    static osg::ref_ptr<osg::Texture2D> texture;
+    static vsg::ref_ptr<osg::Texture2D> texture;
 
     if (texture.valid())
       return texture.get();
@@ -459,12 +459,12 @@ LightSpriteBuilder::setPointSpriteImage(unsigned char* data, unsigned log2resolu
   }
 }
 
-osg::Image*
+vsg::Image*
 LightSpriteBuilder::getPointSpriteImage(int logResolution)
 {
-  osg::Image* image = new osg::Image;
+  vsg::Image* image = new vsg::Image;
 
-  osg::Image::MipmapDataType mipmapOffsets;
+  vsg::Image::MipmapDataType mipmapOffsets;
   unsigned off = 0;
   for (int i = logResolution; 0 <= i; --i) {
     unsigned res = 1 << i;
@@ -477,7 +477,7 @@ LightSpriteBuilder::getPointSpriteImage(int logResolution)
   unsigned char* imageData = new unsigned char[off];
   image->setImage(env_tex_res, env_tex_res, 1,
                   GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, imageData,
-                  osg::Image::USE_NEW_DELETE);
+                  vsg::Image::USE_NEW_DELETE);
   image->setMipmapLevels(mipmapOffsets);
 
   for (int k = logResolution; 0 <= k; --k) {
@@ -535,8 +535,8 @@ protected:
 
 // I use this until osg::CopyImage is fixed
 // This one assumes images are the same format and sizes are correct
-void copySubImage(const osg::Image* srcImage, int src_s, int src_t, int width, int height,
-                 osg::Image* destImage, int dest_s, int dest_t)
+void copySubImage(const vsg::Image* srcImage, int src_s, int src_t, int width, int height,
+                 vsg::Image* destImage, int dest_s, int dest_t)
 {
     for(int row = 0; row<height; ++row)
     {
@@ -584,33 +584,33 @@ Texture* CubeMapBuilder::build(Effect* effect, const SGPropertyNode* props,
         result = osgDB::readRefImageFile(std::get<0>(_tuple), options);
 
         if(result.success()) {
-            osg::Image* image = result.getImage();
+            vsg::Image* image = result.getImage();
             cubeTexture->setImage(TextureCubeMap::POSITIVE_X, image);
         }
         result = osgDB::readRefImageFile(std::get<1>(_tuple), options);
         if(result.success()) {
-            osg::Image* image = result.getImage();
+            vsg::Image* image = result.getImage();
             cubeTexture->setImage(TextureCubeMap::NEGATIVE_X, image);
         }
         result = osgDB::readRefImageFile(std::get<2>(_tuple), options);
         if(result.success()) {
-            osg::Image* image = result.getImage();
+            vsg::Image* image = result.getImage();
             cubeTexture->setImage(TextureCubeMap::POSITIVE_Y, image);
         }
         result = osgDB::readRefImageFile(std::get<3>(_tuple), options);
 
         if(result.success()) {
-            osg::Image* image = result.getImage();
+            vsg::Image* image = result.getImage();
             cubeTexture->setImage(TextureCubeMap::NEGATIVE_Y, image);
         }
         result = osgDB::readRefImageFile(std::get<4>(_tuple), options);
         if(result.success()) {
-            osg::Image* image = result.getImage();
+            vsg::Image* image = result.getImage();
             cubeTexture->setImage(TextureCubeMap::POSITIVE_Z, image);
         }
         result = osgDB::readRefImageFile(std::get<5>(_tuple), options);
         if(result.success()) {
-            osg::Image* image = result.getImage();
+            vsg::Image* image = result.getImage();
             cubeTexture->setImage(TextureCubeMap::NEGATIVE_Z, image);
         }
         wOpts->setLoadOriginHint(origLOH);
@@ -636,7 +636,7 @@ Texture* CubeMapBuilder::build(Effect* effect, const SGPropertyNode* props,
         result = osgDB::readRefImageFile(texname, options);
 
         if(result.success()) {
-            osg::Image* image = result.getImage();
+            vsg::Image* image = result.getImage();
             image->flipVertical();   // Seems like the image coordinates are somewhat funny, flip to get better ones
 
             //cubeTexture->setResizeNonPowerOfTwoHint(false);
@@ -653,7 +653,7 @@ Texture* CubeMapBuilder::build(Effect* effect, const SGPropertyNode* props,
 
                 SG_LOG(SG_INPUT, SG_DEBUG, "Copying the " << n << "th sub-images and pushing it" );
 
-                osg::ref_ptr<osg::Image> subimg = new osg::Image();
+                vsg::ref_ptr<vsg::Image> subimg = new vsg::Image();
                 subimg->allocateImage(width, height, depth, image->getPixelFormat(), image->getDataType());  // Copy attributes
 
                 // Choose correct image
@@ -770,7 +770,7 @@ Texture* Texture2DArrayBuilder::build(Effect* effect,
     wOpts->setLoadOriginHint(SGReaderWriterOptions::LoadOriginHint::ORIGIN_EFFECTS);
 
     for (const auto &pair : signature) {
-        osg::ref_ptr<osg::Image> image;
+        vsg::ref_ptr<vsg::Image> image;
         result = osgDB::readRefImageFile(pair.second, options);
         if (result.success())
             image = result.getImage();
@@ -843,19 +843,19 @@ Texture* Texture3DBuilder::build(Effect* effect,
         options->setLoadOriginHint(SGReaderWriterOptions::LoadOriginHint::ORIGIN_EFFECTS);
     result = osgDB::readRefImageFile(imageName, options);
     options->setLoadOriginHint(origLOH);
-    osg::ref_ptr<osg::Image> image;
+    vsg::ref_ptr<vsg::Image> image;
     if (result.success())
         image = result.getImage();
     if (image.valid())
     {
-        osg::ref_ptr<osg::Image> image3d = new osg::Image;
+        vsg::ref_ptr<vsg::Image> image3d = new vsg::Image;
         int size = image->t();
         int depth = image->s() / image->t();
         image3d->allocateImage(size, size, depth,
                                image->getPixelFormat(), image->getDataType());
 
         for (int i = 0; i < depth; ++i) {
-            osg::ref_ptr<osg::Image> subimage = new osg::Image;
+            vsg::ref_ptr<vsg::Image> subimage = new vsg::Image;
             subimage->allocateImage(size, size, 1,
                                     image->getPixelFormat(), image->getDataType());
             copySubImage(image, size * i, 0, size, size, subimage.get(), 0, 0);

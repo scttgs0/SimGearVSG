@@ -1,9 +1,11 @@
 #pragma once
 
-#include <simgear/structure/Singleton.hxx>
+#include <vsg/all.h>
 
 #include <osg/Referenced>
-#include <osg/ref_ptr>
+
+#include <simgear/structure/Singleton.hxx>
+
 
 namespace simgear {
 
@@ -17,12 +19,12 @@ public:
     }
     static RefClass* instance()
     {
-        SingletonRefPtr& singleton
-            = boost::details::pool::singleton_default<SingletonRefPtr>::instance();
+        SingletonRefPtr& singleton = boost::details::pool::singleton_default<SingletonRefPtr>::instance();
         return singleton.ptr.get();
     }
+
 private:
-    osg::ref_ptr<RefClass> ptr;
+    vsg::ref_ptr<RefClass> ptr;
 };
 
 template <typename RefClass>
@@ -35,4 +37,4 @@ public:
     }
 };
 
-}
+} // namespace simgear

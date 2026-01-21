@@ -24,9 +24,6 @@
 #include <limits>
 #include <iomanip>
 
-#include <osg/Image>
-#include <osg/Vec4>
-
 namespace simgear::effect {
 
 EffectNameValue<MipMapFunction> mipmapFunctionsInit[] =
@@ -71,13 +68,13 @@ unsigned char* imageData(unsigned char* ptr, GLenum pixelFormat, GLenum dataType
 {
     if (!ptr) return NULL;
     return ptr +
-        ( column * osg::Image::computePixelSizeInBits( pixelFormat, dataType ) ) / 8 +
-        row * osg::Image::computeRowWidthInBytes( width, pixelFormat, dataType, packing ) +
-        image * height * osg::Image::computeRowWidthInBytes( width, pixelFormat, dataType, packing );
+        ( column * vsg::Image::computePixelSizeInBits( pixelFormat, dataType ) ) / 8 +
+        row * vsg::Image::computeRowWidthInBytes( width, pixelFormat, dataType, packing ) +
+        image * height * vsg::Image::computeRowWidthInBytes( width, pixelFormat, dataType, packing );
 }
 
 template <typename T>
-void _writeColor(GLenum pixelFormat, T* data, float scale, osg::Vec4 value)
+void _writeColor(GLenum pixelFormat, T* data, float scale, vsg::vec4 value)
 {
     switch(pixelFormat)
     {
@@ -92,7 +89,7 @@ void _writeColor(GLenum pixelFormat, T* data, float scale, osg::Vec4 value)
     }
 }
 
-void setColor(unsigned char *ptr, GLenum pixelFormat, GLenum dataType, osg::Vec4 color)
+void setColor(unsigned char *ptr, GLenum pixelFormat, GLenum dataType, vsg::vec4 color)
 {
     switch(dataType)
     {
@@ -107,23 +104,23 @@ void setColor(unsigned char *ptr, GLenum pixelFormat, GLenum dataType, osg::Vec4
 }
 
 template <typename T>    
-osg::Vec4 _readColor(GLenum pixelFormat, T* data,float scale)
+vsg::vec4 _readColor(GLenum pixelFormat, T* data,float scale)
 {
     switch(pixelFormat)
     {
         case(GL_DEPTH_COMPONENT):   //intentionally fall through and execute the code for GL_LUMINANCE
-        case(GL_LUMINANCE):         { float l = float(*data++)*scale; return osg::Vec4(l, l, l, 1.0f); }
-        case(GL_ALPHA):             { float a = float(*data++)*scale; return osg::Vec4(1.0f, 1.0f, 1.0f, a); }
-        case(GL_LUMINANCE_ALPHA):   { float l = float(*data++)*scale; float a = float(*data++)*scale; return osg::Vec4(l,l,l,a); }
-        case(GL_RGB):               { float r = float(*data++)*scale; float g = float(*data++)*scale; float b = float(*data++)*scale; return osg::Vec4(r,g,b,1.0f); }
-        case(GL_RGBA):              { float r = float(*data++)*scale; float g = float(*data++)*scale; float b = float(*data++)*scale; float a = float(*data++)*scale; return osg::Vec4(r,g,b,a); }
-        case(GL_BGR):               { float b = float(*data++)*scale; float g = float(*data++)*scale; float r = float(*data++)*scale; return osg::Vec4(r,g,b,1.0f); }
-        case(GL_BGRA):              { float b = float(*data++)*scale; float g = float(*data++)*scale; float r = float(*data++)*scale; float a = float(*data++)*scale; return osg::Vec4(r,g,b,a); }
+        case(GL_LUMINANCE):         { float l = float(*data++)*scale; return vsg::vec4(l, l, l, 1.0f); }
+        case(GL_ALPHA):             { float a = float(*data++)*scale; return vsg::vec4(1.0f, 1.0f, 1.0f, a); }
+        case(GL_LUMINANCE_ALPHA):   { float l = float(*data++)*scale; float a = float(*data++)*scale; return vsg::vec4(l,l,l,a); }
+        case(GL_RGB):               { float r = float(*data++)*scale; float g = float(*data++)*scale; float b = float(*data++)*scale; return vsg::vec4(r,g,b,1.0f); }
+        case(GL_RGBA):              { float r = float(*data++)*scale; float g = float(*data++)*scale; float b = float(*data++)*scale; float a = float(*data++)*scale; return vsg::vec4(r,g,b,a); }
+        case(GL_BGR):               { float b = float(*data++)*scale; float g = float(*data++)*scale; float r = float(*data++)*scale; return vsg::vec4(r,g,b,1.0f); }
+        case(GL_BGRA):              { float b = float(*data++)*scale; float g = float(*data++)*scale; float r = float(*data++)*scale; float a = float(*data++)*scale; return vsg::vec4(r,g,b,a); }
     }
-    return osg::Vec4(1.0f,1.0f,1.0f,1.0f);
+    return vsg::vec4(1.0f,1.0f,1.0f,1.0f);
 }
 
-osg::Vec4 getColor(const unsigned char* ptr, GLenum pixelFormat, GLenum dataType)
+vsg::vec4 getColor(const unsigned char* ptr, GLenum pixelFormat, GLenum dataType)
 {
     switch(dataType)
     {
@@ -135,13 +132,13 @@ osg::Vec4 getColor(const unsigned char* ptr, GLenum pixelFormat, GLenum dataType
         case(GL_UNSIGNED_INT):      return _readColor(pixelFormat, (unsigned int*)ptr,     1.0f/4294967295.0f);
         case(GL_FLOAT):             return _readColor(pixelFormat, (float*)ptr,            1.0f);
     }
-    return osg::Vec4(1.0f,1.0f,1.0f,1.0f);
+    return vsg::vec4(1.0f,1.0f,1.0f,1.0f);
 }
 
-osg::Vec4::value_type computeAverage( int c, osg::Vec4 colors[2][2][2], bool colorValid[2][2][2] )
+vsg::vec4::value_type computeAverage( int c, vsg::vec4 colors[2][2][2], bool colorValid[2][2][2] )
 {
-    osg::Vec4::value_type r = 0;
-    osg::Vec4::value_type nb = 0;
+    vsg::vec4::value_type r = 0;
+    vsg::vec4::value_type nb = 0;
     for ( int k = 0; k < 2; ++k ) for ( int j = 0; j < 2; ++j ) for ( int i = 0; i < 2; ++i )
     {
         if ( colorValid[i][j][k] )
@@ -157,9 +154,9 @@ osg::Vec4::value_type computeAverage( int c, osg::Vec4 colors[2][2][2], bool col
     return nb;
 }
 
-osg::Vec4::value_type computeSum( int c, osg::Vec4 colors[2][2][2], bool colorValid[2][2][2] )
+vsg::vec4::value_type computeSum( int c, vsg::vec4 colors[2][2][2], bool colorValid[2][2][2] )
 {
-    osg::Vec4::value_type r = 0;
+    vsg::vec4::value_type r = 0;
     for ( int k = 0; k < 2; ++k ) for ( int j = 0; j < 2; ++j ) for ( int i = 0; i < 2; ++i )
         if ( colorValid[i][j][k] )
         {
@@ -168,9 +165,9 @@ osg::Vec4::value_type computeSum( int c, osg::Vec4 colors[2][2][2], bool colorVa
     return r;
 }
 
-osg::Vec4::value_type computeProduct( int c, osg::Vec4 colors[2][2][2], bool colorValid[2][2][2] )
+vsg::vec4::value_type computeProduct( int c, vsg::vec4 colors[2][2][2], bool colorValid[2][2][2] )
 {
-    osg::Vec4::value_type r = 1;
+    vsg::vec4::value_type r = 1;
     for ( int k = 0; k < 2; ++k ) for ( int j = 0; j < 2; ++j ) for ( int i = 0; i < 2; ++i )
         if ( colorValid[i][j][k] )
         {
@@ -179,9 +176,9 @@ osg::Vec4::value_type computeProduct( int c, osg::Vec4 colors[2][2][2], bool col
     return r;
 }
 
-osg::Vec4::value_type computeMin( int c, osg::Vec4 colors[2][2][2], bool colorValid[2][2][2] )
+vsg::vec4::value_type computeMin( int c, vsg::vec4 colors[2][2][2], bool colorValid[2][2][2] )
 {
-    osg::Vec4::value_type r = std::numeric_limits<osg::Vec4::value_type>::max();
+    vsg::vec4::value_type r = std::numeric_limits<vsg::vec4::value_type>::max();
     for ( int k = 0; k < 2; ++k ) for ( int j = 0; j < 2; ++j ) for ( int i = 0; i < 2; ++i )
         if ( colorValid[i][j][k] )
         {
@@ -190,9 +187,9 @@ osg::Vec4::value_type computeMin( int c, osg::Vec4 colors[2][2][2], bool colorVa
     return r;
 }
 
-osg::Vec4::value_type computeMax( int c, osg::Vec4 colors[2][2][2], bool colorValid[2][2][2] )
+vsg::vec4::value_type computeMax( int c, vsg::vec4 colors[2][2][2], bool colorValid[2][2][2] )
 {
-    osg::Vec4::value_type r = std::numeric_limits<osg::Vec4::value_type>::min();
+    vsg::vec4::value_type r = std::numeric_limits<vsg::vec4::value_type>::min();
     for ( int k = 0; k < 2; ++k ) for ( int j = 0; j < 2; ++j ) for ( int i = 0; i < 2; ++i )
         if ( colorValid[i][j][k] )
         {
@@ -201,7 +198,7 @@ osg::Vec4::value_type computeMax( int c, osg::Vec4 colors[2][2][2], bool colorVa
     return r;
 }
 
-osg::Vec4::value_type computeComponent( int c, osg::Vec4 colors[2][2][2], bool colorValid[2][2][2], MipMapFunction f )
+vsg::vec4::value_type computeComponent( int c, vsg::vec4 colors[2][2][2], bool colorValid[2][2][2], MipMapFunction f )
 {
     switch ( f )
     {
@@ -215,10 +212,10 @@ osg::Vec4::value_type computeComponent( int c, osg::Vec4 colors[2][2][2], bool c
     return 0;
 }
 
-osg::Vec4 computeColor( osg::Vec4 colors[2][2][2], bool colorValid[2][2][2], MipMapTuple attrs, GLenum pixelFormat )
+vsg::vec4 computeColor( vsg::vec4 colors[2][2][2], bool colorValid[2][2][2], MipMapTuple attrs, GLenum pixelFormat )
 {
-    osg::Vec4 result;
-    unsigned int nbComponents = osg::Image::computeNumComponents( pixelFormat );
+    vsg::vec4 result;
+    unsigned int nbComponents = vsg::Image::computeNumComponents( pixelFormat );
     result[0] = computeComponent( 0, colors, colorValid, std::get<0>(attrs) );
     if ( nbComponents >= 2 )
         result[1] = computeComponent( 1, colors, colorValid, std::get<1>(attrs) );
@@ -229,10 +226,10 @@ osg::Vec4 computeColor( osg::Vec4 colors[2][2][2], bool colorValid[2][2][2], Mip
     return result;
 }
 
-void dumpMipmap( std::string n, int s, int t, int r, int c, unsigned char *d, const osg::Image::MipmapDataType &o )
+void dumpMipmap( std::string n, int s, int t, int r, int c, unsigned char *d, const vsg::Image::MipmapDataType &o )
 {
     std::ofstream ofs( (n + ".dump").c_str() );
-    for ( osg::Image::MipmapDataType::size_type i = 0; i < o.size()+1; ++i )
+    for ( vsg::Image::MipmapDataType::size_type i = 0; i < o.size()+1; ++i )
     {
         ofs << s << " " << t << " " << r << std::endl;
         unsigned int offset = 0;
@@ -265,10 +262,10 @@ void dumpMipmap( std::string n, int s, int t, int r, int c, unsigned char *d, co
     }
 }
 
-osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs )
+vsg::Image* computeMipmap( vsg::Image* image, MipMapTuple attrs )
 {
     bool computeMipmap = false;
-    unsigned int nbComponents = osg::Image::computeNumComponents( image->getPixelFormat() );
+    unsigned int nbComponents = vsg::Image::computeNumComponents( image->getPixelFormat() );
     int s = image->s();
     int t = image->t();
     if ( (s & (s - 1)) || (t & (t - 1)) ) // power of two test
@@ -293,17 +290,17 @@ osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs )
     if ( computeMipmap )
     {
         int r = image->r();
-        int nb = osg::Image::computeNumberOfMipmapLevels(s, t, r);
+        int nb = vsg::Image::computeNumberOfMipmapLevels(s, t, r);
         // 1x1x1 textures don't need mipmapping
         if (nb < 2)
             return image;
 
-        osg::ref_ptr<osg::Image> mipmaps = new osg::Image();
-        osg::Image::MipmapDataType mipmapOffsets;
+        vsg::ref_ptr<vsg::Image> mipmaps = new vsg::Image();
+        vsg::Image::MipmapDataType mipmapOffsets;
         unsigned int offset = 0;
         for ( int i = 0; i < nb; ++i )
         {
-            offset += t * r * osg::Image::computeRowWidthInBytes(s, image->getPixelFormat(), image->getDataType(), image->getPacking());
+            offset += t * r * vsg::Image::computeRowWidthInBytes(s, image->getPixelFormat(), image->getDataType(), image->getPacking());
             mipmapOffsets.push_back( offset );
             s >>= 1; if ( s == 0 ) s = 1;
             t >>= 1; if ( t == 0 ) t = 1;
@@ -333,7 +330,7 @@ osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs )
                 {
                     for ( int i = 0; i < s; i += 2 )
                     {
-                        osg::Vec4 colors[2][2][2];
+                        vsg::vec4 colors[2][2][2];
                         bool colorValid[2][2][2];
                         colorValid[0][0][0] = false; colorValid[0][0][1] = false; colorValid[0][1][0] = false; colorValid[0][1][1] = false;
                         colorValid[1][0][0] = false; colorValid[1][0][1] = false; colorValid[1][1][0] = false; colorValid[1][1][1] = false;
@@ -387,7 +384,7 @@ osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs )
                         }
 
                         unsigned char *ptr = imageData( dest, image->getPixelFormat(), image->getDataType(), ns, nt, image->getPacking(), i/2, j/2, k/2 );
-                        osg::Vec4 color = computeColor( colors, colorValid, attrs, image->getPixelFormat() );
+                        vsg::vec4 color = computeColor( colors, colorValid, attrs, image->getPixelFormat() );
                         setColor( ptr, image->getPixelFormat(), image->getDataType(), color );
                     }
                 }
@@ -396,10 +393,10 @@ osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs )
             t = nt;
             r = nr;
         }
-        //dumpMipmap( image->getFileName(), image->s(), image->t(), image->r(), osg::Image::computeNumComponents(image->getPixelFormat()), data, mipmapOffsets );
+        //dumpMipmap( image->getFileName(), image->s(), image->t(), image->r(), vsg::Image::computeNumComponents(image->getPixelFormat()), data, mipmapOffsets );
         mipmaps->setImage( image->s(), image->t(), image->r(), 
             image->getInternalTextureFormat(), image->getPixelFormat(),
-            image->getDataType(), data, osg::Image::USE_NEW_DELETE, image->getPacking() );
+            image->getDataType(), data, vsg::Image::USE_NEW_DELETE, image->getPacking() );
         mipmaps->setMipmapLevels( mipmapOffsets );
         mipmaps->setName(image->getName());
         mipmaps->setFileName(image->getFileName());

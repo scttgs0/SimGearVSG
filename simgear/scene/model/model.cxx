@@ -9,20 +9,21 @@
 
 #include <utility>
 
-#include <osg/ref_ptr>
+#include <vsg/all.h>
+
 #include <osgDB/FileNameUtils>
 #include <osgDB/FileUtils>
-#include <osgDB/ReaderWriter>
 #include <osgDB/ReadFile>
+#include <osgDB/ReaderWriter>
 #include <osgDB/SharedStateManager>
 
 #include <simgear/scene/material/Effect.hxx>
 #include <simgear/scene/material/EffectGeode.hxx>
+#include <simgear/scene/util/CopyOp.hxx>
+#include <simgear/scene/util/SGReaderWriterOptions.hxx>
 #include <simgear/scene/util/SGSceneFeatures.hxx>
 #include <simgear/scene/util/SGSceneUserData.hxx>
-#include <simgear/scene/util/CopyOp.hxx>
 #include <simgear/scene/util/SplicingVisitor.hxx>
-#include <simgear/scene/util/SGReaderWriterOptions.hxx>
 
 #include <simgear/debug/ErrorReportingCallback.hxx>
 #include <simgear/props/condition.hxx>
@@ -33,6 +34,7 @@
 
 #include "model.hxx"
 
+
 using std::vector;
 
 osg::Texture2D*
@@ -40,69 +42,60 @@ SGLoadTexture2D(bool staticTexture, const std::string& path,
                 const osgDB::Options* options,
                 bool wrapu, bool wrapv, int)
 {
-  osg::ref_ptr<osg::Image> image;
-  if (options)
-      image = osgDB::readRefImageFile(path, options);
-  else
-      image = osgDB::readRefImageFile(path);
+    vsg::ref_ptr<vsg::Image> image;
+    if (options)
+        image = osgDB::readRefImageFile(path, options);
+    else
+        image = osgDB::readRefImageFile(path);
 
-  osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
-  texture->setImage(image);
-  texture->setMaxAnisotropy(SGSceneFeatures::instance()->getTextureFilter());
+    vsg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
+    texture->setImage(image);
+    texture->setMaxAnisotropy(SGSceneFeatures::instance()->getTextureFilter());
 
-  if (staticTexture)
-    texture->setDataVariance(osg::Object::STATIC);
-  if (wrapu)
-    texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
-  else
-    texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-  if (wrapv)
-    texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
-  else
-    texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+    if (staticTexture)
+        texture->setDataVariance(vsg::Object::STATIC);
+    if (wrapu)
+        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+    else
+        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    if (wrapv)
+        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+    else
+        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
 
-  if (image) {
-    int s = image->s();
-    int t = image->t();
+    if (image) {
+        int s = image->s();
+        int t = image->t();
 
-    if (s <= t && 32 <= s) {
-      SGSceneFeatures::instance()->applyTextureCompression(texture.get());
-    } else if (t < s && 32 <= t) {
-      SGSceneFeatures::instance()->applyTextureCompression(texture.get());
+        if (s <= t && 32 <= s) {
+            SGSceneFeatures::instance()->applyTextureCompression(texture.get());
+        } else if (t < s && 32 <= t) {
+            SGSceneFeatures::instance()->applyTextureCompression(texture.get());
+        }
     }
-  }
 
-  return texture.release();
+    return texture.release();
 }
 
-namespace simgear
-{
+namespace simgear {
 using namespace std;
 using namespace osg;
 using simgear::CopyOp;
 
 Node* copyModel(Node* model)
 {
-    const CopyOp::CopyFlags flags = (CopyOp::DEEP_COPY_ALL
-                                     & ~CopyOp::DEEP_COPY_TEXTURES
-                                     & ~CopyOp::DEEP_COPY_IMAGES
-                                     & ~CopyOp::DEEP_COPY_STATESETS
-                                     & ~CopyOp::DEEP_COPY_STATEATTRIBUTES
-                                     & ~CopyOp::DEEP_COPY_ARRAYS
-                                     & ~CopyOp::DEEP_COPY_PRIMITIVES
+    const CopyOp::CopyFlags flags = (CopyOp::DEEP_COPY_ALL & ~CopyOp::DEEP_COPY_TEXTURES & ~CopyOp::DEEP_COPY_IMAGES & ~CopyOp::DEEP_COPY_STATESETS & ~CopyOp::DEEP_COPY_STATEATTRIBUTES & ~CopyOp::DEEP_COPY_ARRAYS & ~CopyOp::DEEP_COPY_PRIMITIVES
                                      // This will preserve display lists ...
-                                     & ~CopyOp::DEEP_COPY_DRAWABLES
-                                     & ~CopyOp::DEEP_COPY_SHAPES);
+                                     & ~CopyOp::DEEP_COPY_DRAWABLES & ~CopyOp::DEEP_COPY_SHAPES);
     return (CopyOp(flags))(model);
 }
 
-TextureUpdateVisitor::TextureUpdateVisitor(const osgDB::FilePathList& pathList) :
-    NodeAndDrawableVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN),
-    _pathList(pathList)
+TextureUpdateVisitor::TextureUpdateVisitor(const osgDB::FilePathList& pathList) : NodeAndDrawableVisitor(NodeVisitor::TRAVERSE_ALL_CHILDREN),
+                                                                                  _pathList(pathList)
 {
 }
 
-void TextureUpdateVisitor::apply(osg::Node& node)
+void TextureUpdateVisitor::apply(vsg::Node& node)
 {
     StateSet* stateSet = cloneStateSet(node.getStateSet());
     if (stateSet)
@@ -145,7 +138,7 @@ Texture2D* TextureUpdateVisitor::textureReplace(int unit, const StateAttribute* 
     if (fullLiveryFile.empty() || fullLiveryFile == *fullFilePath)
         return 0;
 
-    osg::ref_ptr<Image> newImage = readRefImageFile(fullLiveryFile);
+    vsg::ref_ptr<Image> newImage = readRefImageFile(fullLiveryFile);
     if (!newImage)
         return 0;
 
@@ -155,8 +148,7 @@ Texture2D* TextureUpdateVisitor::textureReplace(int unit, const StateAttribute* 
         return 0;
 
     newTexture->setImage(newImage);
-    if (newImage.valid())
-    {
+    if (newImage.valid()) {
         newTexture->setMaxAnisotropy(SGSceneFeatures::instance()->getTextureFilter());
     }
 
@@ -174,8 +166,7 @@ StateSet* TextureUpdateVisitor::cloneStateSet(const StateSet* stateSet)
     int numUnits = stateSet->getTextureAttributeList().size();
     if (numUnits > 0) {
         for (int i = 0; i < numUnits; ++i) {
-            const StateAttribute* attr
-                = stateSet->getTextureAttribute(i, StateAttribute::TEXTURE);
+            const StateAttribute* attr = stateSet->getTextureAttribute(i, StateAttribute::TEXTURE);
             Texture2D* newTexture = textureReplace(i, attr);
             if (newTexture)
                 newTextures.push_back(Tex2D(i, newTexture));
@@ -192,9 +183,8 @@ StateSet* TextureUpdateVisitor::cloneStateSet(const StateSet* stateSet)
     return result;
 }
 
-UserDataCopyVisitor::UserDataCopyVisitor() :
-    NodeVisitor(NodeVisitor::NODE_VISITOR,
-                NodeVisitor::TRAVERSE_ALL_CHILDREN)
+UserDataCopyVisitor::UserDataCopyVisitor() : NodeVisitor(NodeVisitor::NODE_VISITOR,
+                                                         NodeVisitor::TRAVERSE_ALL_CHILDREN)
 {
 }
 
@@ -203,15 +193,14 @@ void UserDataCopyVisitor::apply(Node& node)
     ref_ptr<SGSceneUserData> userData;
     userData = SGSceneUserData::getSceneUserData(&node);
     if (userData.valid()) {
-        SGSceneUserData* newUserData  = new SGSceneUserData(*userData);
+        SGSceneUserData* newUserData = new SGSceneUserData(*userData);
         newUserData->setVelocity(0);
         node.setUserData(newUserData);
     }
     node.traverse(*this);
 }
 
-namespace
-{
+namespace {
 class MakeEffectVisitor : public SplicingVisitor
 {
 public:
@@ -221,7 +210,7 @@ public:
         : _options(options), _modelPath(SGPath{})
     {
     }
-    virtual void apply(osg::Group& node);
+    virtual void apply(vsg::Group& node);
     virtual void apply(osg::Geode& geode);
     EffectMap& getEffectMap() { return _effectMap; }
     const EffectMap& getEffectMap() const { return _effectMap; }
@@ -239,11 +228,11 @@ public:
 protected:
     EffectMap _effectMap;
     SGPropertyNode_ptr _currentEffectParent;
-    osg::ref_ptr<const SGReaderWriterOptions> _options;
+    vsg::ref_ptr<const SGReaderWriterOptions> _options;
     SGPath _modelPath;
 };
 
-void MakeEffectVisitor::apply(osg::Group& node)
+void MakeEffectVisitor::apply(vsg::Group& node)
 {
     SGPropertyNode_ptr savedEffectRoot;
     const string& nodeName = node.getName();
@@ -289,22 +278,20 @@ void MakeEffectVisitor::apply(osg::Geode& geode)
         if (userData.valid())
             eg->setUserData(new SGSceneUserData(*userData));
         for (unsigned i = 0; i < geode.getNumDrawables(); ++i) {
-            osg::Drawable *drawable = geode.getDrawable(i);
+            osg::Drawable* drawable = geode.getDrawable(i);
             eg->addDrawable(drawable);
 
             // Generate tangent vectors etc if needed
-            osg::Geometry *geom = dynamic_cast<osg::Geometry*>(drawable);
-            if(geom) eg->runGenerators(geom);
+            vsg::Geometry* geom = dynamic_cast<vsg::Geometry*>(drawable);
+            if (geom) eg->runGenerators(geom);
         }
     }
     pushResultNode(&geode, eg);
-
 }
 
-}
+} // namespace
 
-namespace
-{
+namespace {
 
 class DefaultEffect
 {
@@ -321,9 +308,9 @@ public:
 protected:
     SGPropertyNode_ptr _effect;
 };
-}
+} // namespace
 
-ref_ptr<Node> instantiateEffects(osg::Node* modelGroup,
+ref_ptr<Node> instantiateEffects(vsg::Node* modelGroup,
                                  PropertyList& effectProps,
                                  const SGReaderWriterOptions* options,
                                  const SGPath& modelPath)
@@ -332,10 +319,9 @@ ref_ptr<Node> instantiateEffects(osg::Node* modelGroup,
     MakeEffectVisitor visitor(options);
     MakeEffectVisitor::EffectMap& emap = visitor.getEffectMap();
     for (PropertyList::iterator itr = effectProps.begin(),
-             end = effectProps.end();
+                                end = effectProps.end();
          itr != end;
-        ++itr)
-    {
+         ++itr) {
         SGPropertyNode_ptr configNode = *itr;
         std::vector<SGPropertyNode_ptr> objectNames =
             configNode->getChildren("object-name");
@@ -358,30 +344,29 @@ ref_ptr<Node> instantiateEffects(osg::Node* modelGroup,
     return ref_ptr<Node>(result[0].get());
 }
 
-ref_ptr<Node> instantiateMaterialEffects(osg::Node* modelGroup,
+ref_ptr<Node> instantiateMaterialEffects(vsg::Node* modelGroup,
                                          const SGReaderWriterOptions* options,
                                          const SGPath& modelPath)
 {
-
     SGPropertyNode_ptr effect;
     PropertyList effectProps;
 
     if (options->getMaterialLib()) {
-      const SGGeod loc = SGGeod(options->getLocation());
-      osg::ref_ptr<SGMaterialCache> matcache = options->getMaterialLib()->generateMatCache(loc, options);
-      SGMaterial* mat = matcache->find(options->getMaterialName());
+        const SGGeod loc = SGGeod(options->getLocation());
+        vsg::ref_ptr<SGMaterialCache> matcache = options->getMaterialLib()->generateMatCache(loc, options);
+        SGMaterial* mat = matcache->find(options->getMaterialName());
 
-      if (mat) {
-        effect = new SGPropertyNode();
-        makeChild(effect, "inherits-from")->setStringValue(mat->get_effect_name());
-      } else {
-        effect = DefaultEffect().getEffect();
-        SG_LOG( SG_TERRAIN, SG_ALERT, "Unable to get effect for " << options->getMaterialName());
-        simgear::reportFailure(simgear::LoadFailure::NotFound, simgear::ErrorCode::LoadEffectsShaders,
-                               "Unable to get effect for material:" + options->getMaterialName());
-      }
+        if (mat) {
+            effect = new SGPropertyNode();
+            makeChild(effect, "inherits-from")->setStringValue(mat->get_effect_name());
+        } else {
+            effect = DefaultEffect().getEffect();
+            SG_LOG(SG_TERRAIN, SG_ALERT, "Unable to get effect for " << options->getMaterialName());
+            simgear::reportFailure(simgear::LoadFailure::NotFound, simgear::ErrorCode::LoadEffectsShaders,
+                                   "Unable to get effect for material:" + options->getMaterialName());
+        }
     } else {
-      effect = DefaultEffect().getEffect();
+        effect = DefaultEffect().getEffect();
     }
 
     effect->addChild("default")->setBoolValue(true);
@@ -389,5 +374,5 @@ ref_ptr<Node> instantiateMaterialEffects(osg::Node* modelGroup,
     return instantiateEffects(modelGroup, effectProps, options, modelPath);
 }
 
-}
+} // namespace simgear
 // end of model.cxx

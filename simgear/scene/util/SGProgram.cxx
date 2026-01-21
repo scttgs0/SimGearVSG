@@ -39,7 +39,7 @@ void SGProgram::setEffectFilePath(const SGPath& p)
     _effectFilePath = p;
 }
 
-void SGProgram::apply(osg::State& state) const
+void SGProgram::apply(vsg::State& state) const
 {
     osg::Program::apply(state);
 

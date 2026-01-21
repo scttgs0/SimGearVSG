@@ -11,7 +11,7 @@
 #include <simgear/props/propsfwd.hxx>
 #include <simgear/structure/SGWeakPtr.hxx>
 
-#include <osg/ref_ptr>
+#include <vsg/all.h>
 #include <osgText/Font>
 
 #include <functional>
@@ -66,7 +66,7 @@ namespace simgear::canvas
                                         const Style&,
                                         Element* );
 
-  typedef osg::ref_ptr<osgText::Font> FontPtr;
+  typedef vsg::ref_ptr<osgText::Font> FontPtr;
 
   typedef std::vector<PlacementPtr> Placements;
   typedef std::function<Placements( SGPropertyNode*,

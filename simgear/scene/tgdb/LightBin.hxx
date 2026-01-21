@@ -21,49 +21,52 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/Drawable>
 
 #include <simgear/math/SGMath.hxx>
 #include <simgear/scene/material/EffectGeode.hxx>
 #include <simgear/scene/tgdb/LightBin.hxx>
 
+
 const int LIGHT_ATTR1 = 6;
 const int LIGHT_ATTR2 = 7;
 const int LIGHT_ATTR3 = 10;
 const int LIGHT_ATTR4 = 11;
 
-namespace simgear
+namespace simgear {
+class LightBin final
 {
-class LightBin final {
 public:
     struct Light {
         // Omni-directional non-animated lights constructor
-        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c) :
-            position(p), color(c), size(s), intensity(i), on_period(o),
-            direction(SGVec3f(0.0f, 0.0f, 0.0f)), horizontal_angle(360.0f), vertical_angle(360.0f),
-            animation_params(SGVec4f(-1.0f, 0.0f, 0.0f, 0.0f))
-        { }
+        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c) : position(p), color(c), size(s), intensity(i), on_period(o),
+                                                                                                    direction(SGVec3f(0.0f, 0.0f, 0.0f)), horizontal_angle(360.0f), vertical_angle(360.0f),
+                                                                                                    animation_params(SGVec4f(-1.0f, 0.0f, 0.0f, 0.0f))
+        {
+        }
 
         // Omni-directional animated lights constructor
-        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c, const SGVec4f& a) :
-            position(p), color(c), size(s), intensity(i), on_period(o),
-            direction(SGVec3f(0.0f, 0.0f, 0.0f)), horizontal_angle(360.0f), vertical_angle(360.0f),
-            animation_params(a)
-        { }
+        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c, const SGVec4f& a) : position(p), color(c), size(s), intensity(i), on_period(o),
+                                                                                                                      direction(SGVec3f(0.0f, 0.0f, 0.0f)), horizontal_angle(360.0f), vertical_angle(360.0f),
+                                                                                                                      animation_params(a)
+        {
+        }
 
         // Directional non-animated lights constructor
-        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c, const SGVec3f& d, const double& ha, const double& va) :
-            position(p), color(c), size(s), intensity(i), on_period(o),
-            direction(d), horizontal_angle(ha), vertical_angle(va),
-            animation_params(SGVec4f(-1.0f, 0.0f, 0.0f, 0.0f))
-        { }
+        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c, const SGVec3f& d, const double& ha, const double& va) : position(p), color(c), size(s), intensity(i), on_period(o),
+                                                                                                                                                          direction(d), horizontal_angle(ha), vertical_angle(va),
+                                                                                                                                                          animation_params(SGVec4f(-1.0f, 0.0f, 0.0f, 0.0f))
+        {
+        }
 
         // Directional animated lights constructor
-        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c, const SGVec3f& d, const double& ha, const double& va, const SGVec4f& a) :
-            position(p), color(c), size(s), intensity(i), on_period(o),
-            direction(d), horizontal_angle(ha), vertical_angle(va),
-            animation_params(a)
-        { }
+        Light(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c, const SGVec3f& d, const double& ha, const double& va, const SGVec4f& a) : position(p), color(c), size(s), intensity(i), on_period(o),
+                                                                                                                                                                            direction(d), horizontal_angle(ha), vertical_angle(va),
+                                                                                                                                                                            animation_params(a)
+        {
+        }
 
         // Basic Light parameters
         SGVec3f position;
@@ -91,7 +94,7 @@ public:
     LightBin();
     LightBin(const SGPath& absoluteFileName);
 
-    ~LightBin() = default;      // non-virtual intentional
+    ~LightBin() = default; // non-virtual intentional
 
     void insert(const Light& light);
     void insert(const SGVec3f& p, const double& s, const double& i, const int& o, const SGVec4f& c);
@@ -103,11 +106,12 @@ public:
     const Light& getLight(unsigned i) const;
     double getAverageSize() const;
     double getAverageIntensity() const;
+
 private:
     LightList _lights;
 
     double _aggregated_size, _aggregated_intensity;
 };
 
-osg::ref_ptr<simgear::EffectGeode> createLights(LightBin& lightList, const osg::Matrix& transform, const SGReaderWriterOptions* options);
-};
+vsg::ref_ptr<simgear::EffectGeode> createLights(LightBin& lightList, const vsg::mat4& transform, const SGReaderWriterOptions* options);
+}; // namespace simgear

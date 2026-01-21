@@ -14,8 +14,8 @@
 
 #include <simgear/compiler.h>
 #include <simgear/misc/stdint.hxx>
-
 #include <simgear/math/SGMath.hxx>
+
 
 // forward decls
 class SGPath;

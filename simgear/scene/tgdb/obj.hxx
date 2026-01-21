@@ -23,29 +23,25 @@
 
 #pragma once
 
-#ifndef __cplusplus
-# error This library requires C++
-#endif
+#include <string>
 
 #include <boost/lexical_cast.hpp>
 
+#include <vsg/all.h>
+
 #include <simgear/compiler.h>
 
-#include <string>
-
-#include <osg/Node>
-#include <osg/Group>
 
 using std::string;
 
-using boost::lexical_cast;
 using boost::bad_lexical_cast;
+using boost::lexical_cast;
 
 class SGMaterialLib;
 namespace simgear {
 class SGReaderWriterOptions;
 }
 
-osg::Node*
-SGLoadBTG(const std::string& path, 
+vsg::Node*
+SGLoadBTG(const std::string& path,
           const simgear::SGReaderWriterOptions* options);

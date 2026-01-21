@@ -1,6 +1,6 @@
 // ModelRegistry.hxx -- interface to the OSG model registry
 //
-// Copyright (C) 2005-2007 Mathias Froehlich 
+// Copyright (C) 2005-2007 Mathias Froehlich
 // Copyright (C) 2007  Tim Moore <timoore@redhat.com>
 //
 // This program is free software; you can redistribute it and/or
@@ -19,27 +19,27 @@
 
 #pragma once
 
-#include <osg/ref_ptr>
-#include <osg/Node>
-#include <osgDB/FileUtils>
+#include <map>
+#include <string>
+
+#include <vsg/all.h>
+
+#include <osgDB/Archive>
 #include <osgDB/FileNameUtils>
+#include <osgDB/FileUtils>
 #include <osgDB/ReaderWriter>
 #include <osgDB/Registry>
-#include <osgDB/Archive>
 
 #include <simgear/compiler.h>
-#include <simgear/misc/sg_path.hxx>
 #include <simgear/debug/logstream.hxx>
+#include <simgear/misc/sg_path.hxx>
 #include <simgear/scene/util/OsgSingleton.hxx>
 
-#include <string>
-#include <map>
 
 // Class to register per file extension read callbacks with the OSG
 // registry, mostly to control caching and post load optimization /
 // copying that happens above the level of the ReaderWriter.
-namespace simgear
-{
+namespace simgear {
 
 // Different caching and optimization strategies are needed for
 // different file types. Most loaded files should be optimized and the
@@ -63,13 +63,13 @@ namespace simgear
 // pluggable (and predefined) policies.
 template <typename ProcessPolicy, typename CachePolicy, typename OptimizePolicy,
           typename SubstitutePolicy, typename BVHPolicy>
-class ModelRegistryCallback : public osgDB::Registry::ReadFileCallback {
+class ModelRegistryCallback : public osgDB::Registry::ReadFileCallback
+{
 public:
-    ModelRegistryCallback(const std::string& extension) :
-        _processPolicy(extension), _cachePolicy(extension),
-        _optimizePolicy(extension),
-        _substitutePolicy(extension),
-        _bvhPolicy(extension)
+    ModelRegistryCallback(const std::string& extension) : _processPolicy(extension), _cachePolicy(extension),
+                                                          _optimizePolicy(extension),
+                                                          _substitutePolicy(extension),
+                                                          _bvhPolicy(extension)
     {
     }
     virtual osgDB::ReaderWriter::ReadResult
@@ -79,8 +79,8 @@ public:
         using namespace osg;
         using namespace osgDB;
         using osgDB::ReaderWriter;
-//        Registry* registry = Registry::instance();
-        ref_ptr<osg::Node> optimizedNode = _cachePolicy.find(fileName, opt);
+        //        Registry* registry = Registry::instance();
+        ref_ptr<vsg::Node> optimizedNode = _cachePolicy.find(fileName, opt);
         if (!optimizedNode.valid()) {
             std::string otherFileName = _substitutePolicy.substitute(fileName,
                                                                      opt);
@@ -88,18 +88,16 @@ public:
             if (!otherFileName.empty()) {
                 res = loadUsingReaderWriter(otherFileName, opt);
                 if (res.validNode()) {
-                    ref_ptr<osg::Node> processedNode
-                        = _processPolicy.process(res.getNode(), otherFileName, opt);
+                    ref_ptr<vsg::Node> processedNode = _processPolicy.process(res.getNode(), otherFileName, opt);
                     optimizedNode = _optimizePolicy.optimize(processedNode.get(),
-                                                            otherFileName, opt);
+                                                             otherFileName, opt);
                 }
             }
             if (!optimizedNode.valid()) {
                 res = loadUsingReaderWriter(fileName, opt);
                 if (!res.validNode())
                     return res;
-                ref_ptr<osg::Node> processedNode
-                    = _processPolicy.process(res.getNode(), fileName, opt);
+                ref_ptr<vsg::Node> processedNode = _processPolicy.process(res.getNode(), fileName, opt);
                 optimizedNode = _optimizePolicy.optimize(processedNode.get(),
                                                          fileName, opt);
             }
@@ -109,6 +107,7 @@ public:
         }
         return ReaderWriter::ReadResult(optimizedNode.get());
     }
+
 protected:
     static osgDB::ReaderWriter::ReadResult
     loadUsingReaderWriter(const std::string& fileName,
@@ -126,13 +125,13 @@ protected:
         result = rw->readNode(fileName, opt);
 
         if (result.notFound()) {
-            // Look for an archive up directory path that might contain the required file.  OSG archive references 
-            // are of the form path/to/zipfile.zip/path/to/file. In our case, we assume that for an asset foo/bar/file.osg, 
+            // Look for an archive up directory path that might contain the required file.  OSG archive references
+            // are of the form path/to/zipfile.zip/path/to/file. In our case, we assume that for an asset foo/bar/file.osg,
             // the compressed file will be foo/bar.zip so the final path we want to create for OSG is foo/bar.zip/file.osg.
 
             SGPath archivePath = SGPath(fileName);
 
-            // In the case of assets referencing other assets (i.e. .osg files), the path presented to the loader will be 
+            // In the case of assets referencing other assets (i.e. .osg files), the path presented to the loader will be
             // relative to the parent asset, So if file.osg references file2.osg and both are in bar.zip, then when
             // the loader receives a request to load file2.osg, it will already have a path foo/bar.zip/file2.osg.
             if (fileName.find(".zip") == std::string::npos) {
@@ -168,39 +167,41 @@ protected:
 
 struct DefaultProcessPolicy {
     DefaultProcessPolicy(const std::string& extension) {}
-    osg::Node* process(osg::Node* node, const std::string& filename,
+    vsg::Node* process(vsg::Node* node, const std::string& filename,
                        const osgDB::Options* opt);
 };
 
 struct DefaultCachePolicy {
     DefaultCachePolicy(const std::string& extension) {}
-    osg::ref_ptr<osg::Node> find(const std::string& fileName,
-                    const osgDB::Options* opt);
-    void addToCache(const std::string& filename, osg::Node* node);
+    vsg::ref_ptr<vsg::Node> find(const std::string& fileName,
+                                 const osgDB::Options* opt);
+    void addToCache(const std::string& filename, vsg::Node* node);
 };
 
 struct NoCachePolicy {
     NoCachePolicy(const std::string& extension) {}
-    osg::Node* find(const std::string& fileName,
+    vsg::Node* find(const std::string& fileName,
                     const osgDB::Options* opt)
     {
         return 0;
     }
-    void addToCache(const std::string& filename, osg::Node* node) {}
+    void addToCache(const std::string& filename, vsg::Node* node) {}
 };
 
-class OptimizeModelPolicy {
+class OptimizeModelPolicy
+{
 public:
     OptimizeModelPolicy(const std::string& extension);
-    osg::Node* optimize(osg::Node* node, const std::string& fileName,
-                        const osgDB::Options* opt, const bool compressTextures=true);
+    vsg::Node* optimize(vsg::Node* node, const std::string& fileName,
+                        const osgDB::Options* opt, const bool compressTextures = true);
+
 protected:
     unsigned _osgOptions;
 };
 
 struct NoOptimizePolicy {
     NoOptimizePolicy(const std::string& extension) {}
-    osg::Node* optimize(osg::Node* node, const std::string& fileName,
+    vsg::Node* optimize(vsg::Node* node, const std::string& fileName,
                         const osgDB::Options* opt)
     {
         return node;
@@ -230,17 +231,17 @@ struct NoSubstitutePolicy {
 
 struct BuildLeafBVHPolicy {
     BuildLeafBVHPolicy(const std::string& extension) {}
-    void buildBVH(const std::string& fileName, osg::Node* node);
+    void buildBVH(const std::string& fileName, vsg::Node* node);
 };
 
 struct BuildGroupBVHPolicy {
     BuildGroupBVHPolicy(const std::string& extension) {}
-    void buildBVH(const std::string& fileName, osg::Node* node);
+    void buildBVH(const std::string& fileName, vsg::Node* node);
 };
 
 struct NoBuildBVHPolicy {
     NoBuildBVHPolicy(const std::string& extension) {}
-    void buildBVH(const std::string& fileName, osg::Node* node);
+    void buildBVH(const std::string& fileName, vsg::Node* node);
 };
 
 typedef ModelRegistryCallback<DefaultProcessPolicy,
@@ -248,11 +249,12 @@ typedef ModelRegistryCallback<DefaultProcessPolicy,
                               OptimizeModelPolicy,
                               OSGSubstitutePolicy,
                               BuildLeafBVHPolicy>
-DefaultCallback;
+    DefaultCallback;
 
 // The manager for the callbacks
 class ModelRegistry : public osgDB::Registry::ReadFileCallback,
-                      public ReferencedSingleton<ModelRegistry> {
+                      public ReferencedSingleton<ModelRegistry>
+{
 public:
     ModelRegistry();
     virtual osgDB::ReaderWriter::ReadResult
@@ -263,10 +265,10 @@ public:
              const osgDB::Options* opt);
     void addImageCallbackForExtension(const std::string& extension,
                                       osgDB::Registry::ReadFileCallback*
-                                      callback);
+                                          callback);
     void addNodeCallbackForExtension(const std::string& extension,
                                      osgDB::Registry::ReadFileCallback*
-                                     callback);
+                                         callback);
     virtual ~ModelRegistry() {}
 
     // Some magic strings used to identify WS30 data for processing
@@ -275,11 +277,11 @@ public:
     inline static const std::string WS30_SUBDIR_SUFFIX = std::string("_root_L0_X0_Y0");
 
 protected:
-    typedef std::map<std::string, osg::ref_ptr<osgDB::Registry::ReadFileCallback> >
-    CallbackMap;
+    typedef std::map<std::string, vsg::ref_ptr<osgDB::Registry::ReadFileCallback>>
+        CallbackMap;
     CallbackMap imageCallbackMap;
     CallbackMap nodeCallbackMap;
-    osg::ref_ptr<DefaultCallback> _defaultCallback;
+    vsg::ref_ptr<DefaultCallback> _defaultCallback;
 };
 
 // Callback that only loads the file without any caching or
@@ -288,11 +290,11 @@ typedef ModelRegistryCallback<DefaultProcessPolicy, NoCachePolicy,
                               NoOptimizePolicy,
                               NoSubstitutePolicy,
                               BuildLeafBVHPolicy>
-LoadOnlyCallback;
+    LoadOnlyCallback;
 
 // Proxy for registering extension-based callbacks
 
-template<typename T>
+template <typename T>
 class ModelRegistryCallbackProxy
 {
 public:
@@ -302,4 +304,4 @@ public:
             ->addNodeCallbackForExtension(extension, new T(extension));
     }
 };
-}
+} // namespace simgear

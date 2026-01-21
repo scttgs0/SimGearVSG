@@ -44,6 +44,9 @@ bool LogCallback::shouldLog(sgDebugClass c, sgDebugPriority p) const
         return true;
     if (c == SG_OSG) // always have OSG logging as it OSG logging is configured separately.
         return true;
+    if (c == SG_VSG) // always have VSG logging.
+        return true;
+
     return false;
 }
 

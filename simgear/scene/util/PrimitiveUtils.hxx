@@ -21,15 +21,15 @@
 
 #pragma once
 
-#include <osg/Vec3>
+#include <vsg/all.h>
+
 #include <osg/Drawable>
 
-namespace simgear
-{
-struct Primitive
-{
+
+namespace simgear {
+struct Primitive {
     int numVerts;
-    osg::Vec3 vertices[4];
+    vsg::vec3 vertices[4];
 };
 
 /**
@@ -38,4 +38,4 @@ struct Primitive
  * vertices.
  */
 Primitive getPrimitive(osg::Drawable* drawable, unsigned primitiveIndex);
-}
+} // namespace simgear

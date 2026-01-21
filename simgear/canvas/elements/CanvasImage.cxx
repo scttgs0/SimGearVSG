@@ -83,7 +83,7 @@ namespace simgear::canvas
 
   //----------------------------------------------------------------------------
   const std::string Image::TYPE_NAME = "image";
-  osg::ref_ptr<SGProgram> Image::_program;
+  vsg::ref_ptr<SGProgram> Image::_program;
 
   //----------------------------------------------------------------------------
   void Image::staticInit()
@@ -130,35 +130,35 @@ namespace simgear::canvas
     _texture = new osg::Texture2D;
     _texture->setResizeNonPowerOfTwoHint(false);
 
-    _geom = new osg::Geometry;
+    _geom = new vsg::Geometry;
     // Vertex attributes are empty on creation, and are later filled by
     // setQuad() and setQuadUV().
     // Geometry must be set to DYNAMIC, otherwise OSG will optimize out
     // subsequent glBufferData calls to the VBO.
-    _geom->setDataVariance(osg::Object::DYNAMIC);
+    _geom->setDataVariance(vsg::Object::DYNAMIC);
     _geom->setUseVertexBufferObjects(true);
 
     osg::StateSet *stateSet = _geom->getOrCreateStateSet();
-    stateSet->setDataVariance(osg::Object::STATIC);
+    stateSet->setDataVariance(vsg::Object::STATIC);
     stateSet->setTextureAttributeAndModes(0, _texture.get());
     stateSet->setAttributeAndModes(_program);
     stateSet->addUniform(new osg::Uniform("tex", 0));
 
     // allocate arrays for the image
-    _vertices = new osg::Vec3Array(6);
-    _vertices->setDataVariance(osg::Object::DYNAMIC);
+    _vertices = new vsg::vec3Array(6);
+    _vertices->setDataVariance(vsg::Object::DYNAMIC);
     _geom->setVertexArray(_vertices);
 
     _texCoords = new osg::Vec2Array(6);
-    _texCoords->setDataVariance(osg::Object::DYNAMIC);
+    _texCoords->setDataVariance(vsg::Object::DYNAMIC);
     _geom->setTexCoordArray(0, _texCoords, osg::Array::BIND_PER_VERTEX);
 
     _colors = new osg::Vec4Array(1);
-    _colors->setDataVariance(osg::Object::DYNAMIC);
+    _colors->setDataVariance(vsg::Object::DYNAMIC);
     _geom->setColorArray(_colors, osg::Array::BIND_OVERALL);
 
     _prim = new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES, 0, 6);
-    _prim->setDataVariance(osg::Object::DYNAMIC);
+    _prim->setDataVariance(vsg::Object::DYNAMIC);
     _geom->addPrimitiveSet(_prim);
 
     setDrawable(_geom);
@@ -236,7 +236,7 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  void Image::setImage(osg::ref_ptr<osg::Image> img)
+  void Image::setImage(vsg::ref_ptr<vsg::Image> img)
   {
     // remove canvas...
     setSrcCanvas( CanvasPtr() );
@@ -254,7 +254,7 @@ namespace simgear::canvas
   //----------------------------------------------------------------------------
   void Image::setFill(const std::string& fill)
   {
-    osg::Vec4 color(1,1,1,1);
+    vsg::vec4 color(1,1,1,1);
     if(    !fill.empty() // If no color is given default to white
         && !parseColor(fill, color) )
       return;
@@ -262,7 +262,7 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  void Image::setFill(const osg::Vec4& color)
+  void Image::setFill(const vsg::vec4& color)
   {
       _colors->front() = color;
       _colors->dirty();
@@ -333,13 +333,13 @@ namespace simgear::canvas
       mouse_event->client_pos = mouse_event->local_pos
                               - toOsg(_region.getMin());
 
-      osg::Vec2f size(_region.width(), _region.height());
+      vsg::vec2 size(_region.width(), _region.height());
       if( _outset.isValid() )
       {
         CSSBorder::Offsets outset =
           _outset.getAbsOffsets(getTextureDimensions());
 
-        mouse_event->client_pos += osg::Vec2f(outset.l, outset.t);
+        mouse_event->client_pos += vsg::vec2(outset.l, outset.t);
         size.x() += outset.l + outset.r;
         size.y() += outset.t + outset.b;
       }
@@ -767,7 +767,7 @@ namespace simgear::canvas
     }
     else if( _texture )
     {
-      osg::Image* img = _texture->getImage();
+      vsg::Image* img = _texture->getImage();
 
       if( img )
       {
@@ -849,7 +849,7 @@ namespace simgear::canvas
   {
     SG_LOG(SG_IO, SG_DEBUG, "use image reader detected by " << type);
 
-    osg::ref_ptr<SGReaderWriterOptions> opt;
+    vsg::ref_ptr<SGReaderWriterOptions> opt;
     opt = SGReaderWriterOptions::copyOrCreate(osgDB::Registry::instance()->getOptions());
     opt->setLoadOriginHint(SGReaderWriterOptions::LoadOriginHint::ORIGIN_CANVAS);
 
@@ -869,7 +869,7 @@ namespace simgear::canvas
 
   void Image::fillRect(const SGRect<int>& rect, const std::string& c)
   {
-    osg::Vec4 color(1,1,1,1);
+    vsg::vec4 color(1,1,1,1);
     if(!c.empty() && !parseColor(c, color))
       return;
 
@@ -892,16 +892,16 @@ SGRect<int> intersectRect(const SGRect<int>& a, const SGRect<int>& b)
   return SGRect<int>(m1, m2);
 }
 
-  void Image::fillRect(const SGRect<int>& rect, const osg::Vec4& color)
+  void Image::fillRect(const SGRect<int>& rect, const vsg::vec4& color)
   {
-    osg::ref_ptr<osg::Image> image = _texture->getImage();
+    vsg::ref_ptr<vsg::Image> image = _texture->getImage();
     if (!image) {
       allocateImage();
       image = _texture->getImage();
     }
 
-      if (image->getDataVariance() != osg::Object::DYNAMIC) {
-          image->setDataVariance(osg::Object::DYNAMIC);
+      if (image->getDataVariance() != vsg::Object::DYNAMIC) {
+          image->setDataVariance(vsg::Object::DYNAMIC);
       }
 
     const auto format = image->getInternalTextureFormat();
@@ -956,23 +956,23 @@ SGRect<int> intersectRect(const SGRect<int>& a, const SGRect<int>& b)
 
   void Image::setPixel(int x, int y, const std::string& c)
   {
-    osg::Vec4 color(1,1,1,1);
+    vsg::vec4 color(1,1,1,1);
     if(!c.empty() && !parseColor(c, color))
       return;
 
     setPixel(x, y, color);
   }
 
-  void Image::setPixel(int x, int y, const osg::Vec4& color)
+  void Image::setPixel(int x, int y, const vsg::vec4& color)
   {
-    osg::ref_ptr<osg::Image> image = _texture->getImage();
+    vsg::ref_ptr<vsg::Image> image = _texture->getImage();
     if (!image) {
         allocateImage();
         image = _texture->getImage();
     }
 
-    if (image->getDataVariance() != osg::Object::DYNAMIC) {
-      image->setDataVariance(osg::Object::DYNAMIC);
+    if (image->getDataVariance() != vsg::Object::DYNAMIC) {
+      image->setDataVariance(vsg::Object::DYNAMIC);
     }
 
     image->setColor(color, x, y);
@@ -980,7 +980,7 @@ SGRect<int> intersectRect(const SGRect<int>& a, const SGRect<int>& b)
 
     void Image::dirtyPixels()
     {
-        osg::ref_ptr<osg::Image> image = _texture->getImage();
+        vsg::ref_ptr<vsg::Image> image = _texture->getImage();
         if (!image)
             return;
         image->dirty();
@@ -990,7 +990,7 @@ SGRect<int> intersectRect(const SGRect<int>& a, const SGRect<int>& b)
 
   void Image::allocateImage()
   {
-    osg::Image* image = new osg::Image;
+    vsg::Image* image = new vsg::Image;
     // default to RGBA
     image->allocateImage(_node->getIntValue("size[0]"), _node->getIntValue("size[1]"), 1, GL_RGBA, GL_UNSIGNED_BYTE);
     image->setInternalTextureFormat(GL_RGBA);
@@ -998,7 +998,7 @@ SGRect<int> intersectRect(const SGRect<int>& a, const SGRect<int>& b)
   }
 
 
-osg::ref_ptr<osg::Image> Image::getImage() const
+vsg::ref_ptr<vsg::Image> Image::getImage() const
 {
     if (!_texture)
         return {};

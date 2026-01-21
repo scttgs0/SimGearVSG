@@ -6,19 +6,19 @@
 namespace simgear::ProjectionMatrix {
 
 bool
-isOrtho(const osg::Matrixd &m)
+isOrtho(const vsg::dmat4 &m)
 {
     return !m.isIdentity() && m(3, 3) > 0.0;
 }
 
 bool
-isPerspective(const osg::Matrixd &m)
+isPerspective(const vsg::dmat4 &m)
 {
     return m(3, 3) == 0.0;
 }
 
 Type
-getType(const osg::Matrixd &m)
+getType(const vsg::dmat4 &m)
 {
     if (m(2,2) > 0.0)
         return REVERSE_DEPTH_ZO;
@@ -27,7 +27,7 @@ getType(const osg::Matrixd &m)
 }
 
 void
-makePerspective(osg::Matrixd &m,
+makePerspective(vsg::dmat4 &m,
                 double vfov, double aspect, double near, double far,
                 Type type)
 {
@@ -45,7 +45,7 @@ makePerspective(osg::Matrixd &m,
 }
 
 void
-makeFrustum(osg::Matrixd &m,
+makeFrustum(vsg::dmat4 &m,
             double left, double right,
             double bottom, double top,
             double near, double far,
@@ -65,7 +65,7 @@ makeFrustum(osg::Matrixd &m,
 }
 
 void
-makeOrtho(osg::Matrixd &m,
+makeOrtho(vsg::dmat4 &m,
           double left, double right,
           double bottom, double top,
           double near, double far,
@@ -87,7 +87,7 @@ makeOrtho(osg::Matrixd &m,
 }
 
 bool
-getFrustum(const osg::Matrixd &m,
+getFrustum(const vsg::dmat4 &m,
            double &left, double &right,
            double &bottom, double &top,
            double &near, double &far)
@@ -117,7 +117,7 @@ getFrustum(const osg::Matrixd &m,
 }
 
 bool
-getOrtho(const osg::Matrixd &m,
+getOrtho(const vsg::dmat4 &m,
          double &left, double &right,
          double &bottom, double &top,
          double &near, double &far)
@@ -148,8 +148,8 @@ getOrtho(const osg::Matrixd &m,
 }
 
 void
-clampNearFarPlanes(osg::Matrixd &old_proj, double near, double far,
-                   osg::Matrixd &new_proj)
+clampNearFarPlanes(vsg::dmat4 &old_proj, double near, double far,
+                   vsg::dmat4 &new_proj)
 {
     new_proj = old_proj;
 
@@ -177,7 +177,7 @@ clampNearFarPlanes(osg::Matrixd &old_proj, double near, double far,
         double ratio = fabs(2.0 / (trans_near - trans_far));
         double center = -0.5 * (trans_near + trans_far);
 
-        new_proj.postMult(osg::Matrixd(1.0, 0.0, 0.0, 0.0,
+        new_proj.postMult(vsg::dmat4(1.0, 0.0, 0.0, 0.0,
                                        0.0, 1.0, 0.0, 0.0,
                                        0.0, 0.0, ratio, 0.0,
                                        0.0, 0.0, center*ratio, 1.0));

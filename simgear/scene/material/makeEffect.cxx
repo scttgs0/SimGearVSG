@@ -19,7 +19,6 @@
 #include <osg/Program>
 #include <osg/Referenced>
 #include <osg/Texture2D>
-#include <osg/Vec4d>
 
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>

@@ -103,7 +103,7 @@ SGModelLib::~SGModelLib()
 
 namespace
 {
-osg::Node* loadFile(const string& path, SGReaderWriterOptions* options)
+vsg::Node* loadFile(const string& path, SGReaderWriterOptions* options)
 {
     using namespace osg;
     using namespace osgDB;
@@ -119,14 +119,14 @@ osg::Node* loadFile(const string& path, SGReaderWriterOptions* options)
 }
 }
 
-osg::Node*
+vsg::Node*
 SGModelLib::loadModel(const string &path,
                        SGPropertyNode *prop_root,
                        SGModelData *data,
                        bool autoTooltipsMaster,
                        int autoTooltipsMasterMax)
 {
-    osg::ref_ptr<SGReaderWriterOptions> opt;
+    vsg::ref_ptr<SGReaderWriterOptions> opt;
     opt = SGReaderWriterOptions::copyOrCreate(osgDB::Registry::instance()->getOptions());
     opt->getDatabasePathList().push_front( osgDB::getFilePath(path) );
     opt->setPropertyNode(prop_root ? prop_root: static_propRoot.get());
@@ -135,14 +135,14 @@ SGModelLib::loadModel(const string &path,
     opt->setAutoTooltipsMaster(autoTooltipsMaster);
     opt->setAutoTooltipsMasterMax(autoTooltipsMasterMax);
 
-    osg::Node *n = loadFile(path, opt.get());
+    vsg::Node *n = loadFile(path, opt.get());
     if (n && n->getName().empty())
         n->setName("Direct loaded model \"" + path + "\"");
     return n;
 
 }
 
-osg::Node*
+vsg::Node*
 SGModelLib::loadDeferredModel(const string &path, SGPropertyNode *prop_root,
                              SGModelData *data)
 {
@@ -150,7 +150,7 @@ SGModelLib::loadDeferredModel(const string &path, SGPropertyNode *prop_root,
     proxyNode->setLoadingExternalReferenceMode(osg::ProxyNode::DEFER_LOADING_TO_DATABASE_PAGER);
     proxyNode->setFileName(0, path);
 
-    osg::ref_ptr<SGReaderWriterOptions> opt;
+    vsg::ref_ptr<SGReaderWriterOptions> opt;
     opt = SGReaderWriterOptions::copyOrCreate(osgDB::Registry::instance()->getOptions());
     opt->getDatabasePathList().push_front( osgDB::getFilePath(path) );
     opt->setPropertyNode(prop_root ? prop_root: static_propRoot.get());
@@ -180,7 +180,7 @@ SGModelLib::loadPagedModel(SGPropertyNode *prop_root, SGModelData *data, SGModel
     unsigned int simple_models = 0;
     osg::PagedLOD *plod = new osg::PagedLOD;
 
-    osg::ref_ptr<SGReaderWriterOptions> opt;
+    vsg::ref_ptr<SGReaderWriterOptions> opt;
     opt = SGReaderWriterOptions::copyOrCreate(osgDB::Registry::instance()->getOptions());
     opt->setPropertyNode(prop_root ? prop_root: static_propRoot.get());
     opt->setModelData(data);

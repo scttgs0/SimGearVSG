@@ -18,34 +18,37 @@
 
 #include <tuple>
 
+#include <vsg/all.h>
+
+
 class SGPropertyNode;
 
 namespace osg {
-    class Image;
+class Image;
 }
 
-namespace simgear
-{
+namespace simgear {
 class Effect;
 class SGReaderWriterOptions;
 
 namespace effect {
-    enum MipMapFunction {
-        AUTOMATIC,
-        AVERAGE,
-        SUM,
-        PRODUCT,
-        MIN,
-        MAX
-    };
-    enum ImageInternalFormat {
-        Unspecified,
-        Normalized,
-    };
+enum MipMapFunction {
+    AUTOMATIC,
+    AVERAGE,
+    SUM,
+    PRODUCT,
+    MIN,
+    MAX
+};
+enum ImageInternalFormat {
+    Unspecified,
+    Normalized,
+};
 
 typedef std::tuple<MipMapFunction, MipMapFunction, MipMapFunction, MipMapFunction> MipMapTuple;
 
 MipMapTuple makeMipMapTuple(Effect* effect, const SGPropertyNode* props,
-                      const SGReaderWriterOptions* options);
-osg::Image* computeMipmap( osg::Image* image, MipMapTuple attrs );
-} }
+                            const SGReaderWriterOptions* options);
+vsg::Image* computeMipmap(vsg::Image* image, MipMapTuple attrs);
+} // namespace effect
+} // namespace simgear

@@ -16,7 +16,7 @@ void SplicingVisitor::reset()
     NodeVisitor::reset();
 }
 
-NodeList SplicingVisitor::traverse(osg::Node& node)
+NodeList SplicingVisitor::traverse(vsg::Node& node)
 {
     NodeList result;
     _childStack.push_back(NodeList());
@@ -25,21 +25,21 @@ NodeList SplicingVisitor::traverse(osg::Node& node)
     _childStack.pop_back();
     return result;
 }
-void SplicingVisitor::apply(osg::Node& node)
+void SplicingVisitor::apply(vsg::Node& node)
 {
     NodeVisitor::traverse(node);
     pushNode(&node);
 }
 
-void SplicingVisitor::apply(osg::Group& node)
+void SplicingVisitor::apply(vsg::Group& node)
 {
     if (pushNode(getNewNode(node)))
         return;
     pushResultNode(&node, &node, traverse(node));
 }
 
-osg::Group* SplicingVisitor::pushResultNode( osg::Group* node,
-                                             osg::Group* newNode,
+vsg::Group* SplicingVisitor::pushResultNode( vsg::Group* node,
+                                             vsg::Group* newNode,
                                              const osg::NodeList& children )
 {
     ref_ptr<Group> result;
@@ -57,21 +57,21 @@ osg::Group* SplicingVisitor::pushResultNode( osg::Group* node,
     return result.get();
 }
 
-osg::Node* SplicingVisitor::pushResultNode(osg::Node* node, osg::Node* newNode)
+vsg::Node* SplicingVisitor::pushResultNode(vsg::Node* node, vsg::Node* newNode)
 {
     _childStack.back().push_back(newNode);
     recordNewNode(node, newNode);
     return newNode;
 }
 
-osg::Node* SplicingVisitor::pushNode(osg::Node* node)
+vsg::Node* SplicingVisitor::pushNode(vsg::Node* node)
 {
     if (node)
         _childStack.back().push_back(node);
     return node;
 }
 
-osg::Node* SplicingVisitor::getResult()
+vsg::Node* SplicingVisitor::getResult()
 {
     NodeList& top = _childStack.at(0);
     if (top.empty()) {
@@ -88,7 +88,7 @@ osg::Node* SplicingVisitor::getResult()
     }
 }
 
-osg::Node* SplicingVisitor::getNewNode(osg::Node* node)
+vsg::Node* SplicingVisitor::getNewNode(vsg::Node* node)
 {
     ref_ptr<Node> tmpPtr(node);
     NodeMap::iterator itr;
@@ -105,7 +105,7 @@ osg::Node* SplicingVisitor::getNewNode(osg::Node* node)
         return itr->second.get();
 }
 
-bool SplicingVisitor::recordNewNode(osg::Node* oldNode, osg::Node* newNode)
+bool SplicingVisitor::recordNewNode(vsg::Node* oldNode, vsg::Node* newNode)
 {
     ref_ptr<Node> oldTmp(oldNode);
     ref_ptr<Node> newTmp(newNode);

@@ -7,12 +7,14 @@
 
 #pragma once
 
-#include <osg/ref_ptr>
+#include <vsg/all.h>
+
 #include <osg/Array>
 #include <osg/MatrixTransform>
 
-#include <simgear/structure/SGReferenced.hxx>
 #include <simgear/math/SGMath.hxx>
+#include <simgear/structure/SGReferenced.hxx>
+
 
 namespace osg {
 class DrawElementsUShort;
@@ -22,14 +24,15 @@ namespace simgear {
 class SGReaderWriterOptions;
 }
 
-class SGSkyDome : public SGReferenced {
+class SGSkyDome : public SGReferenced
+{
 public:
     SGSkyDome() = default;
 
     /*
      * Initialize the sky object and connect it into our scene graph root.
      */
-    osg::Node* build(double hscale = 80000.0, double vscale = 80000.0,
+    vsg::Node* build(double hscale = 80000.0, double vscale = 80000.0,
                      const simgear::SGReaderWriterOptions* options = nullptr);
 
     /*
@@ -41,10 +44,11 @@ public:
      */
     bool reposition(const SGVec3f& p, double asl,
                     double lon, double lat, double spin);
+
 private:
     void makeDome(int rings, int bands, osg::DrawElementsUShort& elements);
 
     double asl{0.0};
-    osg::ref_ptr<osg::MatrixTransform> dome_transform;
-    osg::ref_ptr<osg::Vec3Array> dome_vl;
+    vsg::ref_ptr<osg::MatrixTransform> dome_transform;
+    vsg::ref_ptr<vsg::vec3Array> dome_vl;
 };

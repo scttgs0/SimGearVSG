@@ -24,7 +24,7 @@
 #include <osg/Transform>
 #include <simgear/math/SGMath.hxx>
 
-class SGScaleTransform : public osg::Transform {
+class SGScaleTransform : public vsg::Transform {
 public:
   SGScaleTransform();
   SGScaleTransform(const SGScaleTransform&,
@@ -61,9 +61,9 @@ public:
   { return _scaleFactor; }
 
 
-  virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+  virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
-  virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+  virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
   virtual osg::BoundingSphere computeBound() const;
 

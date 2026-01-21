@@ -24,7 +24,7 @@
 #include <osg/Transform>
 #include <simgear/math/SGMath.hxx>
 
-class SGRotateTransform : public osg::Transform {
+class SGRotateTransform : public vsg::Transform {
 public:
   SGRotateTransform();
   SGRotateTransform(const SGRotateTransform&,
@@ -56,15 +56,15 @@ public:
   double getAngleDeg() const
   { return SGMiscd::rad2deg(_angleRad); }
 
-  virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+  virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
-  virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+  virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
 
   virtual osg::BoundingSphere computeBound() const;
 
   // Useful for other classes too.
-  static void set_rotation (osg::Matrix &matrix, double position_rad,
+  static void set_rotation (vsg::mat4 &matrix, double position_rad,
                             const SGVec3d &center, const SGVec3d &axis);
 private:
   SGVec3d _center;

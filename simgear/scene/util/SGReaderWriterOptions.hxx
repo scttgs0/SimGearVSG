@@ -19,11 +19,14 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osgDB/Options>
-#include <simgear/scene/model/modellib.hxx>
 #include <simgear/scene/material/matlib.hxx>
+#include <simgear/scene/model/modellib.hxx>
 
 #include <simgear/props/props.hxx>
+
 
 #ifdef ENABLE_GDAL
 #include <simgear/scene/dem/SGDem.hxx>
@@ -32,15 +35,14 @@
 class SGPropertyNode;
 class SGPath;
 
-typedef std::vector < std::string > string_list;
+typedef std::vector<std::string> string_list;
 
-namespace simgear
+namespace simgear {
+
+class SGReaderWriterOptions : public osgDB::Options
 {
-
-class SGReaderWriterOptions : public osgDB::Options {
 public:
-    enum LoadOriginHint
-    {
+    enum LoadOriginHint {
         ORIGIN_MODEL,
         ORIGIN_EFFECTS,
         ORIGIN_EFFECTS_NORMALIZED,
@@ -60,7 +62,8 @@ public:
                               _LoadOriginHint(ORIGIN_MODEL),
                               _vertexOrderXYZ(false),
                               _defaultEffect("Effects/model-default")
-    { }
+    {
+    }
     SGReaderWriterOptions(const std::string& str) : osgDB::Options(str),
                                                     _materialLib(0),
                                                     _instantiateEffects(false),
@@ -71,7 +74,8 @@ public:
                                                     _LoadOriginHint(ORIGIN_MODEL),
                                                     _vertexOrderXYZ(false),
                                                     _defaultEffect("Effects/model-default")
-    { }
+    {
+    }
     SGReaderWriterOptions(const osgDB::Options& options,
                           const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY) : osgDB::Options(options, copyop),
                                                                                    _materialLib(0),
@@ -83,7 +87,8 @@ public:
                                                                                    _LoadOriginHint(ORIGIN_MODEL),
                                                                                    _vertexOrderXYZ(false),
                                                                                    _defaultEffect("Effects/model-default")
-    { }
+    {
+    }
     SGReaderWriterOptions(const SGReaderWriterOptions& options,
                           const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY) : osgDB::Options(options, copyop),
                                                                                    _propertyNode(options._propertyNode),
@@ -103,72 +108,117 @@ public:
                                                                                    _errorContext(options._errorContext),
                                                                                    _vertexOrderXYZ(options._vertexOrderXYZ),
                                                                                    _defaultEffect(options._defaultEffect)
-    { }
+    {
+    }
 
     META_Object(simgear, SGReaderWriterOptions);
 
     const SGSharedPtr<SGPropertyNode>& getPropertyNode() const
-    { return _propertyNode; }
+    {
+        return _propertyNode;
+    }
     void setPropertyNode(const SGSharedPtr<SGPropertyNode>& propertyNode)
-    { _propertyNode = propertyNode; }
+    {
+        _propertyNode = propertyNode;
+    }
 
     SGMaterialLibPtr getMaterialLib() const
-    { return _materialLib; }
+    {
+        return _materialLib;
+    }
     void setMaterialLib(SGMaterialLib* materialLib)
-    { _materialLib = materialLib; }
+    {
+        _materialLib = materialLib;
+    }
 
 #ifdef ENABLE_GDAL
     SGDemPtr getDem() const
-    { return _dem; }
+    {
+        return _dem;
+    }
     void setDem(SGDem* dem)
-    { _dem = dem; }
+    {
+        _dem = dem;
+    }
 #endif
 
-    SGModelData *getModelData() const
-    { return _model_data.get(); }
-    void setModelData(SGModelData *modelData)
-    { _model_data=modelData; }
+    SGModelData* getModelData() const
+    {
+        return _model_data.get();
+    }
+    void setModelData(SGModelData* modelData)
+    {
+        _model_data = modelData;
+    }
 
     bool getInstantiateEffects() const
-    { return _instantiateEffects; }
+    {
+        return _instantiateEffects;
+    }
     void setInstantiateEffects(bool instantiateEffects)
-    { _instantiateEffects = instantiateEffects; }
+    {
+        _instantiateEffects = instantiateEffects;
+    }
 
     bool getInstantiateMaterialEffects() const
-    { return _instantiateMaterialEffects; }
+    {
+        return _instantiateMaterialEffects;
+    }
     void setInstantiateMaterialEffects(bool instantiateMaterialEffects)
-    { _instantiateMaterialEffects = instantiateMaterialEffects; }
+    {
+        _instantiateMaterialEffects = instantiateMaterialEffects;
+    }
 
     bool getMakeEffectsOnLoad() const
-    { return _makeEffectsOnLoad; }
+    {
+        return _makeEffectsOnLoad;
+    }
     void setMakeEffectsOnLoad(bool makeEffectsOnLoad)
-    { _makeEffectsOnLoad = makeEffectsOnLoad; }
+    {
+        _makeEffectsOnLoad = makeEffectsOnLoad;
+    }
 
     std::string getMaterialName() const
-    { return _materialName; }
+    {
+        return _materialName;
+    }
     void setMaterialName(const std::string& materialName)
-    { _materialName = materialName; }
+    {
+        _materialName = materialName;
+    }
 
     const string_list& getSceneryPathSuffixes() const
-    { return _sceneryPathSuffixes; }
+    {
+        return _sceneryPathSuffixes;
+    }
 
     void setSceneryPathSuffixes(const string_list& suffixes)
-    { _sceneryPathSuffixes = suffixes; }
-    
+    {
+        _sceneryPathSuffixes = suffixes;
+    }
+
     bool getAutoTooltipsMaster() const
-    { return _autoTooltipsMaster; }
+    {
+        return _autoTooltipsMaster;
+    }
     void setAutoTooltipsMaster(bool autoTooltipsMaster)
-    { _autoTooltipsMaster = autoTooltipsMaster; }
-    
+    {
+        _autoTooltipsMaster = autoTooltipsMaster;
+    }
+
     int getAutoTooltipsMasterMax() const
-    { return _autoTooltipsMasterMax; }
+    {
+        return _autoTooltipsMasterMax;
+    }
     void setAutoTooltipsMasterMax(int autoTooltipsMasterMax)
-    { _autoTooltipsMasterMax = autoTooltipsMasterMax; }
+    {
+        _autoTooltipsMasterMax = autoTooltipsMasterMax;
+    }
 
     // the VertexOrderXYZ defines the sorting rule to use for
     // axis objects in animations.
-    bool getVertexOrderXYZ() const                  { return _vertexOrderXYZ; }
-    void setVertexOrderXYZ(bool vertexOrderXYZ)     { _vertexOrderXYZ = vertexOrderXYZ; }
+    bool getVertexOrderXYZ() const { return _vertexOrderXYZ; }
+    void setVertexOrderXYZ(bool vertexOrderXYZ) { _vertexOrderXYZ = vertexOrderXYZ; }
 
     std::string getDefaultEffect() const
     {
@@ -183,16 +233,20 @@ public:
     static SGReaderWriterOptions* fromPath(const SGPath& path);
 
     void setLocation(double lon, double lat)
-    { _geod = SGGeod::fromDeg(lon, lat); }
+    {
+        _geod = SGGeod::fromDeg(lon, lat);
+    }
 
     const SGGeod& getLocation() const
-    { return _geod; }
+    {
+        return _geod;
+    }
 
     // the load origin defines where the load request has come from.
-    // example usage; to allow the DDS Texture Cache (DTC) to ignore 
+    // example usage; to allow the DDS Texture Cache (DTC) to ignore
     // any texture that is used in a shader, as these often have special values
     // encoded into the channels that aren't suitable for conversion.
-    void setLoadOriginHint(LoadOriginHint _v) const { _LoadOriginHint = _v; } 
+    void setLoadOriginHint(LoadOriginHint _v) const { _LoadOriginHint = _v; }
     LoadOriginHint getLoadOriginHint() const { return _LoadOriginHint; }
 
     using ErrorContext = std::map<std::string, std::string>;
@@ -214,8 +268,8 @@ private:
     SGSharedPtr<SGDem> _dem;
 #endif
 
-    osg::ref_ptr<SGModelData> _model_data;
-    
+    vsg::ref_ptr<SGModelData> _model_data;
+
     bool _instantiateEffects;
     bool _instantiateMaterialEffects;
     bool _makeEffectsOnLoad;
@@ -226,8 +280,8 @@ private:
     SGGeod _geod;
     mutable LoadOriginHint _LoadOriginHint;
     ErrorContext _errorContext;
-    bool _vertexOrderXYZ; // used for axis objects in animations
+    bool _vertexOrderXYZ;       // used for axis objects in animations
     std::string _defaultEffect; // defaults to model-default
 };
 
-}
+} // namespace simgear

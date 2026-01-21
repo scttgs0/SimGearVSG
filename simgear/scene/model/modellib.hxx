@@ -17,19 +17,20 @@
 
 #pragma once
 
-#include <simgear/compiler.h>	// for SG_USING_STD
-
 #include <map>
 #include <string>
 
-#include <osg/Node>
+#include <vsg/all.h>
+
 #include <osgDB/ReaderWriter>
 
-#include <simgear/props/props.hxx>
+#include <simgear/compiler.h> // for SG_USING_STD
 #include <simgear/misc/sg_path.hxx>
+#include <simgear/props/props.hxx>
+
 
 namespace osg {
-    class PagedLOD;
+class PagedLOD;
 }
 
 namespace simgear {
@@ -43,54 +44,55 @@ class SGModelLOD;  // defined below
 class SGModelLib final
 {
 public:
-    static void init(const std::string &root_dir, SGPropertyNode* root);
+    static void init(const std::string& root_dir, SGPropertyNode* root);
 
     static void resetPropertyRoot();
 
     // Load a 3D model (any format)
     // data->modelLoaded() will be called after the model is loaded
-    static osg::Node* loadModel(const std::string &path,
-                                SGPropertyNode *prop_root = NULL,
-                                SGModelData *data=0,
-                                bool autoTooltipsMaster=false,
-                                int autoTooltipsMasterMax=0);
+    static vsg::Node* loadModel(const std::string& path,
+                                SGPropertyNode* prop_root = NULL,
+                                SGModelData* data = 0,
+                                bool autoTooltipsMaster = false,
+                                int autoTooltipsMasterMax = 0);
 
     // Load a 3D model (any format) through the DatabasePager.
     // This function initially just returns a proxy node that refers to
     // the model file. Once the viewer steps onto that node the
     // model will be loaded.
-    static osg::Node* loadDeferredModel(const std::string &path,
-                                        SGPropertyNode *prop_root = NULL,
-                                        SGModelData *data=0);
+    static vsg::Node* loadDeferredModel(const std::string& path,
+                                        SGPropertyNode* prop_root = NULL,
+                                        SGModelData* data = 0);
     // Load a 3D model (any format) through the DatabasePager.
     // This function initially just returns a PagedLOD node that refers to
     // the model file. Once the viewer steps onto that node the
     // model will be loaded. When the viewer does no longer reference this
     // node for a long time the node is unloaded again.
-    static osg::PagedLOD* loadPagedModel(SGPropertyNode *prop_root,
-                                      SGModelData *data,
-                                      SGModelLOD model_lods);
-    static osg::PagedLOD* loadPagedModel(const std::string &path,
-                                     SGPropertyNode *prop_root = NULL,
-                                     SGModelData *data=0);
+    static osg::PagedLOD* loadPagedModel(SGPropertyNode* prop_root,
+                                         SGModelData* data,
+                                         SGModelLOD model_lods);
+    static osg::PagedLOD* loadPagedModel(const std::string& path,
+                                         SGPropertyNode* prop_root = NULL,
+                                         SGModelData* data = 0);
 
     static osg::PagedLOD* loadPagedModel(std::vector<std::string> paths,
                                          SGPropertyNode* prop_root = NULL,
                                          SGModelData* data = 0);
 
     static std::string findDataFile(const std::string& file,
-      const osgDB::Options* opts = nullptr,
-      SGPath currentDir = SGPath());
+                                    const osgDB::Options* opts = nullptr,
+                                    SGPath currentDir = SGPath());
 
     static std::string findDataFile(const SGPath& file,
-      const osgDB::Options* opts = nullptr,
-      SGPath currentDir = SGPath());
+                                    const osgDB::Options* opts = nullptr,
+                                    SGPath currentDir = SGPath());
+
 protected:
     SGModelLib();
-    ~SGModelLib();    // non-virtual intentional
+    ~SGModelLib(); // non-virtual intentional
 
 private:
-  static SGPropertyNode_ptr static_propRoot;
+    static SGPropertyNode_ptr static_propRoot;
 };
 
 
@@ -99,11 +101,12 @@ private:
  * called after the model was loaded, and the destructor when the branch
  * is removed from the scene graph.
  */
-class SGModelData : public osg::Referenced {
+class SGModelData : public osg::Referenced
+{
 public:
     virtual ~SGModelData() {}
-    virtual void modelLoaded(const std::string& path, SGPropertyNode *prop,
-                             osg::Node* branch) = 0;
+    virtual void modelLoaded(const std::string& path, SGPropertyNode* prop,
+                             vsg::Node* branch) = 0;
     virtual SGModelData* clone() const = 0;
 
     using ErrorContext = std::map<std::string, std::string>;
@@ -115,32 +118,34 @@ public:
  * Data for a model with multiple LoD versions
  */
 
-class SGModelLOD {
+class SGModelLOD
+{
 public:
-  struct ModelLOD {
-      ModelLOD(const std::string& p, float minrange, float maxrange) : path(p), min_range(minrange), max_range(maxrange)
-      { }
-      const std::string path;
-      float min_range;
-      float max_range;
-  };
-typedef std::vector<ModelLOD> ModelLODList;
+    struct ModelLOD {
+        ModelLOD(const std::string& p, float minrange, float maxrange) : path(p), min_range(minrange), max_range(maxrange)
+        {
+        }
+        const std::string path;
+        float min_range;
+        float max_range;
+    };
+    typedef std::vector<ModelLOD> ModelLODList;
 
-void insert(const ModelLOD& model)
-{
-  _models.push_back(model);
-}
+    void insert(const ModelLOD& model)
+    {
+        _models.push_back(model);
+    }
 
-void insert(const std::string& p, float minrange, float maxrange)
-{
-  insert(ModelLOD(p, minrange, maxrange));
-}
+    void insert(const std::string& p, float minrange, float maxrange)
+    {
+        insert(ModelLOD(p, minrange, maxrange));
+    }
 
-unsigned getNumLODs() const { return _models.size(); }
-const ModelLOD& getModelLOD(unsigned i) const { return _models[i]; }
+    unsigned getNumLODs() const { return _models.size(); }
+    const ModelLOD& getModelLOD(unsigned i) const { return _models[i]; }
 
 private:
-  ModelLODList _models;
+    ModelLODList _models;
 };
 
-}
+} // namespace simgear

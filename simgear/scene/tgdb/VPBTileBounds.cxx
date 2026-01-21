@@ -21,12 +21,12 @@
 #include <simgear/debug/logstream.hxx>
 
 
-TileBounds::TileBounds(Locator *locator, osg::Vec3d up) {
+TileBounds::TileBounds(Locator *locator, vsg::dvec3 up) {
     // Determine the corners of the tile;
-    locator->convertLocalToModel(osg::Vec3d(0.0, 0.0, 0.0), v00);
-    locator->convertLocalToModel(osg::Vec3d(1.0, 0.0, 0.0), v10);
-    locator->convertLocalToModel(osg::Vec3d(0.0, 1.0, 0.0), v01);
-    locator->convertLocalToModel(osg::Vec3d(1.0, 1.0, 0.0), v11);
+    locator->convertLocalToModel(vsg::dvec3(0.0, 0.0, 0.0), v00);
+    locator->convertLocalToModel(vsg::dvec3(1.0, 0.0, 0.0), v10);
+    locator->convertLocalToModel(vsg::dvec3(0.0, 1.0, 0.0), v01);
+    locator->convertLocalToModel(vsg::dvec3(1.0, 1.0, 0.0), v11);
 
     // Determine the normals of the planes defining the vertical edges of the tiles.
     // This can be found using the cross product of the horizontal line and an appropriate "up"
@@ -38,9 +38,9 @@ TileBounds::TileBounds(Locator *locator, osg::Vec3d up) {
     west  = (v00 - v01) ^ up;
 }
 
-std::list<osg::Vec3d> TileBounds::clipToTile(std::list<osg::Vec3d> points) {
+std::list<vsg::dvec3> TileBounds::clipToTile(std::list<vsg::dvec3> points) {
 
-    std::list<osg::Vec3d> lreturn;
+    std::list<vsg::dvec3> lreturn;
 
     bool last_in = false;
     auto last_pt = points.begin();
@@ -77,7 +77,7 @@ std::list<osg::Vec3d> TileBounds::clipToTile(std::list<osg::Vec3d> points) {
     return lreturn;
 }
 
-bool TileBounds::insideTile(osg::Vec3d pt) {
+bool TileBounds::insideTile(vsg::dvec3 pt) {
 
     float s = south * (pt - v00);
     float e = east  * (pt - v10);
@@ -89,7 +89,7 @@ bool TileBounds::insideTile(osg::Vec3d pt) {
 
 // Get the Tile intersection, and also the corner of the tile to the right of the intersection.
 // This corner can be used to define the seaward edge of some coastline.
-osg::Vec3d TileBounds::getTileIntersection(osg::Vec3d inside, osg::Vec3d outside) {
+vsg::dvec3 TileBounds::getTileIntersection(vsg::dvec3 inside, vsg::dvec3 outside) {
 
     if (! insideTile(inside)) {
         SG_LOG(SG_TERRAIN, SG_ALERT, "Invalid VPB Tile intersection - \"inside\" point not inside!");
@@ -102,7 +102,7 @@ osg::Vec3d TileBounds::getTileIntersection(osg::Vec3d inside, osg::Vec3d outside
     }
 
     // Simply clip against each of the planes in turn.
-    osg::Vec3d intersect = outside;
+    vsg::dvec3 intersect = outside;
     intersect = getPlaneIntersection(inside, intersect, south, v00);
     intersect = getPlaneIntersection(inside, intersect, east,  v10);
     intersect = getPlaneIntersection(inside, intersect, north, v11);
@@ -111,12 +111,12 @@ osg::Vec3d TileBounds::getTileIntersection(osg::Vec3d inside, osg::Vec3d outside
     return intersect;
 }
 
-osg::Vec3d TileBounds::getPlaneIntersection(osg::Vec3d inside, osg::Vec3d outside, osg::Vec3d normal, osg::Vec3d plane) {
+vsg::dvec3 TileBounds::getPlaneIntersection(vsg::dvec3 inside, vsg::dvec3 outside, vsg::dvec3 normal, vsg::dvec3 plane) {
     // Check for any intersection at all first
-    osg::Vec3d n  = normal;
-    osg::Vec3d p0 = plane;
-    osg::Vec3d l0 = inside;
-    osg::Vec3d l  = outside-inside;
+    vsg::dvec3 n  = normal;
+    vsg::dvec3 p0 = plane;
+    vsg::dvec3 l0 = inside;
+    vsg::dvec3 l  = outside-inside;
 
     if (fabs(l * n) < 0.01) return outside;
 

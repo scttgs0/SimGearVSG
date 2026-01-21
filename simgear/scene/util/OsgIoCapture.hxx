@@ -21,7 +21,7 @@ const std::string osg_ignored_messages[] = {
 class SGNotifyHandler : public osg::NotifyHandler {
 public:
     // note this callback will be invoked by OSG from multiple threads.
-    // fortunately our Simgear logging implementation already handles
+    // fortunately our SimGear logging implementation already handles
     // that internally, so we simply pass the message on.
     virtual void notify(osg::NotifySeverity severity, const char* message) {
         // avoid asserts when message is NULL or empty
@@ -62,7 +62,7 @@ public:
             return;
         }
 
-        SG_LOG(SG_OSG, translateSeverity(severity), msg);
+        SG_LOG(SG_VSG, translateSeverity(severity), msg);
     }
 
 private:

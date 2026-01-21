@@ -17,9 +17,9 @@
 
 using namespace simgear;
 
-osg::Node* SGMoon::build(double moon_size, const SGReaderWriterOptions* options)
+vsg::Node* SGMoon::build(double moon_size, const SGReaderWriterOptions* options)
 {
-    osg::ref_ptr<EffectGeode> orb = SGMakeSphere(moon_size, 40, 20);
+    vsg::ref_ptr<EffectGeode> orb = SGMakeSphere(moon_size, 40, 20);
     orb->setName("Moon");
 
     Effect* effect = makeEffect("Effects/moon", true, options);
@@ -49,7 +49,7 @@ bool SGMoon::reposition(double rightAscension, double declination,
                         double moon_dist_bare, double moon_dist_factor,
                         double lst, double lat, double alt)
 {
-    osg::Matrix TE, T2, RA, DEC;
+    vsg::mat4 TE, T2, RA, DEC;
 
     // semi mayor axis
     const double moon_a_in_rearth = 60.266600;
@@ -81,16 +81,16 @@ bool SGMoon::reposition(double rightAscension, double declination,
     xp = viewer_radius * cos(lat)*sin(-lha);
 
     //rotate along the z axis
-    RA.makeRotate(rightAscension - 90.0 * SGD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
+    RA.makeRotate(rightAscension - 90.0 * SGD_DEGREES_TO_RADIANS, vsg::vec3(0, 0, 1));
     //rotate along the rotated x axis
-    DEC.makeRotate(declination, osg::Vec3(1, 0, 0));
+    DEC.makeRotate(declination, vsg::vec3(1, 0, 0));
 
     //move to the center of Earth
-    TE.makeTranslate(osg::Vec3(-xp,-yp,-zp));
+    TE.makeTranslate(vsg::vec3(-xp,-yp,-zp));
 
     //move the moon from the center of Earth to moon_dist
     moon_dist = moon_dist_bare * moon_dist_factor;
-    T2.makeTranslate(osg::Vec3(0, moon_dist, 0));
+    T2.makeTranslate(vsg::vec3(0, moon_dist, 0));
 
     // cout << " viewer radius= " << viewer_radius << endl;
     // cout << " xp yp zp= " << xp <<" " << yp << " " << zp << endl;

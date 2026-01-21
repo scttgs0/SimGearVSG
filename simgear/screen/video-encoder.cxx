@@ -11,8 +11,6 @@
 
 #include <simgear/debug/logstream.hxx>
 
-#include <osg/Image>
-
 #include <condition_variable>
 #include <mutex>
 #include <thread>
@@ -24,7 +22,7 @@ namespace simgear
 /* Support for streaming video of gc's pixels to file. */
 struct VideoEncoderInternal : osg::GraphicsOperation
 {
-    osg::ref_ptr<osg::Image>    m_image;
+    vsg::ref_ptr<vsg::Image>    m_image;
     FfmpegEncoder               m_ffmpeg_encoder;
     double                      m_dt = 0;
     int                         m_encoder_busy = 0;  /**/
@@ -46,7 +44,7 @@ struct VideoEncoderInternal : osg::GraphicsOperation
             )
     :
     osg::GraphicsOperation("VideoEncoderOperation", false /*keep*/),
-    m_image(new osg::Image),
+    m_image(new vsg::Image),
     m_ffmpeg_encoder(path, codec, quality, speed, bitrate, log_sws_scale_stats),
     m_thread(
             [this]
@@ -233,7 +231,7 @@ VideoEncoder::VideoEncoder(
         bool log_sws_scale_stats
         )
 {
-    throw std::runtime_error("Video encoding is not available in this build of Flightgear");
+    throw std::runtime_error("Video encoding is not available in this build of FlightGear");
 }
 
 VideoEncoder::~VideoEncoder()
@@ -242,7 +240,7 @@ VideoEncoder::~VideoEncoder()
 
 void VideoEncoder::encode(double dt, osg::GraphicsContext* gc)
 {
-    throw std::runtime_error("Video encoding is not available in this build of Flightgear");
+    throw std::runtime_error("Video encoding is not available in this build of FlightGear");
 }
 
 }   /* namespace simgear. */

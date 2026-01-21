@@ -50,21 +50,21 @@ class VPBMaterialHandler {
 
     // Check against object mask, if any. Returns true if the given point
     // should be masked, false otherwise.
-    bool checkAgainstObjectMask(osg::Image *objectMaskImage,
+    bool checkAgainstObjectMask(vsg::Image *objectMaskImage,
                                 ImageChannel channel, double sampleProbability,
                                 double x, double y, float x_scale,
-                                float y_scale, const osg::Vec2d t_0,
-                                osg::Vec2d t_x, osg::Vec2d t_y);
-    bool checkAgainstObjectMask(osg::Image *objectMaskImage,
+                                float y_scale, const vsg::dvec2 t_0,
+                                vsg::dvec2 t_x, vsg::dvec2 t_y);
+    bool checkAgainstObjectMask(vsg::Image *objectMaskImage,
                                 ImageChannel channel, double sampleProbability,
-                                float x_scale, float y_scale, const osg::Vec2d t);
+                                float x_scale, float y_scale, const vsg::dvec2 t);
 
   public:
     // Initialize internal state and return true if the handler should be called
     // for the current tile.
-    virtual bool initialize(osg::ref_ptr<SGReaderWriterOptions> options,
-                            osg::ref_ptr<TerrainTile> terrainTile,
-                            osg::ref_ptr<SGMaterialCache> matcache) = 0;
+    virtual bool initialize(vsg::ref_ptr<SGReaderWriterOptions> options,
+                            vsg::ref_ptr<TerrainTile> terrainTile,
+                            vsg::ref_ptr<SGMaterialCache> matcache) = 0;
 
     // Function that is called when a new material/landclass is detected during
     // the scanline reading process. Return false if the new material is
@@ -76,16 +76,16 @@ class VPBMaterialHandler {
     // Return true if the point should be used to place an object, updating
     //  the pointInTriangle variable with the x and y location within the
     //  current triangle
-    virtual bool handleIteration(SGMaterial* mat, osg::Image* objectMaskImage,
-                                osg::Vec2d p, const double rand1, const double rand2,
+    virtual bool handleIteration(SGMaterial* mat, vsg::Image* objectMaskImage,
+                                vsg::dvec2 p, const double rand1, const double rand2,
                                  float x_scale, float y_scale) = 0;
 
     // Place an object at the point given by vp
-    virtual void placeObject(const osg::Vec3 vp) = 0;
+    virtual void placeObject(const vsg::vec3 vp) = 0;
 
     // Function that is called after the scanline is complete
-    virtual void finish(osg::ref_ptr<SGReaderWriterOptions> options,
-                        osg::ref_ptr<osg::MatrixTransform> transform,
+    virtual void finish(vsg::ref_ptr<SGReaderWriterOptions> options,
+                        vsg::ref_ptr<osg::MatrixTransform> transform,
                         const SGGeod loc) = 0;
 
     double get_delta_lat() { return delta_lat; };
@@ -98,7 +98,7 @@ class VPBMaterialHandler {
  *
  * This handler takes care of generating vegetation and trees. The code has
  * been ported as-is from the following source:
- * Simgear commit 6d71ab75:
+ * SimGear commit 6d71ab75:
  *  simgear/scene/tgdb/VPBTechnique.cxx : applyTrees()
  */
 class VegetationHandler : public VPBMaterialHandler {
@@ -106,16 +106,16 @@ class VegetationHandler : public VPBMaterialHandler {
     VegetationHandler() {}
     virtual ~VegetationHandler() {}
 
-    bool initialize(osg::ref_ptr<SGReaderWriterOptions> options,
-                    osg::ref_ptr<TerrainTile> terrainTile,
-                    osg::ref_ptr<SGMaterialCache> matcache);
+    bool initialize(vsg::ref_ptr<SGReaderWriterOptions> options,
+                    vsg::ref_ptr<TerrainTile> terrainTile,
+                    vsg::ref_ptr<SGMaterialCache> matcache);
     bool handleNewMaterial(SGMaterial *mat);
-    bool handleIteration(SGMaterial* mat, osg::Image* objectMaskImage,
-                          osg::Vec2d p, const double rand1, const double rand2,
+    bool handleIteration(SGMaterial* mat, vsg::Image* objectMaskImage,
+                          vsg::dvec2 p, const double rand1, const double rand2,
                           float x_scale, float y_scale);
-    void placeObject(const osg::Vec3 vp);
-    void finish(osg::ref_ptr<SGReaderWriterOptions> options,
-                osg::ref_ptr<osg::MatrixTransform> transform, const SGGeod loc);
+    void placeObject(const vsg::vec3 vp);
+    void finish(vsg::ref_ptr<SGReaderWriterOptions> options,
+                vsg::ref_ptr<osg::MatrixTransform> transform, const SGGeod loc);
 
   private:
     float vegetation_density;
@@ -137,16 +137,16 @@ class RandomLightsHandler : public VPBMaterialHandler {
     RandomLightsHandler() {}
     virtual ~RandomLightsHandler() {}
 
-    bool initialize(osg::ref_ptr<SGReaderWriterOptions> options,
-                    osg::ref_ptr<TerrainTile> terrainTile,
-                    osg::ref_ptr<SGMaterialCache> matcache);
+    bool initialize(vsg::ref_ptr<SGReaderWriterOptions> options,
+                    vsg::ref_ptr<TerrainTile> terrainTile,
+                    vsg::ref_ptr<SGMaterialCache> matcache);
     bool handleNewMaterial(SGMaterial *mat);
-    bool handleIteration(SGMaterial* mat, osg::Image* objectMaskImage,
-                                osg::Vec2d p, const double rand1, const double rand2,
+    bool handleIteration(SGMaterial* mat, vsg::Image* objectMaskImage,
+                                vsg::dvec2 p, const double rand1, const double rand2,
                                  float x_scale, float y_scale);
-    void placeObject(const osg::Vec3 vp);
-    void finish(osg::ref_ptr<SGReaderWriterOptions> options,
-                osg::ref_ptr<osg::MatrixTransform> transform, const SGGeod loc);
+    void placeObject(const vsg::vec3 vp);
+    void finish(vsg::ref_ptr<SGReaderWriterOptions> options,
+                vsg::ref_ptr<osg::MatrixTransform> transform, const SGGeod loc);
 
   private:
     LightBin *bin = NULL;

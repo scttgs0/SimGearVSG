@@ -1,4 +1,4 @@
-// CopyOp.hxx - Simgear CopyOp for copying our own classes
+// CopyOp.hxx - SimGear CopyOp for copying our own classes
 //
 // Copyright (C) 2009  Tim Moore timoore@redhat.com
 //
@@ -19,10 +19,12 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/CopyOp>
 
-namespace simgear
-{
+
+namespace simgear {
 class CopyOp : public osg::CopyOp
 {
 public:
@@ -31,6 +33,6 @@ public:
     {
     }
     using osg::CopyOp::operator();
-    virtual osg::Object* operator()(const osg::Object* obj) const;
+    virtual vsg::Object* operator()(const vsg::Object* obj) const;
 };
-}
+} // namespace simgear

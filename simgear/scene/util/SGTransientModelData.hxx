@@ -38,11 +38,11 @@ namespace simgear
     public:
         // fully specified constructor. Probably not relevant as creating an object this specified implies setting up for an individual animation element, which will preclude
         // the use of the axis definition cache between objects.
-        SGTransientModelData(osg::Node* _node, const SGPropertyNode* _configNode, SGPropertyNode* _modelRoot, osgDB::Options* _options, const std::string &_path, int _i)
+        SGTransientModelData(vsg::Node* _node, const SGPropertyNode* _configNode, SGPropertyNode* _modelRoot, osgDB::Options* _options, const std::string &_path, int _i)
             : node(_node), configNode(_configNode), modelRoot(_modelRoot), options(_options), path(_path), index(_i)
         {}
         // usual form of construction - setup the elements that are constant, and specify the config node and index via LoadAnimationValuesForElement 
-        SGTransientModelData(osg::Node* _node, SGPropertyNode* _modelRoot, osgDB::Options* _options, const std::string &_path)
+        SGTransientModelData(vsg::Node* _node, SGPropertyNode* _modelRoot, osgDB::Options* _options, const std::string &_path)
             : node(_node), configNode(nullptr), modelRoot(_modelRoot), options(_options), path(_path), index(0)
         {}
 
@@ -55,7 +55,7 @@ namespace simgear
             index = _index;
         }
 
-        osg::Node*  getNode() { return node; }
+        vsg::Node*  getNode() { return node; }
         const SGPropertyNode* getConfigNode() { return configNode; }
         SGPropertyNode* getModelRoot() { return modelRoot; }
         const osgDB::Options* getOptions() { return options; }
@@ -85,7 +85,7 @@ namespace simgear
         }
 
     private:
-        osg::Node* node = nullptr;
+        vsg::Node* node = nullptr;
         const SGPropertyNode* configNode = nullptr;
         SGPropertyNode* modelRoot = nullptr;
         const osgDB::Options* options = nullptr;

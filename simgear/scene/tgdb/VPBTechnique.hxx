@@ -52,7 +52,7 @@ class VPBTechnique : public TerrainTechnique
         /** Traverse the terrain subgraph.*/
         virtual void traverse(osg::NodeVisitor& nv);
 
-        virtual BVHMaterial* getMaterial(osg::Vec3d point);
+        virtual BVHMaterial* getMaterial(vsg::dvec3 point);
         virtual SGSphered computeBoundingSphere() const;
 
         virtual void cleanSceneGraph();
@@ -81,14 +81,14 @@ class VPBTechnique : public TerrainTechnique
         /** If State is non-zero, this function releases any associated OpenGL objects for
         * the specified graphics context. Otherwise, releases OpenGL objects
         * for all graphics contexts. */
-        virtual void releaseGLObjects(osg::State* = 0) const;
+        virtual void releaseGLObjects(vsg::State* = 0) const;
 
         // Elevation constraints ensure that the terrain mesh is placed underneath objects such as airports.
         // As airports are generated in a separate loading thread, these are static.
-        static void addElevationConstraint(osg::ref_ptr<osg::Node> constraint);
-        static void removeElevationConstraint(osg::ref_ptr<osg::Node> constraint);
-        static double getConstrainedElevation(osg::Vec3d ndc, Locator* masterLocator, double vtx_gap);
-        static bool checkAgainstElevationConstraints(osg::Vec3d origin, osg::Vec3d vertex);
+        static void addElevationConstraint(vsg::ref_ptr<vsg::Node> constraint);
+        static void removeElevationConstraint(vsg::ref_ptr<vsg::Node> constraint);
+        static double getConstrainedElevation(vsg::dvec3 ndc, Locator* masterLocator, double vtx_gap);
+        static bool checkAgainstElevationConstraints(vsg::dvec3 origin, vsg::dvec3 vertex);
 
         static void clearConstraints();
 
@@ -104,17 +104,17 @@ class VPBTechnique : public TerrainTechnique
         public:
 
             typedef std::vector<int> Indices;
-            typedef std::pair< osg::ref_ptr<osg::Vec2Array>, Locator* > TexCoordLocatorPair;
+            typedef std::pair< vsg::ref_ptr<osg::Vec2Array>, Locator* > TexCoordLocatorPair;
             typedef std::map< Layer*, TexCoordLocatorPair > LayerToTexCoordMap;
 
-            VertexNormalGenerator(Locator* masterLocator, const osg::Vec3d& centerModel, int numRows, int numColmns, float scaleHeight, float vtx_gap, bool createSkirt, bool useTessellation);
+            VertexNormalGenerator(Locator* masterLocator, const vsg::dvec3& centerModel, int numRows, int numColmns, float scaleHeight, float vtx_gap, bool createSkirt, bool useTessellation);
 
-            void populateCenter(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, osg::ref_ptr<Atlas> atlas, osgTerrain::TerrainTile* tile, osg::Vec2Array* texcoords1, osg::Vec2Array* texcoords2);
+            void populateCenter(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, vsg::ref_ptr<Atlas> atlas, osgTerrain::TerrainTile* tile, osg::Vec2Array* texcoords1, osg::Vec2Array* texcoords2);
             void populateSeaLevel();
-            void populateLeftBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, osg::ref_ptr<Atlas> atlas);
-            void populateRightBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, osg::ref_ptr<Atlas> atlas);
-            void populateAboveBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, osg::ref_ptr<Atlas> atlas);
-            void populateBelowBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, osg::ref_ptr<Atlas> atlas);
+            void populateLeftBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, vsg::ref_ptr<Atlas> atlas);
+            void populateRightBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, vsg::ref_ptr<Atlas> atlas);
+            void populateAboveBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, vsg::ref_ptr<Atlas> atlas);
+            void populateBelowBoundary(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, vsg::ref_ptr<Atlas> atlas);
 
             enum class Corner {
                 BOTTOM_LEFT,
@@ -122,14 +122,14 @@ class VPBTechnique : public TerrainTechnique
                 TOP_LEFT,
                 TOP_RIGHT
             };
-            void populateCorner(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, osg::ref_ptr<Atlas> atlas, Corner corner);
+            void populateCorner(osgTerrain::Layer* elevationLayer, osgTerrain::Layer* colorLayer, vsg::ref_ptr<Atlas> atlas, Corner corner);
 
             void computeNormals();
 
             //  Convert NDC coordinates into the model coordinates, which centered on the model center and are Z-up
-            osg::Vec3d convertLocalToModel(osg::Vec3d ndc)
+            vsg::dvec3 convertLocalToModel(vsg::dvec3 ndc)
             {
-                osg::Vec3d model;
+                vsg::dvec3 model;
                 _masterLocator->convertLocalToModel(ndc, model);
                 return _ZUpRotationMatrix * (model - _centerModel);
                 return (model - _centerModel);
@@ -138,7 +138,7 @@ class VPBTechnique : public TerrainTechnique
             unsigned int capacity() const { return _vertices->capacity(); }
 
             // Tessellation case - no normal required
-            inline void setVertex(int c, int r, const osg::Vec3& v)
+            inline void setVertex(int c, int r, const vsg::vec3& v)
             {
                 int& i = index(c,r);
                 if (i==0) {
@@ -155,7 +155,7 @@ class VPBTechnique : public TerrainTechnique
             }
 
             // Non-tessellation case - normal and boundaries required
-            inline void setVertex(int c, int r, const osg::Vec3& v, const osg::Vec3& n)
+            inline void setVertex(int c, int r, const vsg::vec3& v, const vsg::vec3& n)
             {
                 int& i = index(c,r);
                 if (i==0) {
@@ -176,7 +176,7 @@ class VPBTechnique : public TerrainTechnique
                 }
             }
 
-            inline bool computeNormal(int c, int r, osg::Vec3& n) const
+            inline bool computeNormal(int c, int r, vsg::vec3& n) const
             {
 #if 1
                 return computeNormalWithNoDiagonals(c,r,n);
@@ -185,21 +185,21 @@ class VPBTechnique : public TerrainTechnique
 #endif
             }
 
-            inline bool computeNormalWithNoDiagonals(int c, int r, osg::Vec3& n) const
+            inline bool computeNormalWithNoDiagonals(int c, int r, vsg::vec3& n) const
             {
-                osg::Vec3 center;
+                vsg::vec3 center;
                 bool center_valid  = vertex(c, r,  center);
                 if (!center_valid) return false;
 
-                osg::Vec3 left, right, top,  bottom;
+                vsg::vec3 left, right, top,  bottom;
                 bool left_valid  = vertex(c-1, r,  left);
                 bool right_valid = vertex(c+1, r,   right);
                 bool bottom_valid = vertex(c,   r-1, bottom);
                 bool top_valid = vertex(c,   r+1, top);
 
-                osg::Vec3 dx(0.0f,0.0f,0.0f);
-                osg::Vec3 dy(0.0f,0.0f,0.0f);
-                osg::Vec3 zero(0.0f,0.0f,0.0f);
+                vsg::vec3 dx(0.0f,0.0f,0.0f);
+                vsg::vec3 dy(0.0f,0.0f,0.0f);
+                vsg::vec3 zero(0.0f,0.0f,0.0f);
                 if (left_valid)
                 {
                     dx += center-left;
@@ -223,27 +223,27 @@ class VPBTechnique : public TerrainTechnique
                 return n.normalize() != 0.0f;
             }
 
-            inline bool computeNormalWithDiagonals(int c, int r, osg::Vec3& n) const
+            inline bool computeNormalWithDiagonals(int c, int r, vsg::vec3& n) const
             {
-                osg::Vec3 center;
+                vsg::vec3 center;
                 bool center_valid  = vertex(c, r,  center);
                 if (!center_valid) return false;
 
-                osg::Vec3 top_left, top_right, bottom_left, bottom_right;
+                vsg::vec3 top_left, top_right, bottom_left, bottom_right;
                 bool top_left_valid  = vertex(c-1, r+1,  top_left);
                 bool top_right_valid  = vertex(c+1, r+1,  top_right);
                 bool bottom_left_valid  = vertex(c-1, r-1,  bottom_left);
                 bool bottom_right_valid  = vertex(c+1, r-1,  bottom_right);
 
-                osg::Vec3 left, right, top,  bottom;
+                vsg::vec3 left, right, top,  bottom;
                 bool left_valid  = vertex(c-1, r,  left);
                 bool right_valid = vertex(c+1, r,   right);
                 bool bottom_valid = vertex(c,   r-1, bottom);
                 bool top_valid = vertex(c,   r+1, top);
 
-                osg::Vec3 dx(0.0f,0.0f,0.0f);
-                osg::Vec3 dy(0.0f,0.0f,0.0f);
-                osg::Vec3 zero(0.0f,0.0f,0.0f);
+                vsg::vec3 dx(0.0f,0.0f,0.0f);
+                vsg::vec3 dy(0.0f,0.0f,0.0f);
+                vsg::vec3 zero(0.0f,0.0f,0.0f);
                 const float ratio = 0.5f;
                 if (left_valid)
                 {
@@ -282,7 +282,7 @@ class VPBTechnique : public TerrainTechnique
 
             inline int vertex_index(int c, int r) const { int i = _indices[(r+1)*(_numColumns+2)+c+1]; return i-1; }
 
-            inline bool vertex(int c, int r, osg::Vec3& v) const
+            inline bool vertex(int c, int r, vsg::vec3& v) const
             {
                 int i = index(c,r);
                 if (i==0) return false;
@@ -294,7 +294,7 @@ class VPBTechnique : public TerrainTechnique
             bool hasSea() { return _hasSea; }
 
             Locator*                        _masterLocator;
-            const osg::Vec3d                _centerModel;
+            const vsg::dvec3                _centerModel;
             int                             _numRows;
             int                             _numColumns;
             float                           _scaleHeight;
@@ -302,40 +302,40 @@ class VPBTechnique : public TerrainTechnique
 
             Indices                         _indices;
 
-            osg::ref_ptr<osg::Vec3Array>    _vertices;
-            osg::ref_ptr<osg::Vec3Array>    _normals;
+            vsg::ref_ptr<vsg::vec3Array>    _vertices;
+            vsg::ref_ptr<vsg::vec3Array>    _normals;
 
-            osg::ref_ptr<osg::Vec3Array>    _sea_vertices;
-            osg::ref_ptr<osg::Vec3Array>    _sea_normals;
+            vsg::ref_ptr<vsg::vec3Array>    _sea_vertices;
+            vsg::ref_ptr<vsg::vec3Array>    _sea_normals;
 
             std::vector<float>              _elevationConstraints;
 
-            osg::ref_ptr<osg::Vec3Array>    _boundaryVertices;
+            vsg::ref_ptr<vsg::vec3Array>    _boundaryVertices;
             bool                            _useTessellation;
             bool                            _hasSea;
 
-            osg::Matrix                     _ZUpRotationMatrix;
+            vsg::mat4                     _ZUpRotationMatrix;
         };
 
 
-        virtual osg::Vec3d computeCenter(BufferData& buffer);
-        virtual osg::Vec3d computeCenterModel(BufferData& buffer);
+        virtual vsg::dvec3 computeCenter(BufferData& buffer);
+        virtual vsg::dvec3 computeCenterModel(BufferData& buffer);
         const virtual SGGeod computeCenterGeod(BufferData& buffer);
 
-        virtual void generateGeometry(BufferData& buffer, const osg::Vec3d& centerModel, osg::ref_ptr<SGMaterialCache> matcache);
+        virtual void generateGeometry(BufferData& buffer, const vsg::dvec3& centerModel, vsg::ref_ptr<SGMaterialCache> matcache);
 
-        virtual void applyColorLayers(BufferData& buffer, osg::ref_ptr<SGMaterialCache> matcache);
+        virtual void applyColorLayers(BufferData& buffer, vsg::ref_ptr<SGMaterialCache> matcache);
 
-        virtual double det2(const osg::Vec2d a, const osg::Vec2d b);
-        virtual int getLandclass(const osg::Vec2d p);
+        virtual double det2(const vsg::dvec2 a, const vsg::dvec2 b);
+        virtual int getLandclass(const vsg::dvec2 p);
 
-        virtual void applyMaterials(BufferData& buffer, osg::ref_ptr<SGMaterialCache> matcache, const SGGeod loc);
-        virtual void applyMaterialsTesselated(BufferData& buffer, osg::ref_ptr<SGMaterialCache> matcache, const SGGeod loc);
-        virtual void applyMaterialsTriangles(BufferData& buffer, osg::ref_ptr<SGMaterialCache> matcache, const SGGeod loc);
+        virtual void applyMaterials(BufferData& buffer, vsg::ref_ptr<SGMaterialCache> matcache, const SGGeod loc);
+        virtual void applyMaterialsTesselated(BufferData& buffer, vsg::ref_ptr<SGMaterialCache> matcache, const SGGeod loc);
+        virtual void applyMaterialsTriangles(BufferData& buffer, vsg::ref_ptr<SGMaterialCache> matcache, const SGGeod loc);
 
-        virtual osg::Vec4d catmull_rom_interp_basis(const float t);
+        virtual vsg::dvec4 catmull_rom_interp_basis(const float t);
 
-        virtual osg::Image* generateWaterTexture(Atlas* atlas);
+        virtual vsg::Image* generateWaterTexture(Atlas* atlas);
         virtual osg::Texture2D* getCoastlineTexture(const SGBucket bucket);
 
         static void updateStats(int tileLevel, float loadTime);
@@ -343,28 +343,28 @@ class VPBTechnique : public TerrainTechnique
         // Check a given vertex against any constraints  E.g. to ensure we
         // don't get objects like trees sprouting from roads or runways.
         bool checkAgainstRandomObjectsConstraints(BufferData& buffer,
-                                                  osg::Vec3d origin, osg::Vec3d vertex);
+                                                  vsg::dvec3 origin, vsg::dvec3 vertex);
 
 
-        bool checkAgainstWaterConstraints(BufferData& buffer, osg::Vec2d point);
+        bool checkAgainstWaterConstraints(BufferData& buffer, vsg::dvec2 point);
 
         OpenThreads::Mutex                  _writeBufferMutex;
-        osg::ref_ptr<BufferData>            _currentBufferData;
-        osg::ref_ptr<BufferData>            _newBufferData;
+        vsg::ref_ptr<BufferData>            _currentBufferData;
+        vsg::ref_ptr<BufferData>            _newBufferData;
 
         float                               _filterBias;
-        osg::ref_ptr<osg::Uniform>          _filterBiasUniform;
+        vsg::ref_ptr<osg::Uniform>          _filterBiasUniform;
         float                               _filterWidth;
-        osg::ref_ptr<osg::Uniform>          _filterWidthUniform;
+        vsg::ref_ptr<osg::Uniform>          _filterWidthUniform;
         osg::Matrix3                        _filterMatrix;
-        osg::ref_ptr<osg::Uniform>          _filterMatrixUniform;
-        osg::ref_ptr<SGReaderWriterOptions> _options;
+        vsg::ref_ptr<osg::Uniform>          _filterMatrixUniform;
+        vsg::ref_ptr<SGReaderWriterOptions> _options;
         const std::string                   _fileName;
-        osg::ref_ptr<osg::Group>            _randomObjectsConstraintGroup;
+        vsg::ref_ptr<vsg::Group>            _randomObjectsConstraintGroup;
         bool                                _useTessellation;
-        osg::ref_ptr<osg::Referenced>       _databaseRequest;
+        vsg::ref_ptr<osg::Referenced>       _databaseRequest;
 
-        inline static osg::ref_ptr<osg::Group>  _elevationConstraintGroup = new osg::Group();
+        inline static vsg::ref_ptr<vsg::Group>  _elevationConstraintGroup = new vsg::Group();
         inline static std::shared_mutex _elevationConstraintMutex;  // protects the _elevationConstraintGroup;
 
         inline static std::mutex _stats_mutex; // Protects the loading statistics and other static properties

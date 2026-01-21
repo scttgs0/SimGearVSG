@@ -12,12 +12,14 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <simgear/bucket/newbucket.hxx>
+#include <simgear/misc/test_macros.hxx>
+
+
 using std::cout;
 using std::cerr;
 using std::endl;
 
-#include <simgear/bucket/newbucket.hxx>
-#include <simgear/misc/test_macros.hxx>
 
 void testBucketSpans()
 {

@@ -13,10 +13,10 @@
 
 using namespace simgear;
 
-osg::Node* SGPlanets::build(int num, const SGVec3d* planet_data, double planet_dist,
+vsg::Node* SGPlanets::build(int num, const SGVec3d* planet_data, double planet_dist,
                             const SGReaderWriterOptions* options)
 {
-    osg::ref_ptr<EffectGeode> geode = new EffectGeode;
+    vsg::ref_ptr<EffectGeode> geode = new EffectGeode;
     geode->setName("Stars");
 
     Effect* effect = makeEffect("Effects/stars", true, options);
@@ -24,10 +24,10 @@ osg::Node* SGPlanets::build(int num, const SGVec3d* planet_data, double planet_d
         geode->setEffect(effect);
     }
 
-    osg::ref_ptr<osg::Vec4Array> vl = new osg::Vec4Array;
+    vsg::ref_ptr<osg::Vec4Array> vl = new osg::Vec4Array;
     for (int i = 0; i < num; ++i) {
         // Position the planet arbitrarily far away
-        osg::Vec3 pos(planet_dist * std::cos(planet_data[i][0]) * std::cos(planet_data[i][1]),
+        vsg::vec3 pos(planet_dist * std::cos(planet_data[i][0]) * std::cos(planet_data[i][1]),
                       planet_dist * std::sin(planet_data[i][0]) * std::cos(planet_data[i][1]),
                       planet_dist * std::sin(planet_data[i][1]));
 
@@ -36,10 +36,10 @@ osg::Node* SGPlanets::build(int num, const SGVec3d* planet_data, double planet_d
         double irradiance = std::pow(10, 0.4 * (-planet_data[i][2] - 19 + 0.4));
 
         // The vertex array contains the position in xyz and irradiance in w
-        vl->push_back(osg::Vec4(pos, irradiance));
+        vl->push_back(vsg::vec4(pos, irradiance));
     }
 
-    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
+    vsg::ref_ptr<vsg::Geometry> geometry = new vsg::Geometry;
     geometry->setUseVertexBufferObjects(true);
     geometry->setVertexArray(vl);
     geometry->addPrimitiveSet(new osg::DrawArrays(GL_POINTS, 0, num));

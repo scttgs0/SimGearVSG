@@ -1,5 +1,5 @@
 // userdata.hxx -- two classes for populating ssg user data slots in association
-//                 with our implimenation of random surface objects.
+//                 with our implementation of random surface objects.
 //
 // Written by David Megginson, started December 2001.
 //
@@ -23,9 +23,10 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <simgear/compiler.h>
 
-#include <osg/Node>
 
 class SGMatModel;
 class SGPropertyNode;
@@ -35,12 +36,11 @@ class SGPropertyNode;
  * following values (needed by the model loader callback at draw time)
  * before drawing any scenery.
  */
-void sgUserDataInit(SGPropertyNode *p);
+void sgUserDataInit(SGPropertyNode* p);
 
-namespace simgear
-{
+namespace simgear {
 /**
  * Get the property root for the simulation
  */
 SGPropertyNode* getPropertyRoot();
-}
+} // namespace simgear

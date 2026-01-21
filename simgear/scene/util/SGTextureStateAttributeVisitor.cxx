@@ -63,7 +63,7 @@ SGTextureStateAttributeVisitor::apply(osg::StateSet* stateSet)
 }
 
 void
-SGTextureStateAttributeVisitor::apply(osg::Node& node)
+SGTextureStateAttributeVisitor::apply(vsg::Node& node)
 {
   apply(node.getStateSet());
   traverse(node);

@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/Texture>
+
 
 class SGPropertyNode;
 
@@ -16,7 +19,7 @@ namespace compositor {
 class Compositor;
 
 struct Buffer : public osg::Referenced {
-    osg::ref_ptr<osg::Texture> texture;
+    vsg::ref_ptr<osg::Texture> texture;
 
     /**
      * The amount to multiply the size of the default framebuffer.
@@ -29,8 +32,8 @@ struct Buffer : public osg::Referenced {
     bool mvr = false;
 };
 
-Buffer *buildBuffer(Compositor *compositor, const SGPropertyNode *node,
-                    const SGReaderWriterOptions *options);
+Buffer* buildBuffer(Compositor* compositor, const SGPropertyNode* node,
+                    const SGReaderWriterOptions* options);
 
 } // namespace compositor
 } // namespace simgear

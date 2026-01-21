@@ -67,7 +67,7 @@ bool SGMaterialLib::load( const SGPath &fg_root, const SGPath& mpath,
                 << ex.getMessage() );
         throw;
     }
-    osg::ref_ptr<osgDB::Options> options
+    vsg::ref_ptr<osgDB::Options> options
         = new osgDB::Options;
     options->setObjectCacheHint(osgDB::Options::CACHE_ALL);
     options->setDatabasePath(fg_root.utf8Str());
@@ -313,9 +313,9 @@ SGMaterial *SGMaterialCache::find(int lc) const
     return find(getNameFromLandclass(lc));
 }
 
-osg::ref_ptr<Atlas> SGMaterialLib::getOrCreateAtlas(SGMaterialLib::landclass_map landclasslib, SGVec2f center, const simgear::SGReaderWriterOptions* const_options) {
+vsg::ref_ptr<Atlas> SGMaterialLib::getOrCreateAtlas(SGMaterialLib::landclass_map landclasslib, SGVec2f center, const simgear::SGReaderWriterOptions* const_options) {
 
-    osg::ref_ptr<Atlas> atlas;
+    vsg::ref_ptr<Atlas> atlas;
     // Non-VPB does not use the Atlas, so save some effort and return
     if (! SGSceneFeatures::instance()->getVPBActive()) return atlas;
 
@@ -339,7 +339,7 @@ osg::ref_ptr<Atlas> SGMaterialLib::getOrCreateAtlas(SGMaterialLib::landclass_map
         return atlas;
     }
 
-    osg::ref_ptr<SGReaderWriterOptions> options = SGReaderWriterOptions::copyOrCreate(const_options);
+    vsg::ref_ptr<SGReaderWriterOptions> options = SGReaderWriterOptions::copyOrCreate(const_options);
     options->setLoadOriginHint(SGReaderWriterOptions::LoadOriginHint::ORIGIN_MATERIAL_ATLAS);
 
     SG_LOG(SG_TERRAIN, SG_DEBUG, "Generating atlas " << (SGMaterialLib::_atlasCache.size() +1) << " of size " << landclasslib.size());

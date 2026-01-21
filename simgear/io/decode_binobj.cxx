@@ -15,9 +15,11 @@
 #include <cstdio>
 #include <vector>
 
-#include "sg_binobj.hxx"
 #include <simgear/debug/logstream.hxx>
 #include <simgear/misc/sg_path.hxx>
+
+#include "sg_binobj.hxx"
+
 
 using std::cout;
 using std::endl;

@@ -17,7 +17,7 @@ FindGroupVisitor::FindGroupVisitor(const std::string& name) :
         SG_LOG(SG_IO, SG_DEV_WARN, "FindGroupVisitor: empty name provided");
 }
 
-void FindGroupVisitor::apply(osg::Group& group)
+void FindGroupVisitor::apply(vsg::Group& group)
 {
     if (_name != group.getName())
         return traverse(group);

@@ -18,46 +18,51 @@
 
 #pragma once
 
-#include <osg/Camera>
+#include <vsg/all.h>
+
 #include <osg/CoordinateSystemNode>
 #include <osg/Drawable>
 #include <osg/Geode>
-#include <osg/Group>
 #include <osg/PagedLOD>
 #include <osg/Transform>
 #include <osg/TriangleFunctor>
-#include <osgTerrain/TerrainTile>
 #include <osgTerrain/Terrain>
+#include <osgTerrain/TerrainTile>
 
+#include <simgear/bvh/BVHStaticGeometryBuilder.hxx>
+#include <simgear/bvh/BVHTerrainTile.hxx>
+#include <simgear/math/SGGeometry.hxx>
 #include <simgear/scene/material/mat.hxx>
 #include <simgear/scene/material/matlib.hxx>
 #include <simgear/scene/util/OsgMath.hxx>
 #include <simgear/scene/util/SGNodeMasks.hxx>
 #include <simgear/scene/util/SGSceneUserData.hxx>
-#include <simgear/math/SGGeometry.hxx>
-
-#include <simgear/bvh/BVHStaticGeometryBuilder.hxx>
-#include <simgear/bvh/BVHTerrainTile.hxx>
 
 #include "PrimitiveCollector.hxx"
 
+
 namespace simgear {
 
-class BoundingVolumeBuildVisitor : public osg::NodeVisitor {
+class BoundingVolumeBuildVisitor : public osg::NodeVisitor
+{
 public:
-    class _PrimitiveCollector : public PrimitiveCollector {
+    class _PrimitiveCollector : public PrimitiveCollector
+    {
     public:
-        _PrimitiveCollector() :
-            _geometryBuilder(new BVHStaticGeometryBuilder)
-        { }
+        _PrimitiveCollector() : _geometryBuilder(new BVHStaticGeometryBuilder)
+        {
+        }
         virtual ~_PrimitiveCollector()
-        { }
+        {
+        }
 
-        virtual void addPoint(const osg::Vec3d& v1)
-        { }
-        virtual void addLine(const osg::Vec3d& v1, const osg::Vec3d& v2)
-        { }
-        virtual void addTriangle(const osg::Vec3d& v1, const osg::Vec3d& v2, const osg::Vec3d& v3)
+        virtual void addPoint(const vsg::dvec3& v1)
+        {
+        }
+        virtual void addLine(const vsg::dvec3& v1, const vsg::dvec3& v2)
+        {
+        }
+        virtual void addTriangle(const vsg::dvec3& v1, const vsg::dvec3& v2, const vsg::dvec3& v3)
         {
             _geometryBuilder->addTriangle(toVec3f(toSG(v1)), toVec3f(toSG(v2)), toVec3f(toSG(v3)));
         }
@@ -87,9 +92,8 @@ public:
         SGSharedPtr<BVHStaticGeometryBuilder> _geometryBuilder;
     };
 
-    BoundingVolumeBuildVisitor(bool dumpIntoLeafs) :
-        osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ACTIVE_CHILDREN),
-        _dumpIntoLeafs(dumpIntoLeafs)
+    BoundingVolumeBuildVisitor(bool dumpIntoLeafs) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ACTIVE_CHILDREN),
+                                                     _dumpIntoLeafs(dumpIntoLeafs)
     {
         setTraversalMask(SG_NODEMASK_TERRAIN_BIT);
     }
@@ -128,7 +132,7 @@ public:
             _primitiveCollector.setCurrentMaterial(mat);
 
             // walk the children
-            for(unsigned i = 0; i < geode.getNumDrawables(); ++i)
+            for (unsigned i = 0; i < geode.getNumDrawables(); ++i)
                 fillWith(geode.getDrawable(i));
 
             // Flush the bounding volume tree if we reached the topmost group
@@ -137,19 +141,19 @@ public:
             // pop the current active primitive list
             _primitiveCollector.swap(previousPrimitives);
         } else {
-            for(unsigned i = 0; i < geode.getNumDrawables(); ++i)
+            for (unsigned i = 0; i < geode.getNumDrawables(); ++i)
                 fillWith(geode.getDrawable(i));
         }
 
         _primitiveCollector.setCurrentMaterial(oldMaterial);
     }
 
-    virtual void apply(osg::Group& group)
-    { 
+    virtual void apply(vsg::Group& group)
+    {
         osgTerrain::TerrainTile* tile = dynamic_cast<osgTerrain::TerrainTile*>(&group);
 
         if (tile) {
-            SGSharedPtr<BVHTerrainTile> bvhTile = new BVHTerrainTile(tile); 
+            SGSharedPtr<BVHTerrainTile> bvhTile = new BVHTerrainTile(tile);
 
             // push the current active primitive list
             _PrimitiveCollector previousPrimitives;
@@ -174,21 +178,23 @@ public:
             // pop the current active primitive list
             _primitiveCollector.swap(previousPrimitives);
         } else {
-            traverseAndCollect(group); 
+            traverseAndCollect(group);
         }
     }
 
-    virtual void apply(osg::Transform& transform)
-    { traverseAndDump(transform); }
+    virtual void apply(vsg::Transform& transform)
+    {
+        traverseAndDump(transform);
+    }
 
     virtual void apply(osg::PagedLOD&)
     {
         // Do nothing. In this case we get called by the loading process anyway
     }
 
-    virtual void apply(osg::Camera& camera)
+    virtual void apply(vsg::Camera& camera)
     {
-        if (camera.getRenderOrder() != osg::Camera::NESTED_RENDER)
+        if (camera.getRenderOrder() != vsg::Camera::NESTED_RENDER)
             return;
         traverseAndDump(camera);
     }
@@ -198,7 +204,7 @@ public:
         traverseAndCollect(node);
     }
 
-    void traverseAndDump(osg::Node& node)
+    void traverseAndDump(vsg::Node& node)
     {
         if (hasBoundingVolumeTree(node))
             return;
@@ -222,7 +228,7 @@ public:
         _primitiveCollector.swap(previousPrimitives);
     }
 
-    void traverseAndCollect(osg::Node& node)
+    void traverseAndCollect(vsg::Node& node)
     {
         // Already been here??
         if (hasBoundingVolumeTree(node))
@@ -241,7 +247,7 @@ public:
         traverse(node);
     }
 
-    void addBoundingVolumeTreeToNode(osg::Node& node)
+    void addBoundingVolumeTreeToNode(vsg::Node& node)
     {
         // Build the flat tree.
         BVHNode* bvNode = _primitiveCollector.buildTreeAndClear();
@@ -255,7 +261,7 @@ public:
         userData->setBVHNode(bvNode);
     }
 
-    bool hasBoundingVolumeTree(osg::Node& node)
+    bool hasBoundingVolumeTree(vsg::Node& node)
     {
         SGSceneUserData* userData;
         userData = SGSceneUserData::getSceneUserData(&node);
@@ -271,4 +277,4 @@ private:
     bool _dumpIntoLeafs;
 };
 
-}
+} // namespace simgear

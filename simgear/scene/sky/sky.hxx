@@ -26,55 +26,52 @@
 
 #pragma once
 
+#include <vector>
+
+#include <vsg/all.h>
+
+#include <osg/MatrixTransform>
+
 #include <simgear/compiler.h>
+#include <simgear/ephemeris/ephemeris.hxx>
+#include <simgear/math/SGMath.hxx>
 #include <simgear/math/sg_random.hxx>
 #include <simgear/misc/sg_path.hxx>
 #include <simgear/props/props.hxx>
-
-#include <vector>
-
-#include <osg/ref_ptr>
-#include <osg/MatrixTransform>
-#include <osg/Node>
-
-#include <simgear/ephemeris/ephemeris.hxx>
-#include <simgear/math/SGMath.hxx>
-
 #include <simgear/scene/sky/cloud.hxx>
 #include <simgear/scene/sky/dome.hxx>
+#include <simgear/scene/sky/galaxy.hxx>
 #include <simgear/scene/sky/moon.hxx>
 #include <simgear/scene/sky/oursun.hxx>
 #include <simgear/scene/sky/planets.hxx>
 #include <simgear/scene/sky/stars.hxx>
-#include <simgear/scene/sky/galaxy.hxx>
+
 
 namespace simgear {
 class SGReaderWriterOptions;
 }
 
-struct SGSkyState
-{
-  SGVec3d pos;     //!< View position in world Cartesian coordinates.
-  SGGeod pos_geod;
-  SGQuatd ori;
-  double spin;     //!< An offset angle for orienting the sky effects with the
-                   //   sun position so sunset and sunrise effects look correct.
-  double gst;      //!< GMT side real time.
-  double sun_dist; //!< the sun's distance from the current view point
-                   //   (to keep it inside your view volume).
-  double moon_dist_bare ;//!< The moon's semi-mayor axis in the rendering (constant)
-  double moon_dist_factor ;//!< Any factor that are needed to artificially change the moon distance
-  double sun_angle;
+struct SGSkyState {
+    SGVec3d pos; //!< View position in world Cartesian coordinates.
+    SGGeod pos_geod;
+    SGQuatd ori;
+    double spin;             //!< An offset angle for orienting the sky effects with the
+                             //   sun position so sunset and sunrise effects look correct.
+    double gst;              //!< GMT side real time.
+    double sun_dist;         //!< the sun's distance from the current view point
+                             //   (to keep it inside your view volume).
+    double moon_dist_bare;   //!< The moon's semi-mayor axis in the rendering (constant)
+    double moon_dist_factor; //!< Any factor that are needed to artificially change the moon distance
+    double sun_angle;
 };
 
-struct SGSkyColor
-{
-  SGVec3f sky_color;
-  SGVec3f adj_sky_color;
-  SGVec3f fog_color;
-  SGVec3f cloud_color;
-  double sun_angle,
-    moon_angle, altitude_m;
+struct SGSkyColor {
+    SGVec3f sky_color;
+    SGVec3f adj_sky_color;
+    SGVec3f fog_color;
+    SGVec3f cloud_color;
+    double sun_angle,
+        moon_angle, altitude_m;
 };
 
 /**
@@ -210,10 +207,10 @@ struct SGSkyColor
 
  */
 
-class SGSky final {
-
+class SGSky final
+{
 private:
-    typedef std::vector<SGSharedPtr<SGCloudLayer> > layer_list_type;
+    typedef std::vector<SGSharedPtr<SGCloudLayer>> layer_list_type;
     typedef layer_list_type::iterator layer_list_iterator;
     typedef layer_list_type::const_iterator layer_list_const_iterator;
 
@@ -226,10 +223,10 @@ private:
     SGSharedPtr<SGGalaxy> galaxy;
     layer_list_type cloud_layers;
 
-    osg::ref_ptr<osg::Group> pre_root, pre_transform;
-    osg::ref_ptr<osg::Switch> cloud_root;
+    vsg::ref_ptr<vsg::Group> pre_root, pre_transform;
+    vsg::ref_ptr<osg::Switch> cloud_root;
 
-    osg::ref_ptr<osg::MatrixTransform> _ephTransform;
+    vsg::ref_ptr<osg::MatrixTransform> _ephTransform;
 
     // visibility
     float visibility;
@@ -239,27 +236,26 @@ private:
 
     // near cloud visibility state variables
     bool in_puff;
-    double puff_length;		// in seconds
-    double puff_progression;	// in seconds
-    double ramp_up;		// in seconds
-    double ramp_down;		// in seconds
+    double puff_length;      // in seconds
+    double puff_progression; // in seconds
+    double ramp_up;          // in seconds
+    double ramp_down;        // in seconds
 
     // 3D clouds enabled
     bool clouds_3d_enabled;
 
     // 3D cloud density
     double clouds_3d_density;
-    
+
     // RNG seed
     mt seed;
 
 public:
-
     /** Constructor */
-    SGSky( void );
+    SGSky(void);
 
     /** Destructor */
-    ~SGSky( void );   // non-virtual intentional
+    ~SGSky(void); // non-virtual intentional
 
     /**
      * Initialize the sky and connect the components to the scene
@@ -275,13 +271,13 @@ public:
      * @param node          Property node connecting sun with environment
      * @param options
      */
-    void build( double h_radius_m,
-                double v_radius_m,
-                double sun_size,
-                double moon_size,
-                const SGEphemeris& eph,
-                SGPropertyNode *node,
-                simgear::SGReaderWriterOptions* options );
+    void build(double h_radius_m,
+               double v_radius_m,
+               double sun_size,
+               double moon_size,
+               const SGEphemeris& eph,
+               SGPropertyNode* node,
+               simgear::SGReaderWriterOptions* options);
 
     /**
      * Repaint the sky components based on current sun angle, and sky and fog
@@ -292,8 +288,8 @@ public:
      * @param sky_color The base sky color (for the top of the dome)
      * @param eph       Current positions of planets and stars
      */
-    bool repaint( const SGSkyColor &sky_color,
-                  const SGEphemeris& eph );
+    bool repaint(const SGSkyColor& sky_color,
+                 const SGEphemeris& eph);
 
     /**
      * Reposition the sky at the specified origin and orientation.
@@ -301,9 +297,9 @@ public:
      * @note See discussion in \ref SGSky-details "detailed class description".
      *
      */
-    bool reposition( const SGSkyState& sky_state,
-                     const SGEphemeris& eph,
-                     double dt = 0.0 );
+    bool reposition(const SGSkyState& sky_state,
+                    const SGEphemeris& eph,
+                    double dt = 0.0);
 
     /**
      * Modify the given visibility based on cloud layers, thickness,
@@ -315,10 +311,10 @@ public:
      * @param time_factor amount of time since modify_vis() last called so
      *        we can scale effect rates properly despite variable frame rates.
      */
-    void modify_vis( float alt, float time_factor );
+    void modify_vis(float alt, float time_factor);
 
-    osg::Group* getPreRoot() { return pre_root.get(); }
-    osg::Group* getCloudRoot() { return cloud_root.get(); }
+    vsg::Group* getPreRoot() { return pre_root.get(); }
+    vsg::Group* getCloudRoot() { return cloud_root.get(); }
 
     /**
      * Add a cloud layer.
@@ -327,7 +323,7 @@ public:
      *
      * @param layer The new cloud layer to add.
      */
-    void add_cloud_layer (SGCloudLayer * layer);
+    void add_cloud_layer(SGCloudLayer* layer);
 
 
     /**
@@ -338,7 +334,7 @@ public:
      * @param i The index of the cloud layer, zero-based.
      * @return A const pointer to the cloud layer.
      */
-    const SGCloudLayer * get_cloud_layer (int i) const;
+    const SGCloudLayer* get_cloud_layer(int i) const;
 
 
     /**
@@ -349,7 +345,7 @@ public:
      * @param i The index of the cloud layer, zero-based.
      * @return A non-const pointer to the cloud layer.
      */
-    SGCloudLayer * get_cloud_layer (int i);
+    SGCloudLayer* get_cloud_layer(int i);
 
 
     /**
@@ -357,7 +353,7 @@ public:
      *
      * @return The cloud layer count.
      */
-    int get_cloud_layer_count () const;
+    int get_cloud_layer_count() const;
 
 
     /** @return current effective visibility */
@@ -366,7 +362,7 @@ public:
     /** Set desired clear air visibility.
      * @param v visibility in meters
      */
-    void set_visibility( float v );
+    void set_visibility(float v);
 
     /** Get 3D cloud density */
     double get_3dCloudDensity() const;
@@ -428,5 +424,4 @@ public:
     void set_3dCloudWrap(bool wrap);
 
     void set_clouds_enabled(bool enabled);
-
 };

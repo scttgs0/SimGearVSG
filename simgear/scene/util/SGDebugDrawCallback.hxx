@@ -27,7 +27,7 @@
 #include <osg/State>
 
 struct SGDebugDrawCallback : public osg::Drawable::DrawCallback {
-  virtual void drawImplementation(osg::State& state,
+  virtual void drawImplementation(vsg::State& state,
                                   const osg::Drawable* drawable) const
   {
 //     state.dirtyColorPointer();

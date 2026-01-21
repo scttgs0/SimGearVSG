@@ -34,17 +34,17 @@ public:
     BufferData() : _transform(0), _landGeode(0), _landGeometry(0), _lineFeatures(0), _width(0.0), _height(0.0)            
     {}
 
-    osg::ref_ptr<osg::MatrixTransform>  _transform;
-    osg::ref_ptr<simgear::EffectGeode>  _landGeode;
-    osg::ref_ptr<simgear::EffectGeode>  _seaGeode;
-    osg::ref_ptr<osg::Geometry>         _landGeometry;
-    osg::ref_ptr<osg::Geometry>         _seaGeometry;
-    osg::ref_ptr<osg::Group>            _lineFeatures;
+    vsg::ref_ptr<osg::MatrixTransform>  _transform;
+    vsg::ref_ptr<simgear::EffectGeode>  _landGeode;
+    vsg::ref_ptr<simgear::EffectGeode>  _seaGeode;
+    vsg::ref_ptr<vsg::Geometry>         _landGeometry;
+    vsg::ref_ptr<vsg::Geometry>         _seaGeometry;
+    vsg::ref_ptr<vsg::Group>            _lineFeatures;
     float                               _width;
     float                               _height;
     Atlas::AtlasMap                     _BVHMaterialMap;
-    osg::ref_ptr<osgTerrain::Locator>   _masterLocator;
-    osg::ref_ptr<osg::Texture2D>        _waterRasterTexture;
+    vsg::ref_ptr<osgTerrain::Locator>   _masterLocator;
+    vsg::ref_ptr<osg::Texture2D>        _waterRasterTexture;
 
 protected:
     virtual ~BufferData() {}

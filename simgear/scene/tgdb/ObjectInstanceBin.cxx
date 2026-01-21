@@ -49,8 +49,8 @@ struct ObjectInstanceBoundingBoxCallback : public Drawable::ComputeBoundingBoxCa
             bb.expandBy(pt);
         }
 
-        bb = BoundingBox(bb._min - osg::Vec3(_bounding_diameter * maxScale, _bounding_diameter * maxScale, _bounding_diameter * maxScale),
-                         bb._max + osg::Vec3(_bounding_diameter * maxScale, _bounding_diameter * maxScale, _bounding_diameter * maxScale));
+        bb = BoundingBox(bb._min - vsg::vec3(_bounding_diameter * maxScale, _bounding_diameter * maxScale, _bounding_diameter * maxScale),
+                         bb._max + vsg::vec3(_bounding_diameter * maxScale, _bounding_diameter * maxScale, _bounding_diameter * maxScale));
 
         return bb;
     }
@@ -59,10 +59,10 @@ struct ObjectInstanceBoundingBoxCallback : public Drawable::ComputeBoundingBoxCa
 class InstancingVisitor : public osg::NodeVisitor
 {
 public:
-    typedef std::set<osg::ref_ptr<osg::Drawable>> DrawableSet;
-    typedef std::set<osg::ref_ptr<EffectGeode>> EffectGeodeSet;
+    typedef std::set<vsg::ref_ptr<osg::Drawable>> DrawableSet;
+    typedef std::set<vsg::ref_ptr<EffectGeode>> EffectGeodeSet;
 
-    InstancingVisitor(osg::Vec3Array* positions, osg::Vec4Array* rotationsAndScales, osg::Vec4Array* customAttribs, std::string effect, const SGReaderWriterOptions* opts) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
+    InstancingVisitor(vsg::vec3Array* positions, osg::Vec4Array* rotationsAndScales, osg::Vec4Array* customAttribs, std::string effect, const SGReaderWriterOptions* opts) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
     {
         _positions = positions;
         _rotationsAndScales = rotationsAndScales;
@@ -73,13 +73,13 @@ public:
 
     void setPropsOnDrawable(osg::Drawable* drawable)
     {
-        osg::Geometry* geometry = dynamic_cast<osg::Geometry*>(drawable);
+        vsg::Geometry* geometry = dynamic_cast<vsg::Geometry*>(drawable);
         if (!geometry) {
             return;
         }
         geometry->setUseDisplayList(false);
         geometry->setUseVertexBufferObjects(true);
-        geometry->setDataVariance(osg::Object::STATIC);
+        geometry->setDataVariance(vsg::Object::STATIC);
         geometry->setComputeBoundingBoxCallback(new ObjectInstanceBoundingBoxCallback);
 
         geometry->setVertexAttribArray(INSTANCE_POSITIONS, _positions, Array::BIND_PER_VERTEX, 1);
@@ -96,7 +96,7 @@ public:
         }
     }
 
-    virtual void apply(osg::Node& node)
+    virtual void apply(vsg::Node& node)
     {
         traverse(node);
     }
@@ -151,7 +151,7 @@ public:
     }
 
 private:
-    osg::Vec3Array* _positions;
+    vsg::vec3Array* _positions;
     osg::Vec4Array* _rotationsAndScales;
     osg::Vec4Array* _customAttribs;
     std::string _effect;
@@ -165,7 +165,7 @@ void ObjectInstanceBin::insert(const ObjectInstance& obj)
 {
     _objectInstances.push_back(obj);
 }
-void ObjectInstanceBin::insert(const osg::Vec3f& p, const osg::Vec3f& r, const float& s, const osg::Vec4f& c)
+void ObjectInstanceBin::insert(const vsg::vec3& p, const vsg::vec3& r, const float& s, const vsg::vec4& c)
 {
     insert(ObjectInstance(p, r, s, c));
 }
@@ -264,26 +264,26 @@ ObjectInstanceBin::ObjectInstanceBin(const std::string modelFileName, const std:
 
         if (!hasCustomAttributes) {
             if (number_of_props == 3) {
-                insert(osg::Vec3f(props[0], props[1], props[2]));
+                insert(vsg::vec3(props[0], props[1], props[2]));
             } else if (number_of_props == 4) {
-                insert(osg::Vec3f(props[0], props[1], props[2]), osg::Vec3f(0.0f, 0.0f, 0.0f), props[3]);
+                insert(vsg::vec3(props[0], props[1], props[2]), vsg::vec3(0.0f, 0.0f, 0.0f), props[3]);
             } else if (number_of_props == 6) {
-                insert(osg::Vec3f(props[0], props[1], props[2]), osg::Vec3f(props[3], props[4], props[5]));
+                insert(vsg::vec3(props[0], props[1], props[2]), vsg::vec3(props[3], props[4], props[5]));
             } else if (number_of_props == 7) {
-                insert(osg::Vec3f(props[0], props[1], props[2]), osg::Vec3f(props[3], props[4], props[5]), props[6]);
+                insert(vsg::vec3(props[0], props[1], props[2]), vsg::vec3(props[3], props[4], props[5]), props[6]);
             } else {
                 SG_LOG(SG_TERRAIN, SG_WARN, "Error parsing instanced object entry in: " << instancesFilePath << " line: \"" << line << "\"");
                 continue;
             }
         } else {
             if (number_of_props == 7) {
-                insert(osg::Vec3f(props[0], props[1], props[2]), osg::Vec3f(0.0f, 0.0f, 0.0f), 1.0f, osg::Vec4f(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
+                insert(vsg::vec3(props[0], props[1], props[2]), vsg::vec3(0.0f, 0.0f, 0.0f), 1.0f, vsg::vec4(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
             } else if (number_of_props == 8) {
-                insert(osg::Vec3f(props[0], props[1], props[2]), osg::Vec3f(0.0f, 0.0f, 0.0f), props[3], osg::Vec4f(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
+                insert(vsg::vec3(props[0], props[1], props[2]), vsg::vec3(0.0f, 0.0f, 0.0f), props[3], vsg::vec4(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
             } else if (number_of_props == 10) {
-                insert(osg::Vec3f(props[0], props[1], props[2]), osg::Vec3f(props[3], props[4], props[5]), 1.0f, osg::Vec4f(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
+                insert(vsg::vec3(props[0], props[1], props[2]), vsg::vec3(props[3], props[4], props[5]), 1.0f, vsg::vec4(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
             } else if (number_of_props == 11) {
-                insert(osg::Vec3f(props[0], props[1], props[2]), osg::Vec3f(props[3], props[4], props[5]), props[6], osg::Vec4f(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
+                insert(vsg::vec3(props[0], props[1], props[2]), vsg::vec3(props[3], props[4], props[5]), props[6], vsg::vec4(props[number_of_props - 4], props[number_of_props - 3], props[number_of_props - 2], props[number_of_props - 1]));
             } else {
                 SG_LOG(SG_TERRAIN, SG_WARN, "Error parsing instanced object entry in: " << instancesFilePath << " line: \"" << line << "\"");
                 continue;
@@ -297,7 +297,7 @@ ObjectInstanceBin::ObjectInstanceBin(const std::string modelFileName, const std:
 // From ReaderWriterSTG.cxx
 SGReaderWriterOptions* sharedOptions(const std::string& filePath, const osgDB::Options* options)
 {
-    osg::ref_ptr<SGReaderWriterOptions> sharedOptions;
+    vsg::ref_ptr<SGReaderWriterOptions> sharedOptions;
     sharedOptions = SGReaderWriterOptions::copyOrCreate(options);
     sharedOptions->getDatabasePathList().clear();
 
@@ -327,11 +327,11 @@ SGReaderWriterOptions* sharedOptions(const std::string& filePath, const osgDB::O
     return sharedOptions.release();
 }
 
-osg::ref_ptr<osg::Node> createObjectInstances(ObjectInstanceBin& objectInstances, const osg::Matrix& transform, const osg::ref_ptr<SGReaderWriterOptions> options)
+vsg::ref_ptr<vsg::Node> createObjectInstances(ObjectInstanceBin& objectInstances, const vsg::mat4& transform, const vsg::ref_ptr<SGReaderWriterOptions> options)
 {
     // Setup options for instancing with the correct effect
     // Options are shared-objects like
-    osg::ref_ptr<SGReaderWriterOptions> opt;
+    vsg::ref_ptr<SGReaderWriterOptions> opt;
 
 
     opt = sharedOptions(objectInstances.getSTGFilePath().dir(), options);
@@ -357,7 +357,7 @@ osg::ref_ptr<osg::Node> createObjectInstances(ObjectInstanceBin& objectInstances
     }
 
     // Load the model to be instanced
-    osg::ref_ptr<osg::Node> model = osgDB::readRefNodeFile(objectInstances.getModelFileName(), opt.get());
+    vsg::ref_ptr<vsg::Node> model = osgDB::readRefNodeFile(objectInstances.getModelFileName(), opt.get());
 
     if (!model.valid()) {
         SG_LOG(SG_TERRAIN, SG_ALERT, objectInstances.getSTGFilePath() << ": Failed to load '" << objectInstances.getModelFileName() << "'");
@@ -374,7 +374,7 @@ osg::ref_ptr<osg::Node> createObjectInstances(ObjectInstanceBin& objectInstances
     }
 
     // Get parameters for instances
-    osg::Vec3Array* positions = new osg::Vec3Array;
+    vsg::vec3Array* positions = new vsg::vec3Array;
     positions->reserve(objectInstances.getNumInstances());
 
     osg::Vec4Array* rotationsAndScales = new osg::Vec4Array;
@@ -389,7 +389,7 @@ osg::ref_ptr<osg::Node> createObjectInstances(ObjectInstanceBin& objectInstances
     for (unsigned int objectIdx = 0; objectIdx < objectInstances.getNumInstances(); objectIdx++) {
         const auto obj = objectInstances.getInstance(objectIdx);
         positions->push_back(obj.position * transform);
-        rotationsAndScales->push_back(osg::Vec4f(obj.rotation[0], obj.rotation[1], obj.rotation[2], obj.scale));
+        rotationsAndScales->push_back(vsg::vec4(obj.rotation[0], obj.rotation[1], obj.rotation[2], obj.scale));
         if (hasCustomAttributes) {
             // Pass custom attributes
             customAttribs->push_back(obj.customAttribs);

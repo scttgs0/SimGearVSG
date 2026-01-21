@@ -99,7 +99,7 @@ SGMaterial::SGMaterial( const osgDB::Options* options,
                         SGSharedPtr<const SGCondition> c,
                         const std::string& n)
 {
-    osg::ref_ptr<SGReaderWriterOptions> opt;
+    vsg::ref_ptr<SGReaderWriterOptions> opt;
     opt = SGReaderWriterOptions::copyOrCreate(options);
     areas = a;
     condition = c;
@@ -214,7 +214,7 @@ SGMaterial::read_properties(const SGReaderWriterOptions* options,
             }
             else
             {
-                osg::Image* image = osgDB::readRefImageFile(fullMaskPath, options);
+                vsg::Image* image = osgDB::readRefImageFile(fullMaskPath, options);
                 if (image && image->valid())
                 {
                     Texture2DRef object_mask = new osg::Texture2D;
@@ -228,7 +228,7 @@ SGMaterial::read_properties(const SGReaderWriterOptions* options,
                         // (otherwise a second reference to the object mask would flip it
                         // back!).
                         SG_LOG(SG_GENERAL, SG_DEBUG, "Flipping object mask" << omname);
-                        image = (osg::Image* ) image->clone(osg::CopyOp::SHALLOW_COPY);
+                        image = (vsg::Image* ) image->clone(osg::CopyOp::SHALLOW_COPY);
                         image->flipVertical();
                     }
 
@@ -239,7 +239,7 @@ SGMaterial::read_properties(const SGReaderWriterOptions* options,
                     object_mask->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
                     object_mask->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
 
-                    object_mask->setDataVariance(osg::Object::STATIC);
+                    object_mask->setDataVariance(vsg::Object::STATIC);
                     object_mask->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
                     object_mask->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
                     _masks.push_back(object_mask);
@@ -358,8 +358,8 @@ SGMaterial::read_properties(const SGReaderWriterOptions* options,
     if (building_medium_max_width  > 80.0) SG_LOG(SG_GENERAL, SG_ALERT, "building-medium-max-width-m exceeds maximum (80). Texture will be stretched to fit.");
     if (building_medium_max_depth  > 80.0) SG_LOG(SG_GENERAL, SG_ALERT, "building-medium-max-depth-m exceeds maximum (80). Texture will be stretched to fit.");
 
-    cos_object_max_density_slope_angle  = cos(props->getFloatValue("object-max-density-angle-deg", 20.0) * osg::PI/180.0);
-    cos_object_zero_density_slope_angle = cos(props->getFloatValue("object-zero-density-angle-deg", 30.0) * osg::PI/180.0);
+    cos_object_max_density_slope_angle  = cos(props->getFloatValue("object-max-density-angle-deg", 20.0) * vsg::PI/180.0);
+    cos_object_zero_density_slope_angle = cos(props->getFloatValue("object-zero-density-angle-deg", 30.0) * vsg::PI/180.0);
 
     // Random vegetation properties
     wood_coverage = props->getDoubleValue("wood-coverage", 0.0);
@@ -371,8 +371,8 @@ SGMaterial::read_properties(const SGReaderWriterOptions* options,
     tree_height = props->getDoubleValue("tree-height-m", 0.0);
     // This defaults to a simple mapping of the texture without squashing as there are 4 trees vertically on the atlas
     tree_width = props->getDoubleValue("tree-width-m", tree_height*4/tree_varieties);
-    cos_tree_max_density_slope_angle  = cos(props->getFloatValue("tree-max-density-angle-deg", 30.0) * osg::PI/180.0);
-    cos_tree_zero_density_slope_angle = cos(props->getFloatValue("tree-zero-density-angle-deg", 45.0) * osg::PI/180.0);
+    cos_tree_max_density_slope_angle  = cos(props->getFloatValue("tree-max-density-angle-deg", 30.0) * vsg::PI/180.0);
+    cos_tree_zero_density_slope_angle = cos(props->getFloatValue("tree-zero-density-angle-deg", 45.0) * vsg::PI/180.0);
 
     std::string treeTexPath = props->getStringValue("tree-texture");
 

@@ -25,19 +25,20 @@
 
 #pragma once
 
-#include <simgear/compiler.h>
-#include <simgear/misc/sg_path.hxx>
-#include <simgear/math/SGMath.hxx>
-#include <simgear/structure/SGReferenced.hxx>
-
 #include <string>
 
-#include <osg/ref_ptr>
+#include <vsg/all.h>
+
 #include <osg/Array>
 #include <osg/Geode>
-#include <osg/Group>
 #include <osg/MatrixTransform>
 #include <osg/Switch>
+
+#include <simgear/compiler.h>
+#include <simgear/math/SGMath.hxx>
+#include <simgear/misc/sg_path.hxx>
+#include <simgear/structure/SGReferenced.hxx>
+
 
 class SGCloudField;
 class SGPath;
@@ -45,50 +46,50 @@ class SGPath;
 /**
  * A class layer to model a single cloud layer
  */
-class SGCloudLayer : public SGReferenced {
+class SGCloudLayer : public SGReferenced
+{
 public:
-
     /**
      * This is the list of available cloud coverages/textures
      */
     enum Coverage {
-	SG_CLOUD_OVERCAST = 0,
-	SG_CLOUD_BROKEN,
-	SG_CLOUD_SCATTERED,
-	SG_CLOUD_FEW,
-	SG_CLOUD_CIRRUS,
-	SG_CLOUD_CLEAR,
-	SG_MAX_CLOUD_COVERAGES
+        SG_CLOUD_OVERCAST = 0,
+        SG_CLOUD_BROKEN,
+        SG_CLOUD_SCATTERED,
+        SG_CLOUD_FEW,
+        SG_CLOUD_CIRRUS,
+        SG_CLOUD_CLEAR,
+        SG_MAX_CLOUD_COVERAGES
     };
 
-    static const std::string SG_CLOUD_OVERCAST_STRING; // "overcast"
-    static const std::string SG_CLOUD_BROKEN_STRING; // "broken"
+    static const std::string SG_CLOUD_OVERCAST_STRING;  // "overcast"
+    static const std::string SG_CLOUD_BROKEN_STRING;    // "broken"
     static const std::string SG_CLOUD_SCATTERED_STRING; // "scattered"
-    static const std::string SG_CLOUD_FEW_STRING; // "few"
-    static const std::string SG_CLOUD_CIRRUS_STRING; // "cirrus"
-    static const std::string SG_CLOUD_CLEAR_STRING; // "clear"
+    static const std::string SG_CLOUD_FEW_STRING;       // "few"
+    static const std::string SG_CLOUD_CIRRUS_STRING;    // "cirrus"
+    static const std::string SG_CLOUD_CLEAR_STRING;     // "clear"
 
     /**
      * Constructor
      * @param tex_path the path to the set of cloud textures
      */
-    SGCloudLayer( const SGPath &tex_path );
+    SGCloudLayer(const SGPath& tex_path);
 
     /**
      * Destructor
      */
-    virtual ~SGCloudLayer( void );
+    virtual ~SGCloudLayer(void);
 
     /** get the cloud span (in meters) */
-    float getSpan_m () const;
+    float getSpan_m() const;
     /**
      * set the cloud span
      * @param span_m the cloud span in meters
      */
-    void setSpan_m (float span_m);
+    void setSpan_m(float span_m);
 
     /** get the layer elevation (in meters) */
-    float getElevation_m () const;
+    float getElevation_m() const;
     /**
      * set the layer elevation.  Note that this specifies the bottom
      * of the cloud layer.  The elevation of the top of the layer is
@@ -96,15 +97,15 @@ public:
      * @param elevation_m the layer elevation in meters
      * @param set_span defines whether it is allowed to adjust the span
      */
-    void setElevation_m (float elevation_m, bool set_span = true);
+    void setElevation_m(float elevation_m, bool set_span = true);
 
     /** get the layer thickness */
-    float getThickness_m () const;
+    float getThickness_m() const;
     /**
      * set the layer thickness.
      * @param thickness_m the layer thickness in meters.
      */
-    void setThickness_m (float thickness_m);
+    void setThickness_m(float thickness_m);
 
     /** get the layer visibility */
     float getVisibility_m() const;
@@ -115,46 +116,46 @@ public:
     void setVisibility_m(float visibility_m);
 
 
-
     /**
      * get the transition/boundary layer depth in meters.  This
      * allows gradual entry/exit from the cloud layer via adjusting
      * visibility.
      */
-    float getTransition_m () const;
+    float getTransition_m() const;
 
     /**
      * set the transition layer size in meters
      * @param transition_m the transition layer size in meters
      */
-    void setTransition_m (float transition_m);
+    void setTransition_m(float transition_m);
 
     /** get coverage type */
-    Coverage getCoverage () const;
+    Coverage getCoverage() const;
 
     /**
      * set coverage type
      * @param coverage the coverage type
      */
-    void setCoverage (Coverage coverage);
+    void setCoverage(Coverage coverage);
 
     /** get coverage as string */
-    const std::string & getCoverageString() const;
+    const std::string& getCoverageString() const;
 
     /** get coverage as string */
-    static const std::string & getCoverageString( Coverage coverage );
+    static const std::string& getCoverageString(Coverage coverage);
 
     /** get coverage type from string */
-    static Coverage getCoverageType( const std::string & coverage );
+    static Coverage getCoverageType(const std::string& coverage);
 
     /** set coverage as string */
-    void setCoverageString( const std::string & coverage );
+    void setCoverageString(const std::string& coverage);
 
     /**
      * set the cloud movement direction
      * @param dir the cloud movement direction
      */
-    inline void setDirection(float dir) { 
+    inline void setDirection(float dir)
+    {
         // cout << "cloud dir = " << dir << endl;
         direction = dir;
     }
@@ -166,7 +167,8 @@ public:
      * set the cloud movement speed 
      * @param sp the cloud movement speed
      */
-    inline void setSpeed(float sp) {
+    inline void setSpeed(float sp)
+    {
         // cout << "cloud speed = " << sp << endl;
         speed = sp;
     }
@@ -180,19 +182,22 @@ public:
      * to 1.0 to fade a cloud layer in or out.
      * @param alpha cloud alpha value (0.0 to 1.0)
      */
-    inline void setAlpha( float alpha ) {
-        if ( alpha < 0.0 ) { alpha = 0.0; }
-        if ( alpha > max_alpha ) { alpha = max_alpha; }
+    inline void setAlpha(float alpha)
+    {
+        if (alpha < 0.0) { alpha = 0.0; }
+        if (alpha > max_alpha) { alpha = max_alpha; }
         cloud_alpha = alpha;
     }
 
-    inline void setMaxAlpha( float alpha ) {
-        if ( alpha < 0.0 ) { alpha = 0.0; }
-        if ( alpha > 1.0 ) { alpha = 1.0; }
+    inline void setMaxAlpha(float alpha)
+    {
+        if (alpha < 0.0) { alpha = 0.0; }
+        if (alpha > 1.0) { alpha = 1.0; }
         max_alpha = alpha;
     }
 
-    inline float getMaxAlpha() const {
+    inline float getMaxAlpha() const
+    {
         return max_alpha;
     }
 
@@ -209,21 +214,20 @@ public:
      * @param alt TODO
      * @param dt the time elapsed since the last call
      */
-    bool reposition( const SGVec3f& p,
-                     const SGVec3f& up,
-                     double lon, double lat, double alt,
-                     double dt = 0.0 );
+    bool reposition(const SGVec3f& p,
+                    const SGVec3f& up,
+                    double lon, double lat, double alt,
+                    double dt = 0.0);
 
     osg::Switch* getNode() { return cloud_root.get(); }
 
     /** return the 3D layer cloud associated with this 2D layer */
-    SGCloudField *get_layer3D(void) { return layer3D; }
+    SGCloudField* get_layer3D(void) { return layer3D; }
 
 private:
+    vsg::ref_ptr<osg::Switch> cloud_root;
 
-    osg::ref_ptr<osg::Switch> cloud_root;
-
-    float cloud_alpha;          // 1.0 = drawn fully, 0.0 faded out completely
+    float cloud_alpha; // 1.0 = drawn fully, 0.0 faded out completely
 
     // height above sea level (meters)
     SGPath texture_path;
@@ -243,8 +247,7 @@ private:
     SGGeod last_pos;
     double max_alpha;
 
-    osg::Vec2 base;
+    vsg::vec2 base;
 
-    SGCloudField *layer3D;
-
+    SGCloudField* layer3D;
 };

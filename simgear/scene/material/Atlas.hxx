@@ -20,42 +20,43 @@
 
 #pragma once
 
+#include <map> // STL associative "array"
+#include <memory>
+#include <string> // Standard C++ string library
+#include <vector> // STL "array"
+
+#include <vsg/all.h>
+
+#include <osg/Texture1D>
+#include <osg/Texture2DArray>
+
 #include <simgear/compiler.h>
 
 #include <simgear/bvh/BVHMaterial.hxx>
 #include <simgear/math/SGMath.hxx>
+#include <simgear/scene/material/mat.hxx>
 #include <simgear/structure/SGReferenced.hxx>
 #include <simgear/structure/SGSharedPtr.hxx>
-#include <simgear/scene/material/mat.hxx>
-#include <osg/Texture2DArray>
-#include <osg/Texture1D>
 
-#include <memory>
-#include <string>   // Standard C++ string library
-#include <map>      // STL associative "array"
-#include <vector>   // STL "array"
-
-namespace simgear
-{
+namespace simgear {
 
 // Atlas of textures
 class Atlas : public osg::Referenced
 {
 public:
-
     // Constructor
-    Atlas (osg::ref_ptr<const SGReaderWriterOptions> options );
+    Atlas(vsg::ref_ptr<const SGReaderWriterOptions> options);
 
     // Mapping of landclass numbers to indexes within the atlas
     // materialLookup
     typedef std::map<int, int> AtlasIndex;
-    typedef std::map<unsigned, SGSharedPtr<SGMaterial> >  AtlasMap;
+    typedef std::map<unsigned, SGSharedPtr<SGMaterial>> AtlasMap;
 
     // Mapping of texture filenames to their index in the Atlas image itself.
     typedef std::map<std::string, unsigned int> TextureMap;
 
     // The Texture array itself
-    typedef osg::ref_ptr<osg::Texture2DArray> AtlasImage;
+    typedef vsg::ref_ptr<osg::Texture2DArray> AtlasImage;
     typedef std::map<int, bool> WaterAtlas;
 
     void addUniforms(osg::StateSet* stateset);
@@ -66,7 +67,7 @@ public:
 
     // Lookups into the Atlas from landclass
     bool isWater(int landclass) { return _waterAtlas[landclass]; };
-    bool isSea(int landclass) { return _seaAtlas[landclass];}
+    bool isSea(int landclass) { return _seaAtlas[landclass]; }
     int getIndex(int landclass) { return _index[landclass]; };
 
     AtlasMap getBVHMaterialMap() { return _bvhMaterialMap; };
@@ -77,23 +78,23 @@ private:
     AtlasImage _image;
     GLint _internalFormat;
 
-    osg::ref_ptr<const SGReaderWriterOptions> _options;
+    vsg::ref_ptr<const SGReaderWriterOptions> _options;
 
-    osg::ref_ptr<osg::Uniform> _textureLookup1;
-    osg::ref_ptr<osg::Uniform> _textureLookup2;
-    osg::ref_ptr<osg::Uniform> _dimensions;
-    osg::ref_ptr<osg::Uniform> _shoreAtlastIndex;
+    vsg::ref_ptr<osg::Uniform> _textureLookup1;
+    vsg::ref_ptr<osg::Uniform> _textureLookup2;
+    vsg::ref_ptr<osg::Uniform> _dimensions;
+    vsg::ref_ptr<osg::Uniform> _shoreAtlastIndex;
 
-    osg::ref_ptr<osg::Uniform> _materialParams1;
-    osg::ref_ptr<osg::Uniform> _materialParams2;
+    vsg::ref_ptr<osg::Uniform> _materialParams1;
+    vsg::ref_ptr<osg::Uniform> _materialParams2;
 
-    osg::ref_ptr<osg::Uniform> _PBRParams;
-    osg::ref_ptr<osg::Uniform> _emission;
-    osg::ref_ptr<osg::Uniform> _heightAmplitude;
-    osg::ref_ptr<osg::Uniform> _bumpmapAmplitude;
+    vsg::ref_ptr<osg::Uniform> _PBRParams;
+    vsg::ref_ptr<osg::Uniform> _emission;
+    vsg::ref_ptr<osg::Uniform> _heightAmplitude;
+    vsg::ref_ptr<osg::Uniform> _bumpmapAmplitude;
 
 
-    unsigned int _imageIndex; // Index into the image
+    unsigned int _imageIndex;          // Index into the image
     unsigned int _materialLookupIndex; // Index into the material lookup
 
     WaterAtlas _waterAtlas;
@@ -118,8 +119,7 @@ private:
         // The following two textures are large and don't have an alpha channel.  Ignoring for now.
         //"Textures/Globe/ocean_depth_1.png",
         //"Textures/Globe/globe_colors.jpg",
-        "Textures/Terrain/packice-overlay.png"
-    };
+        "Textures/Terrain/packice-overlay.png"};
 };
 
-}
+} // namespace simgear

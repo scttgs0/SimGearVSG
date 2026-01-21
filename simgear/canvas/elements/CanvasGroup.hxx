@@ -86,7 +86,7 @@ namespace simgear::canvas
                      const StyleInfo* style_info = 0 ) override;
 
       osg::BoundingBox
-      getTransformedBounds(const osg::Matrix& m) const override;
+      getTransformedBounds(const vsg::mat4& m) const override;
 
 
       FocusScope* getOrCreateFocusScope();

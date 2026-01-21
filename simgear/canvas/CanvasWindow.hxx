@@ -8,18 +8,20 @@
 
 #pragma once
 
-#include <simgear/canvas/elements/CanvasImage.hxx>
-#include <simgear/canvas/layout/Layout.hxx>
-#include <simgear/canvas/events/MouseEvent.hxx>
-#include <simgear/props/PropertyBasedElement.hxx>
-#include <simgear/props/propertyObject.hxx>
-#include <simgear/misc/CSSBorder.hxx>
+#include <vsg/all.h>
 
 #include <osg/Geode>
 #include <osg/Geometry>
 
-namespace simgear::canvas
-{
+#include <simgear/canvas/elements/CanvasImage.hxx>
+#include <simgear/canvas/events/MouseEvent.hxx>
+#include <simgear/canvas/layout/Layout.hxx>
+#include <simgear/misc/CSSBorder.hxx>
+#include <simgear/props/PropertyBasedElement.hxx>
+#include <simgear/props/propertyObject.hxx>
+
+
+namespace simgear::canvas {
 
 class FocusScope;
 
@@ -81,11 +83,11 @@ public:
     void raise();
 
     void handleResize(uint8_t mode,
-                      const osg::Vec2f& offset = osg::Vec2f());
+                      const vsg::vec2& offset = vsg::vec2());
 
     bool handleEvent(const EventPtr& event) override;
 
-    SGVec2<float> toScreenPosition(const osg::Vec2f& pos = {}) const;
+    SGVec2<float> toScreenPosition(const vsg::vec2& pos = {}) const;
 
     FocusScope* focusScope();
 
@@ -124,6 +126,6 @@ protected:
     void updateDecoration();
 
     void invalidate() override;
-  };
+};
 
 } // namespace simgear::canvas

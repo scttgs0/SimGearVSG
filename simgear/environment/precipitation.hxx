@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <osg/Group>
+#include <vsg/all.h>
+
 #include <osg/Referenced>
 #include <osgParticle/PrecipitationEffect>
 
@@ -26,17 +27,17 @@ protected:
     float _rain_droplet_size;
     float _snow_flake_size;
     float _illumination;
-	
-    osg::Vec3 _wind_vec;
-	
-    osg::ref_ptr<osgParticle::PrecipitationEffect> _precipitationEffect;
+
+    vsg::vec3 _wind_vec;
+
+    vsg::ref_ptr<osgParticle::PrecipitationEffect> _precipitationEffect;
 
 public:
     SGPrecipitation();
     virtual ~SGPrecipitation() {}
-    osg::Group* build(void);
+    vsg::Group* build(void);
     bool update(void);
-	
+
     void setWindProperty(double, double);
     void setFreezing(bool);
     void setDropletExternal(bool);

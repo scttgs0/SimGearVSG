@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include <simgear/compiler.h>
-#include <simgear/debug/debug_types.h>
-
 #include <sstream>
 #include <vector>
 #include <memory>
+
+#include <simgear/compiler.h>
+#include <simgear/debug/debug_types.h>
+
 
 // forward decls
 class SGPath;

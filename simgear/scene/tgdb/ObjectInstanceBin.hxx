@@ -3,10 +3,12 @@
 
 #pragma once
 
-#include <osg/Node>
+#include <vsg/all.h>
+
 #include <simgear/math/SGVec3.hxx>
 #include <simgear/math/SGVec4.hxx>
 #include <simgear/scene/util/SGReaderWriterOptions.hxx>
+
 
 // these correspond to object-instancing*.eff
 const int INSTANCE_POSITIONS = 6;            // (x,y,z)
@@ -19,12 +21,12 @@ class ObjectInstanceBin final
 public:
     struct ObjectInstance {
         // Object with position, rotation scale and customAttribs
-        ObjectInstance(const osg::Vec3f& p, const osg::Vec3f& r = osg::Vec3f(0.0f, 0.0f, 0.0f), const float& s = 1.0f, const osg::Vec4f& c = osg::Vec4f(0.0f, 0.0f, 0.0f, 0.0f)) : position(p), rotation(r), scale(s), customAttribs(c) {}
+        ObjectInstance(const vsg::vec3& p, const vsg::vec3& r = vsg::vec3(0.0f, 0.0f, 0.0f), const float& s = 1.0f, const vsg::vec4& c = vsg::vec4(0.0f, 0.0f, 0.0f, 0.0f)) : position(p), rotation(r), scale(s), customAttribs(c) {}
 
-        osg::Vec3f position;
-        osg::Vec3f rotation; // hdg, pitch, roll
+        vsg::vec3 position;
+        vsg::vec3 rotation; // hdg, pitch, roll
         float scale;
-        osg::Vec4f customAttribs;
+        vsg::vec4 customAttribs;
     };
 
     typedef std::vector<ObjectInstance> ObjectInstanceList;
@@ -34,10 +36,10 @@ public:
                       const SGPath& STGFilePath = SGPath{std::string{"dynamically-generated"}},
                       const SGPath& instancesFilePath = SGPath{});
 
-    ~ObjectInstanceBin() = default;     // non-virtual intentional
+    ~ObjectInstanceBin() = default; // non-virtual intentional
 
     void insert(const ObjectInstance& light);
-    void insert(const osg::Vec3f& p, const osg::Vec3f& r = osg::Vec3f(0.0f, 0.0f, 0.0f), const float& s = 1.0f, const osg::Vec4f& c = osg::Vec4f(0.0f, 0.0f, 0.0f, 0.0f));
+    void insert(const vsg::vec3& p, const vsg::vec3& r = vsg::vec3(0.0f, 0.0f, 0.0f), const float& s = 1.0f, const vsg::vec4& c = vsg::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
     const std::string getModelFileName() const;
     const SGPath getSTGFilePath() const;
@@ -56,5 +58,5 @@ private:
     const std::set<std::string> customInstancingEffects = {"Effects/object-instancing-colored"};
 };
 
-osg::ref_ptr<osg::Node> createObjectInstances(ObjectInstanceBin& objectInstances, const osg::Matrix& transform, const osg::ref_ptr<SGReaderWriterOptions> options);
+vsg::ref_ptr<vsg::Node> createObjectInstances(ObjectInstanceBin& objectInstances, const vsg::mat4& transform, const vsg::ref_ptr<SGReaderWriterOptions> options);
 }; // namespace simgear

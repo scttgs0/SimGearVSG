@@ -6,65 +6,69 @@
  * @brief Canvas keyboard event demo. Press some keys and get some info.
  */
 
+#include <iostream>
+
+#include <vsg/all.h>
+
+#include <osgGA/GUIEventHandler>
+#include <osgGA/GUIEventAdapter>
+
 #include <simgear_config.h>
 
 #include "KeyboardEvent.hxx"
 
-#include <osgViewer/Viewer>
-#include <iostream>
 
-class DemoEventHandler:
-  public osgGA::GUIEventHandler
+class DemoEventHandler : public osgGA::GUIEventHandler
 {
-  public:
-    bool handle( const osgGA::GUIEventAdapter& ea,
-                 osgGA::GUIActionAdapter&,
-                 osg::Object*,
-                 osg::NodeVisitor* )
+public:
+    bool handle(const osgGA::GUIEventAdapter& ea,
+                osgGA::GUIActionAdapter&,
+                vsg::Object*,
+                osg::NodeVisitor*)
     {
-      switch( ea.getEventType() )
-      {
+        switch (ea.getEventType()) {
         case osgGA::GUIEventAdapter::PUSH:
         case osgGA::GUIEventAdapter::RELEASE:
         case osgGA::GUIEventAdapter::DRAG:
         case osgGA::GUIEventAdapter::MOVE:
         case osgGA::GUIEventAdapter::SCROLL:
-          return handleMouse(ea);
+            return handleMouse(ea);
         case osgGA::GUIEventAdapter::KEYDOWN:
         case osgGA::GUIEventAdapter::KEYUP:
-          return handleKeyboard(ea);
+            return handleKeyboard(ea);
         default:
-          return false;
-      }
+            return false;
+        }
     }
 
-  protected:
+protected:
     bool handleMouse(const osgGA::GUIEventAdapter&)
     {
-      return false;
+        return false;
     }
 
     bool handleKeyboard(const osgGA::GUIEventAdapter& ea)
     {
-      simgear::canvas::KeyboardEvent evt(ea);
-      std::cout << evt.getTypeString() << " '" << evt.key() << "'"
-                                       << ", loc=" << evt.location()
-                                       << ", char=" << evt.charCode()
-                                       << ", key=" << evt.keyCode()
-                                       << (evt.isPrint() ? ", printable" : "")
-                                       << std::endl;
-      return true;
+        simgear::canvas::KeyboardEvent evt(ea);
+        std::cout << evt.getTypeString() << " '" << evt.key() << "'"
+                  << ", loc=" << evt.location()
+                  << ", char=" << evt.charCode()
+                  << ", key=" << evt.keyCode()
+                  << (evt.isPrint() ? ", printable" : "")
+                  << std::endl;
+        return true;
     }
 };
 
 int main()
 {
-  osgViewer::Viewer viewer;
+    //!!osgViewer::Viewer viewer;
+    vsg::Viewer viewer;
 
-  osg::ref_ptr<DemoEventHandler> handler( new DemoEventHandler );
-  viewer.addEventHandler(handler);
+    vsg::ref_ptr<DemoEventHandler> handler(new DemoEventHandler);
+    viewer.addEventHandler(handler);
 
-  viewer.setUpViewInWindow(100, 100, 200, 100, 0);
-  viewer.setRunMaxFrameRate(5);
-  return viewer.run();
+    viewer.setUpViewInWindow(100, 100, 200, 100, 0);
+    viewer.setRunMaxFrameRate(5);
+    return viewer.run();
 }

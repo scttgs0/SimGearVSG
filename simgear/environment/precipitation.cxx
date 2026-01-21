@@ -48,20 +48,20 @@ bool SGPrecipitation::getEnabled() const
  * This function permits you to create an object precipitationEffect and initialize it.
  * I define by default the color of water (for raining)
  */
-osg::Group* SGPrecipitation::build(void)
+vsg::Group* SGPrecipitation::build(void)
 {
     if (!_enabled) 
         return nullptr;
 
-    osg::ref_ptr<osg::Group> group = new osg::Group;
+    vsg::ref_ptr<vsg::Group> group = new vsg::Group;
 
     _precipitationEffect->snow(0);	
     _precipitationEffect->rain(0);	
 
     if (_clip_distance!=0.0)
     {
-        osg::ref_ptr<osg::ClipNode> clipNode = new osg::ClipNode;
-        osg::ref_ptr<osg::ClipPlane> clipPlane = new osg::ClipPlane(0);
+        vsg::ref_ptr<osg::ClipNode> clipNode = new osg::ClipNode;
+        vsg::ref_ptr<osg::ClipPlane> clipPlane = new osg::ClipPlane(0);
         clipNode->addClipPlane(clipPlane.get());
         clipNode->getClipPlane(0)->setClipPlane(0.0, 0.0, -1.0, -_clip_distance);
         clipNode->setReferenceFrame(osg::ClipNode::ABSOLUTE_RF);
@@ -201,7 +201,7 @@ void SGPrecipitation::setWindProperty(double heading, double speed)
     y = sin(heading) * speed;
     z = 0;
 
-    this->_wind_vec = osg::Vec3(x, y, z);
+    this->_wind_vec = vsg::vec3(x, y, z);
 }
 
 
@@ -259,12 +259,12 @@ bool SGPrecipitation::update(void)
 		}
 
 
-        _precipitationEffect->setCellSize(osg::Vec3(5.0f / (0.25f+_snow_intensity), 5.0f / (0.25f+_snow_intensity), 5.0f));
+        _precipitationEffect->setCellSize(vsg::vec3(5.0f / (0.25f+_snow_intensity), 5.0f / (0.25f+_snow_intensity), 5.0f));
 		
         _precipitationEffect->setNearTransition(25.f);
         _precipitationEffect->setFarTransition(100.0f - 60.0f*sqrtf(_snow_intensity));
 		
-        _precipitationEffect->setParticleColor(osg::Vec4(0.85 * _illumination, 0.85 * _illumination, 0.85 * _illumination, 1.0) - osg::Vec4(0.1, 0.1, 0.1, 1.0) * _snow_intensity);
+        _precipitationEffect->setParticleColor(vsg::vec4(0.85 * _illumination, 0.85 * _illumination, 0.85 * _illumination, 1.0) - vsg::vec4(0.1, 0.1, 0.1, 1.0) * _snow_intensity);
     } else if (_enabled && this->_rain_intensity > 0) {
 
         _precipitationEffect->setWind(_wind_vec);
@@ -282,12 +282,12 @@ bool SGPrecipitation::update(void)
 		}
 		
         _precipitationEffect->setMaximumParticleDensity(_rain_intensity * 7.5f);
-        _precipitationEffect->setCellSize(osg::Vec3(5.0f / (0.25f+_rain_intensity), 5.0f / (0.25f+_rain_intensity), 5.0f));
+        _precipitationEffect->setCellSize(vsg::vec3(5.0f / (0.25f+_rain_intensity), 5.0f / (0.25f+_rain_intensity), 5.0f));
 		
         _precipitationEffect->setNearTransition(25.f);
         _precipitationEffect->setFarTransition(100.0f - 60.0f*sqrtf(_rain_intensity));
 		
-	_precipitationEffect->setParticleColor( osg::Vec4(0.64 * _illumination, 0.64 * _illumination, 0.64 * _illumination, 0.5));
+	_precipitationEffect->setParticleColor( vsg::vec4(0.64 * _illumination, 0.64 * _illumination, 0.64 * _illumination, 0.5));
     } else {
         _precipitationEffect->snow(0);	
         _precipitationEffect->rain(0);	

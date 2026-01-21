@@ -6,9 +6,10 @@
  * @brief Routines to handle lowlevel compressed binary IO of various datatypes
  */
 
+#include <iostream>
+
 #include <simgear/compiler.h>
 
-#include <iostream>
 #include "lowlevel.hxx"
 
 

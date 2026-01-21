@@ -25,34 +25,34 @@ enum Type {
     REVERSE_DEPTH_NO
 };
 
-bool isOrtho(const osg::Matrixd &m);
+bool isOrtho(const vsg::dmat4 &m);
 
-bool isPerspective(const osg::Matrixd &m);
+bool isPerspective(const vsg::dmat4 &m);
 
-Type getType(const osg::Matrixd &m);
+Type getType(const vsg::dmat4 &m);
 
-void makePerspective(osg::Matrixd &m,
+void makePerspective(vsg::dmat4 &m,
                      double vfov, double aspect, double near, double far,
                      Type type = STANDARD);
 
-void makeFrustum(osg::Matrixd &m,
+void makeFrustum(vsg::dmat4 &m,
                  double left, double right,
                  double bottom, double top,
                  double near, double far,
                  Type type = STANDARD);
 
-void makeOrtho(osg::Matrixd &m,
+void makeOrtho(vsg::dmat4 &m,
                double left, double right,
                double bottom, double top,
                double near, double far,
                Type type = STANDARD);
 
-bool getFrustum(const osg::Matrixd &m,
+bool getFrustum(const vsg::dmat4 &m,
                 double &left, double &right,
                 double &bottom, double &top,
                 double &near, double &far);
 
-bool getOrtho(const osg::Matrixd &m,
+bool getOrtho(const vsg::dmat4 &m,
               double &left, double &right,
               double &bottom, double &top,
               double &near, double &far);
@@ -61,7 +61,7 @@ bool getOrtho(const osg::Matrixd &m,
  * Given a projection matrix, return a new one with the same frustum sides and
  * new near/far planes.
  */
-void clampNearFarPlanes(osg::Matrixd &old_proj, double near, double far,
-                        osg::Matrixd &new_proj);
+void clampNearFarPlanes(vsg::dmat4 &old_proj, double near, double far,
+                        vsg::dmat4 &new_proj);
 
 } // namespace simgear::ProjectionMatrix

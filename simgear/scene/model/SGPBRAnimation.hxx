@@ -11,7 +11,7 @@ class SGPBRAnimation : public SGAnimation {
 public:
     SGPBRAnimation(simgear::SGTransientModelData& modelData);
     virtual ~SGPBRAnimation();
-    osg::Group* createAnimationGroup(osg::Group& parent) override;
+    vsg::Group* createAnimationGroup(vsg::Group& parent) override;
 private:
     osgDB::FilePathList _texture_path_list;
 };

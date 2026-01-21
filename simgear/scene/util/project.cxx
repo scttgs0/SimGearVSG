@@ -16,32 +16,31 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#  include <simgear_config.h>
+#include <simgear_config.h>
 #endif
 
 #include "project.hxx"
 
 #include <osg/Math>
-#include <osg/Matrixd>
 
-namespace simgear
-{
+
+namespace simgear {
 GLint project(GLdouble objX, GLdouble objY, GLdouble objZ,
-              const GLdouble *model, const GLdouble *proj, const GLint *view,
+              const GLdouble* model, const GLdouble* proj, const GLint* view,
               GLdouble* winX, GLdouble* winY, GLdouble* winZ)
 {
     using namespace osg;
     Vec4d obj(objX, objY, objZ, 1.0);
     Matrixd Mmodel(model), Mproj(proj);
-    Matrixd Mwin = (Matrixd::translate(1.0, 1.0, 1.0)
-                    * Matrixd::scale(0.5 * view[2], 0.5 * view[3], 0.5)
-                    * Matrixd::translate(view[0], view[1], 0.0));
+    Matrixd Mwin = (Matrixd::translate(1.0, 1.0, 1.0) * Matrixd::scale(0.5 * view[2], 0.5 * view[3], 0.5) * Matrixd::translate(view[0], view[1], 0.0));
     Vec4d result = obj * Mmodel * Mproj * Mwin;
     if (equivalent(result.w(), 0.0))
         return GL_FALSE;
     result = result / result.w();
-    *winX = result.x();  *winY = result.y();  *winZ = result.z();
+    *winX = result.x();
+    *winY = result.y();
+    *winZ = result.z();
     return GL_TRUE;
 }
 
-} // of namespace simgear
+} // namespace simgear

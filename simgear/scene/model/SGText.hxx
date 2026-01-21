@@ -18,15 +18,18 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osgDB/ReaderWriter>
-#include <osg/Group>
 
 #include <simgear/props/props.hxx>
 
-class SGText : public osg::NodeCallback 
+
+class SGText : public osg::NodeCallback
 {
 public:
-  static osg::Node * appendText(const SGPropertyNode* configNode, SGPropertyNode* modelRoot, const osgDB::Options* options);
+    static vsg::Node* appendText(const SGPropertyNode* configNode, SGPropertyNode* modelRoot, const osgDB::Options* options);
+
 private:
-  class UpdateCallback;
+    class UpdateCallback;
 };

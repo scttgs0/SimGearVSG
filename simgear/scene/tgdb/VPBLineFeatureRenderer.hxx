@@ -44,29 +44,29 @@ namespace simgear {
 class VPBLineFeatureRenderer
 {
     public:
-        VPBLineFeatureRenderer(osg::ref_ptr<TerrainTile> tile);
+        VPBLineFeatureRenderer(vsg::ref_ptr<TerrainTile> tile);
 
-        virtual void applyLineFeatures(BufferData& buffer, osg::ref_ptr<SGReaderWriterOptions> options, osg::ref_ptr<SGMaterialCache> matcache);
+        virtual void applyLineFeatures(BufferData& buffer, vsg::ref_ptr<SGReaderWriterOptions> options, vsg::ref_ptr<SGMaterialCache> matcache);
 
         static void addLineFeatureList(SGBucket bucket, LineFeatureBinList roadList);
         static void unloadFeatures(SGBucket bucket);
 
     protected:
 
-        osg::ref_ptr<osgTerrain::Locator> _masterLocator;
+        vsg::ref_ptr<osgTerrain::Locator> _masterLocator;
         unsigned int _tileLevel;
 
         virtual void generateLineFeature(BufferData& buffer, 
             LineFeatureBin::LineFeature road, 
-            osg::Matrix localToWorldMatrix,
-            osg::Vec3Array* v, 
+            vsg::mat4 localToWorldMatrix,
+            vsg::vec3Array* v, 
             osg::Vec2Array* t, 
-            osg::Vec3Array* n,
-            std::vector<osg::Vec3f>* lights,
+            vsg::vec3Array* n,
+            std::vector<vsg::vec3>* lights,
             std::vector<float>* rotations,
             SGMaterial* mat);
 
-        virtual osg::Vec3d getMeshIntersection(BufferData& buffer, osg::Vec3d pt);
+        virtual vsg::dvec3 getMeshIntersection(BufferData& buffer, vsg::dvec3 pt);
 
         typedef std::pair<SGBucket, LineFeatureBinList> BucketLineFeatureBinList;
 

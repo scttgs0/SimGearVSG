@@ -7,39 +7,40 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osg/CopyOp>
 #include <osg/StateAttribute>
 #include <osg/StateSet>
 #include <osgText/Text>
 
+
 /** Typesafe wrapper around OSG's object clone function. Something
  * very similar is in current OSG sources.
  */
-namespace osg
-{
-template <typename T> class ref_ptr;
+namespace osg {
+template <typename T>
+class ref_ptr;
 class CopyOp;
-}
+} // namespace osg
 
-namespace simgear
-{
+namespace simgear {
 template <typename T>
 T* clone(const T* object, const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY)
 {
     return static_cast<T*>(object->clone(copyop));
 }
 
-template<typename T>
-T* clone_ref(const osg::ref_ptr<T>& object,
-             const osg::CopyOp& copyop  = osg::CopyOp::SHALLOW_COPY)
+template <typename T>
+T* clone_ref(const vsg::ref_ptr<T>& object,
+             const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY)
 {
     return static_cast<T*>(object->clone(copyop));
 }
 
-}
+} // namespace simgear
 
-namespace osg
-{
+namespace osg {
 class AlphaFunc;
 class BlendColor;
 class BlendEquation;
@@ -81,163 +82,162 @@ class TextureCubeMap;
 class TextureRectangle;
 class VertexProgram;
 class Viewport;
-}
+} // namespace osg
 
-namespace simgear
-{
-namespace osgutils
-{
+namespace simgear {
+namespace osgutils {
 using namespace osg;
 
-template<StateAttribute::Type T>
-struct TypeHolder
-{
+template <StateAttribute::Type T>
+struct TypeHolder {
     static const StateAttribute::Type type = T;
 };
 
-template<typename AT> struct AttributeType;
-template<typename AT> struct TexAttributeType;
+template <typename AT>
+struct AttributeType;
+template <typename AT>
+struct TexAttributeType;
 
-template<>
+template <>
 struct AttributeType<AlphaFunc>
-    : public TypeHolder<StateAttribute::ALPHAFUNC>
-{};
+    : public TypeHolder<StateAttribute::ALPHAFUNC> {
+};
 
-template<>
+template <>
 struct AttributeType<BlendColor>
-    : public TypeHolder<StateAttribute::BLENDCOLOR>
-{};
+    : public TypeHolder<StateAttribute::BLENDCOLOR> {
+};
 
-template<>
+template <>
 struct AttributeType<BlendEquation>
-    : public TypeHolder<StateAttribute::BLENDEQUATION>
-{};
+    : public TypeHolder<StateAttribute::BLENDEQUATION> {
+};
 
-template<>
+template <>
 struct AttributeType<BlendFunc>
-    : public TypeHolder<StateAttribute::BLENDFUNC>
-{};
+    : public TypeHolder<StateAttribute::BLENDFUNC> {
+};
 
-template<>
+template <>
 struct AttributeType<ClampColor>
-    : public TypeHolder<StateAttribute::CLAMPCOLOR>
-{};
+    : public TypeHolder<StateAttribute::CLAMPCOLOR> {
+};
 
-template<>
+template <>
 struct AttributeType<ColorMask>
-    : public TypeHolder<StateAttribute::COLORMASK>
-{};
+    : public TypeHolder<StateAttribute::COLORMASK> {
+};
 
-template<>
+template <>
 struct AttributeType<ColorMatrix>
-    : public TypeHolder<StateAttribute::COLORMATRIX>
-{};
+    : public TypeHolder<StateAttribute::COLORMATRIX> {
+};
 
-template<>
+template <>
 struct AttributeType<CullFace>
-    : public TypeHolder<StateAttribute::CULLFACE>
-{};
+    : public TypeHolder<StateAttribute::CULLFACE> {
+};
 
 
-template<>
+template <>
 struct AttributeType<osg::Depth> // Conflicts with Xlib
-    : public TypeHolder<StateAttribute::DEPTH>
-{};
+    : public TypeHolder<StateAttribute::DEPTH> {
+};
 
-template<>
+template <>
 struct AttributeType<Fog>
-    : public TypeHolder<StateAttribute::FOG>
-{};
+    : public TypeHolder<StateAttribute::FOG> {
+};
 
-template<>
+template <>
 struct AttributeType<FragmentProgram>
-    : public TypeHolder<StateAttribute::FRAGMENTPROGRAM>
-{};
+    : public TypeHolder<StateAttribute::FRAGMENTPROGRAM> {
+};
 
-template<>
+template <>
 struct AttributeType<FrontFace>
-    : public TypeHolder<StateAttribute::FRONTFACE>
-{};
+    : public TypeHolder<StateAttribute::FRONTFACE> {
+};
 
-template<>
+template <>
 struct AttributeType<LightModel>
-    : public TypeHolder<StateAttribute::LIGHTMODEL>
-{};
+    : public TypeHolder<StateAttribute::LIGHTMODEL> {
+};
 
-template<>
+template <>
 struct AttributeType<LineStipple>
-    : public TypeHolder<StateAttribute::LINESTIPPLE>
-{};
+    : public TypeHolder<StateAttribute::LINESTIPPLE> {
+};
 
-template<>
+template <>
 struct AttributeType<LineWidth>
-    : public TypeHolder<StateAttribute::LINEWIDTH>
-{};
+    : public TypeHolder<StateAttribute::LINEWIDTH> {
+};
 
-template<>
+template <>
 struct AttributeType<LogicOp>
-    : public TypeHolder<StateAttribute::LOGICOP>
-{};
+    : public TypeHolder<StateAttribute::LOGICOP> {
+};
 
-template<>
+template <>
 struct AttributeType<Material>
-    : public TypeHolder<StateAttribute::MATERIAL>
-{};
+    : public TypeHolder<StateAttribute::MATERIAL> {
+};
 
-template<>
+template <>
 struct AttributeType<Multisample>
-    : public TypeHolder<StateAttribute::MULTISAMPLE>
-{};
+    : public TypeHolder<StateAttribute::MULTISAMPLE> {
+};
 
-template<>
+template <>
 struct AttributeType<Point>
-    : public TypeHolder<StateAttribute::POINT>
-{};
+    : public TypeHolder<StateAttribute::POINT> {
+};
 
-template<>
+template <>
 struct TexAttributeType<PointSprite>
-    : public TypeHolder<StateAttribute::POINTSPRITE>
-{};
+    : public TypeHolder<StateAttribute::POINTSPRITE> {
+};
 
-template<>
+template <>
 struct AttributeType<PolygonMode>
-    : public TypeHolder<StateAttribute::POLYGONMODE>
-{};
+    : public TypeHolder<StateAttribute::POLYGONMODE> {
+};
 
-template<>
+template <>
 struct AttributeType<PolygonOffset>
-    : public TypeHolder<StateAttribute::POLYGONOFFSET>
-{};
+    : public TypeHolder<StateAttribute::POLYGONOFFSET> {
+};
 
-template<>
+template <>
 struct AttributeType<PolygonStipple>
-    : public TypeHolder<StateAttribute::POLYGONSTIPPLE>
-{};
+    : public TypeHolder<StateAttribute::POLYGONSTIPPLE> {
+};
 
-template<>
+template <>
 struct AttributeType<Program>
-    : public TypeHolder<StateAttribute::PROGRAM>
-{};
+    : public TypeHolder<StateAttribute::PROGRAM> {
+};
 
-template<>
+template <>
 struct AttributeType<Scissor>
-    : public TypeHolder<StateAttribute::SCISSOR>
-{};
+    : public TypeHolder<StateAttribute::SCISSOR> {
+};
 
-template<>
+template <>
 struct AttributeType<ShadeModel>
-    : public TypeHolder<StateAttribute::SHADEMODEL>
-{};
+    : public TypeHolder<StateAttribute::SHADEMODEL> {
+};
 
-template<>
+template <>
 struct AttributeType<Stencil>
-    : public TypeHolder<StateAttribute::STENCIL>
-{};
+    : public TypeHolder<StateAttribute::STENCIL> {
+};
 
-template<>
+template <>
 struct AttributeType<StencilTwoSided>
-    : public TypeHolder<StateAttribute::STENCIL>
-{};
+    : public TypeHolder<StateAttribute::STENCIL> {
+};
 
 // TexEnvCombine is not a subclass of TexEnv, so we can't do a
 // typesafe access of the attribute.
@@ -253,64 +253,62 @@ struct TexAttributeType<TexEnvCombine>
 {};
 #endif
 
-template<>
+template <>
 struct TexAttributeType<TexEnvFilter>
-    : public TypeHolder<StateAttribute::TEXENVFILTER>
-{};
+    : public TypeHolder<StateAttribute::TEXENVFILTER> {
+};
 
-template<>
+template <>
 struct TexAttributeType<TexGen>
-    : public TypeHolder<StateAttribute::TEXGEN>
-{};
+    : public TypeHolder<StateAttribute::TEXGEN> {
+};
 
-template<>
+template <>
 struct TexAttributeType<TexMat>
-    : public TypeHolder<StateAttribute::TEXMAT>
-{};
+    : public TypeHolder<StateAttribute::TEXMAT> {
+};
 
-template<>
+template <>
 struct TexAttributeType<Texture>
-    : public TypeHolder<StateAttribute::TEXTURE>
-{};
+    : public TypeHolder<StateAttribute::TEXTURE> {
+};
 
-template<>
+template <>
 struct AttributeType<VertexProgram>
-    : public TypeHolder<StateAttribute::VERTEXPROGRAM>
-{};
+    : public TypeHolder<StateAttribute::VERTEXPROGRAM> {
+};
 
-template<>
+template <>
 struct AttributeType<Viewport>
-    : public TypeHolder<StateAttribute::VIEWPORT>
-{};
+    : public TypeHolder<StateAttribute::VIEWPORT> {
+};
 
 osgText::Text::AlignmentType mapAlignment(const std::string& val);
 
 } // namespace osgutils
 
-template<typename AT>
+template <typename AT>
 inline AT* getStateAttribute(osg::StateSet* ss)
 {
     return static_cast<AT*>(ss->getAttribute(osgutils::AttributeType<AT>::type));
 }
 
-template<typename AT>
+template <typename AT>
 inline const AT* getStateAttribute(const osg::StateSet* ss)
 {
     return static_cast<const AT*>(ss->getAttribute(osgutils::AttributeType<AT>::type));
 }
 
-template<typename AT>
+template <typename AT>
 inline AT* getStateAttribute(unsigned int unit, osg::StateSet* ss)
 {
-    return static_cast<AT*>(ss->getTextureAttribute(unit, osgutils::TexAttributeType<AT>
-                                                    ::type));
+    return static_cast<AT*>(ss->getTextureAttribute(unit, osgutils::TexAttributeType<AT>::type));
 }
 
-template<typename AT>
+template <typename AT>
 inline const AT* getStateAttribute(unsigned int unit, const osg::StateSet* ss)
 {
     return static_cast<const AT*>(ss->getTextureAttribute(unit,
-                                                          osgutils::TexAttributeType<AT>
-                                                          ::type));
+                                                          osgutils::TexAttributeType<AT>::type));
 }
 } // namespace simgear

@@ -16,11 +16,14 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <simgear/xml/easyxml.hxx>
+
 #include "EffectElement.hxx"
 
-namespace simgear
-{
+
+namespace simgear {
 class ElementBuilder;
 
 class EffectElementBuilder
@@ -33,6 +36,5 @@ public:
     virtual void processSubElement(EffectElement* subElement);
     virtual void processData(const char* data, int length);
     virtual EffectElement* finalize();
-
 };
-}
+} // namespace simgear

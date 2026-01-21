@@ -6,27 +6,24 @@
  * @brief Unit-tests for SGPrecipitation class
  */
 
-
-
 #include <cmath>
 #include <memory>
-
-#include <osg/Group>
 
 #include <simgear/constants.h>
 #include <simgear/misc/test_macros.hxx>
 
 #include "precipitation.hxx"
 
-using std::cout;
+
 using std::cerr;
+using std::cout;
 using std::endl;
 
 
 class SGPrecipitationTestFixture : public SGPrecipitation
 {
 public:
-    osg::ref_ptr<osg::Group> _group;
+    vsg::ref_ptr<vsg::Group> _group;
 
     void test_configuration()
     {

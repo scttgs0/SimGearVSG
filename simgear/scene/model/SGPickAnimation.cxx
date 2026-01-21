@@ -55,7 +55,7 @@ static void readOptionalBindingList(const SGPropertyNode* aNode, SGPropertyNode*
 }
 
 
-osg::Vec2d eventToWindowCoords(const osgGA::GUIEventAdapter& ea)
+vsg::dvec2 eventToWindowCoords(const osgGA::GUIEventAdapter& ea)
 {
     using namespace osg;
     const GraphicsContext* gc = ea.getGraphicsContext();
@@ -68,7 +68,7 @@ osg::Vec2d eventToWindowCoords(const osgGA::GUIEventAdapter& ea)
     if (ea.getMouseYOrientation() == osgGA::GUIEventAdapter::Y_INCREASING_DOWNWARDS)
         y = (double)traits->height - y;
     
-    return osg::Vec2d(x, y);
+    return vsg::dvec2(x, y);
 }
 
  class SGPickAnimation::PickCallback : public SGPickCallback {
@@ -157,7 +157,7 @@ osg::Vec2d eventToWindowCoords(const osgGA::GUIEventAdapter& ea)
        }
    }
    
-   virtual bool hover( const osg::Vec2d& windowPos,
+   virtual bool hover( const vsg::dvec2& windowPos,
                        const Info& )
    {
        if (!_condition || _condition->test()) {
@@ -198,7 +198,7 @@ osg::Vec2d eventToWindowCoords(const osgGA::GUIEventAdapter& ea)
        << x << "," << y << " mask " << mask);
    }
 
-   virtual void apply(osg::Node &node)
+   virtual void apply(vsg::Node &node)
    {
      // Some nodes have state sets attached
      touchStateSet(node.getStateSet());
@@ -242,7 +242,7 @@ osg::Vec2d eventToWindowCoords(const osgGA::GUIEventAdapter& ea)
      if (!sa) return;
      osg::Texture *t = sa->asTexture();
      if (!t) return;
-     osg::Image *img = t->getImage(0);
+     vsg::Image *img = t->getImage(0);
      if (!img) return;
      if (!_done) {
        int pixX = _texX * img->s();
@@ -270,7 +270,7 @@ class SGPickAnimation::VncCallback : public SGPickCallback {
 public:
  VncCallback(const SGPropertyNode* configNode,
               SGPropertyNode* modelRoot,
-              osg::Group *node,
+              vsg::Group *node,
               SGSharedPtr<SGCondition const> condition)
      : _condition(condition)
      , _node(node)
@@ -325,7 +325,7 @@ private:
  SGSharedPtr<SGCondition const> _condition;
 
  double _x, _y;
- osg::ref_ptr<osg::Group> _node;
+ vsg::ref_ptr<vsg::Group> _node;
  SGVec3d _topLeft, _toRight, _toDown;
  double _squaredRight, _squaredDown;
 };
@@ -343,13 +343,13 @@ SGPickAnimation::SGPickAnimation(simgear::SGTransientModelData &modelData) :
   }
 }
 
-void SGPickAnimation::apply(osg::Node* node)
+void SGPickAnimation::apply(vsg::Node* node)
 {
     SGAnimation::apply(node);
 }
 
 void
-SGPickAnimation::apply(osg::Group& group)
+SGPickAnimation::apply(vsg::Group& group)
 {
   if (_objectNames.empty() && _proxyNames.empty()) {
     return;
@@ -363,7 +363,7 @@ SGPickAnimation::apply(osg::Group& group)
   // iterate over all group children
   int i = group.getNumChildren() - 1;
   for (; 0 <= i; --i) {
-    osg::Node* child = group.getChild(i);
+    vsg::Node* child = group.getChild(i);
     if (child->getName().empty()) {
         continue;
     }
@@ -391,7 +391,7 @@ SGPickAnimation::apply(osg::Group& group)
           // Second install, Search upwards for a node with multiple parents
           unsigned int foundMultiParents = 0;
           unsigned int numParents;
-          for (osg::Node* cur = child; (numParents = cur->getNumParents());
+          for (vsg::Node* cur = child; (numParents = cur->getNumParents());
                cur = cur->getParent(0)) {
             if (numParents > 1)
               ++foundMultiParents;
@@ -413,7 +413,7 @@ SGPickAnimation::apply(osg::Group& group)
             SG_LOG(SG_GENERAL, SG_DEV_ALERT, "    Animation node at: " << getConfig()->getLocation());
 
             // Search upwards for a node with multiple parents
-            for (osg::Node* cur = child; (numParents = cur->getNumParents());
+            for (vsg::Node* cur = child; (numParents = cur->getNumParents());
                  cur = cur->getParent(0)) {
               if (numParents > 1) {
                 // This is the one, look for a parent with a location
@@ -438,20 +438,20 @@ SGPickAnimation::apply(osg::Group& group)
 
       install(*child);
       
-      osg::ref_ptr<osg::Group> renderGroup, pickGroup;      
-      osg::Group* mainGroup = createMainGroup(&group);
+      vsg::ref_ptr<vsg::Group> renderGroup, pickGroup;      
+      vsg::Group* mainGroup = createMainGroup(&group);
       mainGroup->setName(child->getName());
       child->setName(""); // don't apply other animations twice
       
       if (getConfig()->getBoolValue("visible", true)) {
-          renderGroup = new osg::Group;
+          renderGroup = new vsg::Group;
           renderGroup->setName("pick render group");
           SGSceneUserData::getOrCreateSceneUserData(renderGroup)->setLocation(getConfig()->getLocation());
           renderGroup->addChild(child);
           mainGroup->addChild(renderGroup);
       }
       
-      pickGroup = new osg::Group;
+      pickGroup = new vsg::Group;
       pickGroup->setName("pick highlight group");
       SGSceneUserData::getOrCreateSceneUserData(pickGroup)->setLocation(getConfig()->getLocation());
       pickGroup->setNodeMask(simgear::PICK_BIT);
@@ -470,7 +470,7 @@ SGPickAnimation::apply(osg::Group& group)
     }
     
     _proxyNames.erase(j);
-    osg::ref_ptr<osg::Group> proxyGroup = new osg::Group;
+    vsg::ref_ptr<vsg::Group> proxyGroup = new vsg::Group;
     group.addChild(proxyGroup);
     proxyGroup->setNodeMask(simgear::PICK_BIT);
       
@@ -480,16 +480,16 @@ SGPickAnimation::apply(osg::Group& group)
   } // of group children iteration
 }
 
-osg::Group*
-SGPickAnimation::createMainGroup(osg::Group* pr)
+vsg::Group*
+SGPickAnimation::createMainGroup(vsg::Group* pr)
 {
-  osg::Group* g = new osg::Group;
+  vsg::Group* g = new vsg::Group;
   pr->addChild(g);
   return g;
 }
 
 void
-SGPickAnimation::setupCallbacks(SGSceneUserData* ud, osg::Group* parent)
+SGPickAnimation::setupCallbacks(SGSceneUserData* ud, vsg::Group* parent)
 {
   PickCallback* pickCb = NULL;
   
@@ -671,7 +671,7 @@ public:
     {
         if (!_condition || _condition->test()) {
             _mousePos = eventToWindowCoords(ea);
-            osg::Vec2d deltaMouse = _mousePos - _lastFirePos;
+            vsg::dvec2 deltaMouse = _mousePos - _lastFirePos;
 
             if (!_hasDragged) {
 
@@ -719,7 +719,7 @@ public:
         }
     }
 
-    bool hover( const osg::Vec2d& windowPos, const Info& ) override
+    bool hover( const vsg::dvec2& windowPos, const Info& ) override
     {
         if (!_condition || _condition->test()) {
 
@@ -782,7 +782,7 @@ private:
     SGSharedPtr<SGCondition const> _condition;
 
     bool _hasDragged; ///< has the mouse been dragged since the press?
-    osg::Vec2d _mousePos, ///< current window coords location of the mouse
+    vsg::dvec2 _mousePos, ///< current window coords location of the mouse
         _lastFirePos; ///< mouse location where we last fired the bindings
     double _dragScale;
   
@@ -799,7 +799,7 @@ public:
     {
         setName("SGKnobAnimation::UpdateCallback");
     }
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+    virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
     {
         if (!_condition || _condition->test()) {
             SGRotateTransform* transform = static_cast<SGRotateTransform*>(node);
@@ -826,8 +826,8 @@ SGKnobAnimation::SGKnobAnimation(simgear::SGTransientModelData &modelData) :
     readRotationCenterAndAxis(modelData.getNode(), _center, _axis, modelData);
 }
 
-osg::Group*
-SGKnobAnimation::createMainGroup(osg::Group* pr)
+vsg::Group*
+SGKnobAnimation::createMainGroup(vsg::Group* pr)
 {  
   SGRotateTransform* transform = new SGRotateTransform();
   
@@ -841,7 +841,7 @@ SGKnobAnimation::createMainGroup(osg::Group* pr)
 }
 
 void
-SGKnobAnimation::setupCallbacks(SGSceneUserData* ud, osg::Group*)
+SGKnobAnimation::setupCallbacks(SGSceneUserData* ud, vsg::Group*)
 {
   ud->setPickCallback(new KnobSliderPickCallback(getConfig(), getModelRoot(), _condition));
 }
@@ -878,7 +878,7 @@ public:
     {
         setName("SGSliderAnimation::UpdateCallback");
     }
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+    virtual void operator()(vsg::Node* node, osg::NodeVisitor* nv)
     {
         SGTranslateTransform* transform = static_cast<SGTranslateTransform*>(node);
         transform->setValue(_animationValue->getValue());
@@ -901,8 +901,8 @@ SGSliderAnimation::SGSliderAnimation(simgear::SGTransientModelData &modelData) :
     readRotationCenterAndAxis(modelData.getNode(), garbage, _axis, modelData);
 }
 
-osg::Group*
-SGSliderAnimation::createMainGroup(osg::Group* pr)
+vsg::Group*
+SGSliderAnimation::createMainGroup(vsg::Group* pr)
 {  
   SGTranslateTransform* transform = new SGTranslateTransform();
   
@@ -915,7 +915,7 @@ SGSliderAnimation::createMainGroup(osg::Group* pr)
 }
 
 void
-SGSliderAnimation::setupCallbacks(SGSceneUserData* ud, osg::Group*)
+SGSliderAnimation::setupCallbacks(SGSceneUserData* ud, vsg::Group*)
 {
   ud->setPickCallback(new KnobSliderPickCallback(getConfig(), getModelRoot(), _condition));
 }
@@ -1016,7 +1016,7 @@ class TouchPickCallback : public SGPickCallback {
             }
         }
 
-        bool hover(const osg::Vec2d& windowPos,
+        bool hover(const vsg::dvec2& windowPos,
             const Info& info) override
         {
             if (!anyBindingEnabled(_hover)) {
@@ -1053,14 +1053,14 @@ SGTouchAnimation::SGTouchAnimation(simgear::SGTransientModelData &modelData) :
 {
 }
 
-osg::Group* SGTouchAnimation::createMainGroup(osg::Group* pr)
+vsg::Group* SGTouchAnimation::createMainGroup(vsg::Group* pr)
 {
     SGRotateTransform* transform = new SGRotateTransform();
     pr->addChild(transform);
     return transform;
 }
 
-void SGTouchAnimation::setupCallbacks(SGSceneUserData* ud, osg::Group*)
+void SGTouchAnimation::setupCallbacks(SGSceneUserData* ud, vsg::Group*)
 {
     TouchPickCallback* touchCb = nullptr;
 

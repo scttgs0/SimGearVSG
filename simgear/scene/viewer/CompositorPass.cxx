@@ -32,19 +32,19 @@
 
 namespace simgear::compositor {
 
-PropStringMap<osg::Camera::BufferComponent> buffer_component_map = {
-    {"color", osg::Camera::COLOR_BUFFER},
-    {"color0", osg::Camera::COLOR_BUFFER0},
-    {"color1", osg::Camera::COLOR_BUFFER1},
-    {"color2", osg::Camera::COLOR_BUFFER2},
-    {"color3", osg::Camera::COLOR_BUFFER3},
-    {"color4", osg::Camera::COLOR_BUFFER4},
-    {"color5", osg::Camera::COLOR_BUFFER5},
-    {"color6", osg::Camera::COLOR_BUFFER6},
-    {"color7", osg::Camera::COLOR_BUFFER7},
-    {"depth", osg::Camera::DEPTH_BUFFER},
-    {"stencil", osg::Camera::STENCIL_BUFFER},
-    {"packed-depth-stencil", osg::Camera::PACKED_DEPTH_STENCIL_BUFFER}
+PropStringMap<vsg::Camera::BufferComponent> buffer_component_map = {
+    {"color", vsg::Camera::COLOR_BUFFER},
+    {"color0", vsg::Camera::COLOR_BUFFER0},
+    {"color1", vsg::Camera::COLOR_BUFFER1},
+    {"color2", vsg::Camera::COLOR_BUFFER2},
+    {"color3", vsg::Camera::COLOR_BUFFER3},
+    {"color4", vsg::Camera::COLOR_BUFFER4},
+    {"color5", vsg::Camera::COLOR_BUFFER5},
+    {"color6", vsg::Camera::COLOR_BUFFER6},
+    {"color7", vsg::Camera::COLOR_BUFFER7},
+    {"depth", vsg::Camera::DEPTH_BUFFER},
+    {"stencil", vsg::Camera::STENCIL_BUFFER},
+    {"packed-depth-stencil", vsg::Camera::PACKED_DEPTH_STENCIL_BUFFER}
 };
 
 class CSMCullCallback : public osg::NodeCallback {
@@ -57,15 +57,15 @@ public:
             compositor->getMVRViews());
     }
 
-    virtual void operator()(osg::Node *node, osg::NodeVisitor *nv) {
-        osg::Camera *camera = static_cast<osg::Camera *>(node);
+    virtual void operator()(vsg::Node *node, osg::NodeVisitor *nv) {
+        vsg::Camera *camera = static_cast<vsg::Camera *>(node);
 
         traverse(node, nv);
 
         for (unsigned int i = 0; i < _real_inverse_views.size(); ++i) {
             // The light matrix uniform is updated after the traverse in case
             // the OSG near/far plane calculations were enabled
-            osg::Matrixf light_matrix =
+            vsg::mat4 light_matrix =
                 // Include the real camera inverse view matrix because if the
                 // shader used world coordinates, there would be precision
                 // issues.
@@ -73,14 +73,14 @@ public:
                 camera->getViewMatrix() *
                 camera->getProjectionMatrix() *
                 // Bias matrices
-                osg::Matrix::translate(1.0, 1.0, 1.0) *
-                osg::Matrix::scale(0.5, 0.5, 0.5);
+                vsg::mat4::translate(1.0, 1.0, 1.0) *
+                vsg::mat4::scale(0.5, 0.5, 0.5);
             _light_matrix_uniform->setElement(i, light_matrix);
         }
     }
 
     void setRealInverseViewMatrix(unsigned int sub_view_index,
-                                  const osg::Matrix &matrix)
+                                  const vsg::mat4 &matrix)
     {
         _real_inverse_views[sub_view_index] = matrix;
     }
@@ -90,8 +90,8 @@ public:
     }
 
 protected:
-    std::vector<osg::Matrix>   _real_inverse_views;
-    osg::ref_ptr<osg::Uniform> _light_matrix_uniform;
+    std::vector<vsg::mat4>   _real_inverse_views;
+    vsg::ref_ptr<osg::Uniform> _light_matrix_uniform;
 };
 
 class SceneCullCallback : public osg::NodeCallback {
@@ -99,8 +99,8 @@ public:
     SceneCullCallback(ClusteredShading *clustered) :
         _clustered(clustered) {}
 
-    virtual void operator()(osg::Node *node, osg::NodeVisitor *nv) {
-        osg::Camera *camera = static_cast<osg::Camera *>(node);
+    virtual void operator()(vsg::Node *node, osg::NodeVisitor *nv) {
+        vsg::Camera *camera = static_cast<vsg::Camera *>(node);
         EffectCullVisitor *cv = dynamic_cast<EffectCullVisitor *>(nv);
 
         cv->traverse(*camera);
@@ -114,7 +114,7 @@ public:
 
     ClusteredShading *getClusteredShading() const { return _clustered.get(); }
 protected:
-    osg::ref_ptr<ClusteredShading> _clustered;
+    vsg::ref_ptr<ClusteredShading> _clustered;
 };
 
 //------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ Pass *
 PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
                    const SGReaderWriterOptions *options)
 {
-    osg::ref_ptr<Pass> pass = new Pass;
+    vsg::ref_ptr<Pass> pass = new Pass;
     // The pass index matches its render order
     pass->render_order = root->getIndex();
     pass->name = root->getStringValue("name");
@@ -144,21 +144,21 @@ PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
     if (p_render_condition)
         pass->render_condition = sgReadCondition(getPropertyRoot(), p_render_condition);
 
-    osg::Camera *camera = new osg::Camera;
+    vsg::Camera *camera = new vsg::Camera;
     pass->camera = camera;
 
     camera->setName(pass->name);
     camera->setGraphicsContext(compositor->getGraphicsContext());
     // Even though this camera will be added as a slave to the view, it will
     // always be updated manually in Compositor::update()
-    camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+    camera->setReferenceFrame(vsg::Transform::ABSOLUTE_RF);
     // Same with the projection matrix
-    camera->setProjectionResizePolicy(osg::Camera::FIXED);
+    camera->setProjectionResizePolicy(vsg::Camera::FIXED);
     // We only use POST_RENDER. Leave PRE_RENDER for Canvas and other RTT stuff
     // that doesn't involve the rendering pipeline itself. NESTED_RENDER is also
     // not a possibility since we don't want to share RenderStage with the View
     // master camera.
-    camera->setRenderOrder(osg::Camera::POST_RENDER,
+    camera->setRenderOrder(vsg::Camera::POST_RENDER,
                            pass->render_order + compositor->getOrderOffset() * 100);
     camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
@@ -166,19 +166,19 @@ PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
     camera->setCullingMode(osg::CullSettings::SMALL_FEATURE_CULLING
                            | osg::CullSettings::VIEW_FRUSTUM_CULLING);
 
-    osg::Node::NodeMask cull_mask =
+    vsg::Node::NodeMask cull_mask =
         std::stoul(root->getStringValue("cull-mask", "0xffffffff"), nullptr, 0);
     pass->cull_mask = cull_mask;
     camera->setCullMask(pass->cull_mask);
     camera->setCullMaskLeft(pass->cull_mask & ~RIGHT_BIT);
     camera->setCullMaskRight(pass->cull_mask & ~LEFT_BIT);
 
-    osg::Vec4f clear_color(0.0f, 0.0f, 0.0f, 1.0f);
+    vsg::vec4 clear_color(0.0f, 0.0f, 0.0f, 1.0f);
     const SGPropertyNode *p_clear_color = root->getChild("clear-color");
     if (p_clear_color)
         clear_color = toOsg(p_clear_color->getValue<SGVec4d>());
     camera->setClearColor(clear_color);
-    osg::Vec4f clear_accum(0.0f, 0.0f, 0.0f, 0.0f);
+    vsg::vec4 clear_accum(0.0f, 0.0f, 0.0f, 0.0f);
     const SGPropertyNode *p_clear_accum = root->getChild("clear-accum");
     if (p_clear_accum)
         clear_accum = toOsg(p_clear_accum->getValue<SGVec4d>());
@@ -405,14 +405,14 @@ PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
         // if we set FRAME_BUFFER_OBJECT it will create an FBO.
         // Therefore we set FRAME_BUFFER, and clone the viewport so it won't
         // mess with the compositor viewport on window resize.
-        camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER);
+        camera->setRenderTargetImplementation(vsg::Camera::FRAME_BUFFER);
         camera->setDrawBuffer(GL_NONE);
         camera->setReadBuffer(GL_NONE);
         camera->setViewport(new osg::Viewport(*compositor->getViewport()));
     } else if (p_attachments.empty()) {
         // If there are no attachments, assume the pass is rendering
         // directly to the screen
-        camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER);
+        camera->setRenderTargetImplementation(vsg::Camera::FRAME_BUFFER);
         camera->setDrawBuffer(GL_BACK);
         camera->setReadBuffer(GL_BACK);
 
@@ -421,7 +421,7 @@ PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
         camera->setViewport(compositor->getViewport());
     } else {
         // This is a RTT camera
-        camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+        camera->setRenderTargetImplementation(vsg::Camera::FRAME_BUFFER_OBJECT);
 
         bool viewport_absolute = false;
         // The index of the attachment to be used as the size of the viewport.
@@ -462,18 +462,18 @@ PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
 
                 osg::Texture *texture = buffer->texture;
 
-                osg::Camera::BufferComponent component = osg::Camera::COLOR_BUFFER;
+                vsg::Camera::BufferComponent component = vsg::Camera::COLOR_BUFFER;
                 findPropString(p_attachment, "component", component, buffer_component_map);
                 switch(component) {
-                case osg::Camera::COLOR_BUFFER:
-                case osg::Camera::COLOR_BUFFER0:
-                case osg::Camera::COLOR_BUFFER1:
-                case osg::Camera::COLOR_BUFFER2:
-                case osg::Camera::COLOR_BUFFER3:
-                case osg::Camera::COLOR_BUFFER4:
-                case osg::Camera::COLOR_BUFFER5:
-                case osg::Camera::COLOR_BUFFER6:
-                case osg::Camera::COLOR_BUFFER7:
+                case vsg::Camera::COLOR_BUFFER:
+                case vsg::Camera::COLOR_BUFFER0:
+                case vsg::Camera::COLOR_BUFFER1:
+                case vsg::Camera::COLOR_BUFFER2:
+                case vsg::Camera::COLOR_BUFFER3:
+                case vsg::Camera::COLOR_BUFFER4:
+                case vsg::Camera::COLOR_BUFFER5:
+                case vsg::Camera::COLOR_BUFFER6:
+                case vsg::Camera::COLOR_BUFFER7:
                     color_buffer_present = true;
                     break;
                 default:
@@ -483,7 +483,7 @@ PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
                 unsigned int level = p_attachment->getIntValue("level", 0);
                 unsigned int face;
                 if (p_attachment->getStringValue("face") == "controlled-by-geometry-shader") {
-                    face = osg::Camera::FACE_CONTROLLED_BY_GEOMETRY_SHADER;
+                    face = vsg::Camera::FACE_CONTROLLED_BY_GEOMETRY_SHADER;
                 } else {
                     face = p_attachment->getIntValue("face", 0);
                 }
@@ -568,12 +568,12 @@ PassBuilder::build(Compositor *compositor, const SGPropertyNode *root,
     osg::Viewport *viewport = camera->getViewport();
     auto &uniforms = compositor->getBuiltinUniforms();
     uniforms[Compositor::SG_UNIFORM_VIEWPORT]->setElement(0,
-        osg::Vec4f(viewport->x(),
+        vsg::vec4(viewport->x(),
                    viewport->y(),
                    viewport->width(),
                    viewport->height()));
     uniforms[Compositor::SG_UNIFORM_PIXEL_SIZE]->set(
-        osg::Vec2f(1.0f / viewport->width(),
+        vsg::vec2(1.0f / viewport->width(),
                    1.0f / viewport->height()));
     uniforms[Compositor::SG_UNIFORM_ASPECT_RATIO]->set(
         float(viewport->width() / viewport->height()));
@@ -616,13 +616,13 @@ struct QuadPassBuilder : public PassBuilder {
 public:
     virtual Pass *build(Compositor *compositor, const SGPropertyNode *root,
                         const SGReaderWriterOptions *options) {
-        osg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
+        vsg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
         pass->useMastersSceneData = false;
 
-        osg::Camera *camera = pass->camera;
+        vsg::Camera *camera = pass->camera;
         camera->setAllowEventFocus(false);
-        camera->setViewMatrix(osg::Matrix::identity());
-        camera->setProjectionMatrix(osg::Matrix::ortho2D(0, 1, 0, 1));
+        camera->setViewMatrix(vsg::mat4::identity());
+        camera->setProjectionMatrix(vsg::mat4::ortho2D(0, 1, 0, 1));
 
         float left = 0.0f, bottom = 0.0f, width = 1.0f, height = 1.0f, scale = 1.0f;
         const SGPropertyNode *p_geometry = root->getNode("geometry");
@@ -634,7 +634,7 @@ public:
             scale  = p_geometry->getFloatValue("scale",  scale);
         }
 
-        osg::ref_ptr<EffectGeode> quad = new EffectGeode;
+        vsg::ref_ptr<EffectGeode> quad = new EffectGeode;
         camera->addChild(quad);
         quad->setCullingActive(false);
 
@@ -645,11 +645,11 @@ public:
                 quad->setEffect(eff);
         }
 
-        osg::ref_ptr<osg::Geometry> geom = createFullscreenQuadGeom(
+        vsg::ref_ptr<vsg::Geometry> geom = createFullscreenQuadGeom(
             left, bottom, width, height, scale);
         quad->addDrawable(geom);
 
-        osg::ref_ptr<osg::StateSet> quad_state = quad->getOrCreateStateSet();
+        vsg::ref_ptr<osg::StateSet> quad_state = quad->getOrCreateStateSet();
         quad_state->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF
                             | osg::StateAttribute::PROTECTED);
 
@@ -660,9 +660,9 @@ public:
         return pass.release();
     }
 protected:
-    osg::ref_ptr<osg::Geometry> _fullscreen_triangle_geom;
+    vsg::ref_ptr<vsg::Geometry> _fullscreen_triangle_geom;
 
-    osg::Geometry *createFullscreenQuadGeom(float left,
+    vsg::Geometry *createFullscreenQuadGeom(float left,
                                             float bottom,
                                             float width,
                                             float height,
@@ -675,10 +675,10 @@ protected:
         // instead.
         if (left != 0.0f || bottom != 0.0f || width != 1.0f || height != 1.0f || scale != 1.0f) {
             // Normal quad geometry
-            osg::Geometry *geom = new osg::Geometry;
+            vsg::Geometry *geom = new vsg::Geometry;
             geom->setSupportsDisplayList(false);
 
-            osg::Vec3Array *vertices = new osg::Vec3Array(4);
+            vsg::vec3Array *vertices = new vsg::vec3Array(4);
             (*vertices)[0].set(left,       bottom+height, 0.0f);
             (*vertices)[1].set(left,       bottom,        0.0f);
             (*vertices)[2].set(left+width, bottom+height, 0.0f);
@@ -698,7 +698,7 @@ protected:
         } else {
             // Create an optimized fullscreen triangle if it wasn't created yet
             if (!_fullscreen_triangle_geom) {
-                _fullscreen_triangle_geom = new osg::Geometry;
+                _fullscreen_triangle_geom = new vsg::Geometry;
                 _fullscreen_triangle_geom->setSupportsDisplayList(false);
                 // No need to add a vertex/texture arrays. The shaders use
                 // gl_VertexID to generate the correct coordinates.
@@ -721,10 +721,10 @@ public:
     virtual Pass* build(Compositor* compositor, const SGPropertyNode* root,
                         const SGReaderWriterOptions* options)
     {
-        osg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
+        vsg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
         pass->useMastersSceneData = false;
 
-        osg::Camera* camera = pass->camera;
+        vsg::Camera* camera = pass->camera;
         camera->setAllowEventFocus(false);
 
         const std::string eff_file = root->getStringValue("effect");
@@ -735,7 +735,7 @@ public:
         static const char* dimNames[] = {"x", "y", "z"};
         static const char* dimScaleNames[] = {"x-screen-scale", "y-screen-scale", "z-screen-scale"};
         const osg::Viewport* vp = compositor->getViewport();
-        osg::Vec3f screenSize(vp->width(), vp->height(), 1);
+        vsg::vec3 screenSize(vp->width(), vp->height(), 1);
         // Get workgroup size (also defined in the shader)
         osg::Vec3i wgSize(1, 1, 1);
         const SGPropertyNode* workgroupSizeNode = root->getChild("workgroup-size");
@@ -752,10 +752,10 @@ public:
         pass->compute_wg_size.set(wgSize[0], wgSize[1]);
 
         // Get global size (will be divided by workgroup size and rounded up)
-        osg::Vec3f globalSize(1.0f, 1.0f, 1.0f);
+        vsg::vec3 globalSize(1.0f, 1.0f, 1.0f);
         const SGPropertyNode* globalSizeNode = root->getChild("global-size");
         if (globalSizeNode) {
-            osg::Vec3f screenScale(1.0f, 1.0f, 1.0f);
+            vsg::vec3 screenScale(1.0f, 1.0f, 1.0f);
             for (int dim = 0; dim < 3; ++dim) {
                 const SGPropertyNode* scaleNode = globalSizeNode->getChild(dimScaleNames[dim]);
                 if (scaleNode)
@@ -787,7 +787,7 @@ public:
                 wgCount[dim] = 1;
         }
 
-        osg::ref_ptr<osg::Drawable> computeNode = new osg::DispatchCompute(
+        vsg::ref_ptr<osg::Drawable> computeNode = new osg::DispatchCompute(
             wgCount[0], wgCount[1], wgCount[2]);
         pass->compute_node = computeNode;
 
@@ -808,13 +808,13 @@ public:
             }
         }
         for (int view = 0; view < numPasses; ++view) {
-            osg::ref_ptr<EffectGeode> compute = new EffectGeode;
+            vsg::ref_ptr<EffectGeode> compute = new EffectGeode;
             camera->addChild(compute);
             compute->setCullingActive(false);
             if (eff)
                 compute->setEffect(eff);
             if (numPasses > 1) {
-                osg::ref_ptr<osg::StateSet> compute_state = compute->getOrCreateStateSet();
+                vsg::ref_ptr<osg::StateSet> compute_state = compute->getOrCreateStateSet();
                 compute_state->addUniform(new osg::Uniform("fg_ViewIndex", view));
             }
 
@@ -845,26 +845,26 @@ public:
         _near_m(near_m),
         _far_m(far_m)
     {
-        _half_sm_size = osg::Vec2d((double)sm_width, (double)sm_height) * 0.5;
+        _half_sm_size = vsg::dvec2((double)sm_width, (double)sm_height) * 0.5;
     }
 
     virtual void updatePass(Pass &pass,
-                            const osg::Matrix &view_matrix,
-                            const osg::Matrix &proj_matrix)
+                            const vsg::mat4 &view_matrix,
+                            const vsg::mat4 &proj_matrix)
     {
-        osg::Camera *camera = pass.camera;
+        vsg::Camera *camera = pass.camera;
 
         // HACK: Get the light direction from the fg_SunDirection uniform
-        osg::Vec3 light_dir;
+        vsg::vec3 light_dir;
         if (_sundir_uniform) {
             _sundir_uniform->get(light_dir);
         }
 
-        osg::Matrix view_inverse = osg::Matrix::inverse(view_matrix);
+        vsg::mat4 view_inverse = vsg::mat4::inverse(view_matrix);
         _cull_callback->setRealInverseViewMatrix(0, view_inverse);
 
         if (!_render_at_night) {
-            osg::Vec3 camera_pos = osg::Vec3(0.0f, 0.0f, 0.0f) * view_inverse;
+            vsg::vec3 camera_pos = vsg::vec3(0.0f, 0.0f, 0.0f) * view_inverse;
             camera_pos.normalize();
             float cos_light_angle = camera_pos * light_dir;
             if (cos_light_angle < -0.1) {
@@ -883,21 +883,21 @@ public:
         proj_matrix.getFrustum(left, right, bottom, top, zNear, zFar);
 
         osg::BoundingSphere bs;
-        bs.expandBy(osg::Vec3(left,  bottom, -zNear) * (_near_m / zNear));
-        bs.expandBy(osg::Vec3(right, top,    -zNear) * (_far_m  / zNear));
-        bs.expandBy(osg::Vec3(left,  bottom, -zNear) * (_far_m  / zNear));
-        bs.expandBy(osg::Vec3(right, top,    -zNear) * (_near_m / zNear));
+        bs.expandBy(vsg::vec3(left,  bottom, -zNear) * (_near_m / zNear));
+        bs.expandBy(vsg::vec3(right, top,    -zNear) * (_far_m  / zNear));
+        bs.expandBy(vsg::vec3(left,  bottom, -zNear) * (_far_m  / zNear));
+        bs.expandBy(vsg::vec3(right, top,    -zNear) * (_near_m / zNear));
 
-        osg::Vec4d aim4 = osg::Vec4d(bs.center(), 1.0) * view_inverse;
-        osg::Vec3d aim(aim4.x(), aim4.y(), aim4.z());
+        vsg::dvec4 aim4 = vsg::dvec4(bs.center(), 1.0) * view_inverse;
+        vsg::dvec3 aim(aim4.x(), aim4.y(), aim4.z());
 
-        osg::Matrixd &light_view_matrix = camera->getViewMatrix();
+        vsg::dmat4 &light_view_matrix = camera->getViewMatrix();
         light_view_matrix.makeLookAt(
             aim + light_dir * (bs.radius() + 100.f),
             aim,
-            osg::Vec3(0.0f, 0.0f, 1.0f));
+            vsg::vec3(0.0f, 0.0f, 1.0f));
 
-        osg::Matrixd &light_proj_matrix = camera->getProjectionMatrix();
+        vsg::dmat4 &light_proj_matrix = camera->getProjectionMatrix();
         light_proj_matrix.makeOrtho(
             -bs.radius(), bs.radius(),
             -bs.radius(), bs.radius(),
@@ -907,28 +907,28 @@ public:
         // We are using double precision vectors and matrices because in FG
         // world coordinates are relative to the center of the Earth, which can
         // (and will) cause precision issues due to their magnitude.
-        osg::Vec4d shadow_origin4 = osg::Vec4d(0.0, 0.0, 0.0, 1.0) *
+        vsg::dvec4 shadow_origin4 = vsg::dvec4(0.0, 0.0, 0.0, 1.0) *
             light_view_matrix * light_proj_matrix;
-        osg::Vec2d shadow_origin(shadow_origin4.x(), shadow_origin4.y());
-        shadow_origin = osg::Vec2d(shadow_origin.x() * _half_sm_size.x(),
+        vsg::dvec2 shadow_origin(shadow_origin4.x(), shadow_origin4.y());
+        shadow_origin = vsg::dvec2(shadow_origin.x() * _half_sm_size.x(),
                                    shadow_origin.y() * _half_sm_size.y());
-        osg::Vec2d rounded_origin(std::floor(shadow_origin.x()),
+        vsg::dvec2 rounded_origin(std::floor(shadow_origin.x()),
                                   std::floor(shadow_origin.y()));
-        osg::Vec2d rounding = rounded_origin - shadow_origin;
-        rounding = osg::Vec2d(rounding.x() / _half_sm_size.x(),
+        vsg::dvec2 rounding = rounded_origin - shadow_origin;
+        rounding = vsg::dvec2(rounding.x() / _half_sm_size.x(),
                               rounding.y() / _half_sm_size.y());
 
-        osg::Matrixd round_matrix = osg::Matrixd::translate(
+        vsg::dmat4 round_matrix = vsg::dmat4::translate(
             rounding.x(), rounding.y(), 0.0);
         light_proj_matrix *= round_matrix;
     }
 
     virtual void updateSubView(Pass &pass, unsigned int sub_view_index,
-                               const osg::Matrix &view_matrix,
-                               const osg::Matrix &proj_matrix)
+                               const vsg::mat4 &view_matrix,
+                               const vsg::mat4 &proj_matrix)
     {
         // Allow cull callback to update per-subview uniforms
-        osg::Matrix view_inverse = osg::Matrix::inverse(view_matrix);
+        vsg::mat4 view_inverse = vsg::mat4::inverse(view_matrix);
         _cull_callback->setRealInverseViewMatrix(sub_view_index, view_inverse);
     }
 
@@ -938,16 +938,16 @@ protected:
     bool                          _render_at_night;
     float                         _near_m;
     float                         _far_m;
-    osg::Vec2d                    _half_sm_size;
+    vsg::dvec2                    _half_sm_size;
 };
 
 struct CSMPassBuilder : public PassBuilder {
     virtual Pass *build(Compositor *compositor, const SGPropertyNode *root,
                         const SGReaderWriterOptions *options) {
-        osg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
+        vsg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
 
-        osg::Camera *camera = pass->camera;
-        camera->setReferenceFrame(osg::Camera::ABSOLUTE_RF_INHERIT_VIEWPOINT);
+        vsg::Camera *camera = pass->camera;
+        camera->setReferenceFrame(vsg::Camera::ABSOLUTE_RF_INHERIT_VIEWPOINT);
         camera->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);
         //camera->setComputeNearFarMode(
         //    osg::CullSettings::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
@@ -985,16 +985,16 @@ public:
         _zFar(zFar) {}
 
     virtual void updatePass(Pass &pass,
-                            const osg::Matrix &view_matrix,
-                            const osg::Matrix &proj_matrix) {
-        osg::Camera *camera = pass.camera;
+                            const vsg::mat4 &view_matrix,
+                            const vsg::mat4 &proj_matrix) {
+        vsg::Camera *camera = pass.camera;
 
         double left = 0.0, right = 0.0, bottom = 0.0, top = 0.0,
             znear = 0.0, zfar = 0.0;
         proj_matrix.getFrustum(left, right, bottom, top, znear, zfar);
 
-        osg::Matrixd given_proj_matrix = proj_matrix;
-        osg::Matrixd new_proj_matrix = given_proj_matrix;
+        vsg::dmat4 given_proj_matrix = proj_matrix;
+        vsg::dmat4 new_proj_matrix = given_proj_matrix;
         if (_zNear != 0.0 || _zFar != 0.0) {
             if (_zNear != 0.0) znear = _zNear;
             if (_zFar  != 0.0) zfar  = _zFar;
@@ -1006,21 +1006,21 @@ public:
             camera->setViewMatrix(view_matrix);
             camera->setProjectionMatrix(new_proj_matrix);
         } else {
-            osg::Vec4d camera_pos4 = osg::Vec4d(0.0, 0.0, 0.0, 1.0) *
-                osg::Matrixd::inverse(view_matrix);
-            osg::Vec3d camera_pos(camera_pos4.x(), camera_pos4.y(), camera_pos4.z());
+            vsg::dvec4 camera_pos4 = vsg::dvec4(0.0, 0.0, 0.0, 1.0) *
+                vsg::dmat4::inverse(view_matrix);
+            vsg::dvec3 camera_pos(camera_pos4.x(), camera_pos4.y(), camera_pos4.z());
 
-            typedef std::pair<osg::Vec3d, osg::Vec3d> CubemapFace;
+            typedef std::pair<vsg::dvec3, vsg::dvec3> CubemapFace;
             const CubemapFace id[] = {
-                CubemapFace(osg::Vec3d( 1.0,  0.0,  0.0), osg::Vec3d( 0.0, -1.0,  0.0)), // +X
-                CubemapFace(osg::Vec3d(-1.0,  0.0,  0.0), osg::Vec3d( 0.0, -1.0,  0.0)), // -X
-                CubemapFace(osg::Vec3d( 0.0,  1.0,  0.0), osg::Vec3d( 0.0,  0.0,  1.0)), // +Y
-                CubemapFace(osg::Vec3d( 0.0, -1.0,  0.0), osg::Vec3d( 0.0,  0.0, -1.0)), // -Y
-                CubemapFace(osg::Vec3d( 0.0,  0.0,  1.0), osg::Vec3d( 0.0, -1.0,  0.0)), // +Z
-                CubemapFace(osg::Vec3d( 0.0,  0.0, -1.0), osg::Vec3d( 0.0, -1.0,  0.0))  // -Z
+                CubemapFace(vsg::dvec3( 1.0,  0.0,  0.0), vsg::dvec3( 0.0, -1.0,  0.0)), // +X
+                CubemapFace(vsg::dvec3(-1.0,  0.0,  0.0), vsg::dvec3( 0.0, -1.0,  0.0)), // -X
+                CubemapFace(vsg::dvec3( 0.0,  1.0,  0.0), vsg::dvec3( 0.0,  0.0,  1.0)), // +Y
+                CubemapFace(vsg::dvec3( 0.0, -1.0,  0.0), vsg::dvec3( 0.0,  0.0, -1.0)), // -Y
+                CubemapFace(vsg::dvec3( 0.0,  0.0,  1.0), vsg::dvec3( 0.0, -1.0,  0.0)), // +Z
+                CubemapFace(vsg::dvec3( 0.0,  0.0, -1.0), vsg::dvec3( 0.0, -1.0,  0.0))  // -Z
             };
 
-            osg::Matrixd cubemap_view_matrix;
+            vsg::dmat4 cubemap_view_matrix;
             cubemap_view_matrix.makeLookAt(camera_pos,
                                            camera_pos + id[_cubemap_face].first,
                                            id[_cubemap_face].second);
@@ -1038,10 +1038,10 @@ struct ScenePassBuilder : public PassBuilder {
 public:
     virtual Pass *build(Compositor *compositor, const SGPropertyNode *root,
                         const SGReaderWriterOptions *options) {
-        osg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
+        vsg::ref_ptr<Pass> pass = PassBuilder::build(compositor, root, options);
         pass->inherit_cull_mask = true;
 
-        osg::Camera *camera = pass->camera;
+        vsg::Camera *camera = pass->camera;
         camera->setAllowEventFocus(true);
 
         const SGPropertyNode *p_lod_scale = root->getNode("lod-scale");
@@ -1097,7 +1097,7 @@ public:
         ss->addUniform(uniforms[Compositor::SG_UNIFORM_MOON_ZENITH_COSTHETA]);
         ss->addUniform(uniforms[Compositor::SG_UNIFORM_EARTH_RADIUS]);
 
-        osg::ref_ptr<osg::Uniform> clustered_shading_enabled =
+        vsg::ref_ptr<osg::Uniform> clustered_shading_enabled =
             new osg::Uniform("fg_ClusteredEnabled", clustered ? true : false);
         ss->addUniform(clustered_shading_enabled);
 

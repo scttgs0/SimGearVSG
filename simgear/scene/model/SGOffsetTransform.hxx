@@ -23,7 +23,7 @@
 
 #include <osg/Transform>
 
-class SGOffsetTransform : public osg::Transform {
+class SGOffsetTransform : public vsg::Transform {
 public:
   SGOffsetTransform(double scaleFactor = 1.0);
   SGOffsetTransform(const SGOffsetTransform&,
@@ -39,9 +39,9 @@ public:
     _rScaleFactor = 1.0 / scaleFactor;
   }
   
-  virtual bool computeLocalToWorldMatrix(osg::Matrix& matrix,
+  virtual bool computeLocalToWorldMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
-  virtual bool computeWorldToLocalMatrix(osg::Matrix& matrix,
+  virtual bool computeWorldToLocalMatrix(vsg::mat4& matrix,
                                          osg::NodeVisitor* nv) const;
 
 private:

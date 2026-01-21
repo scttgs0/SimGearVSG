@@ -22,24 +22,19 @@
 
 #pragma once
 
-#ifndef __cplusplus
-# error This library requires C++
-#endif
-
-#include <simgear/compiler.h>
-
-#include <string>      // Standard C++ string library
+#include <string> // Standard C++ string library
 #include <vector>
 
-#include <osg/ref_ptr>
-#include <osg/Node>
-#include <osg/NodeVisitor>
-#include <osg/Billboard>
+#include <vsg/all.h>
 
+#include <osg/Billboard>
+#include <osg/NodeVisitor>
+
+#include <simgear/compiler.h>
+#include <simgear/math/sg_random.hxx>
+#include <simgear/props/props.hxx>
 #include <simgear/structure/SGReferenced.hxx>
 #include <simgear/structure/SGSharedPtr.hxx>
-#include <simgear/props/props.hxx>
-#include <simgear/math/sg_random.hxx>
 
 
 class SGMatModelGroup;
@@ -54,10 +49,9 @@ class SGMatModelGroup;
  * different shapes of trees), but they are considered equivalent
  * and interchangeable.
  */
-class SGMatModel : public SGReferenced {
-
+class SGMatModel : public SGReferenced
+{
 public:
-
     /**
      * The heading type for a randomly-placed object.
      */
@@ -73,7 +67,7 @@ public:
      *
      * @return The number of variant models.
      */
-    int get_model_count( SGPropertyNode *prop_root );
+    int get_model_count(SGPropertyNode* prop_root);
 
 
     /**
@@ -81,7 +75,7 @@ public:
      *
      * @return A randomly select model from the variants.
      */
-    osg::Node *get_random_model( SGPropertyNode *prop_root, mt *seed );
+    vsg::Node* get_random_model(SGPropertyNode* prop_root, mt* seed);
 
 
     /**
@@ -89,14 +83,14 @@ public:
      *
      * @return The coverage in meters^2.
      */
-    double get_coverage_m2 () const;
+    double get_coverage_m2() const;
 
     /**
      * Get the visual range of the object in meters.
      *
      * @return The visual range.
      */
-    double get_range_m () const;
+    double get_range_m() const;
 
     /**
      * Get the minimum spacing between this and any
@@ -104,44 +98,42 @@ public:
      *
      * @return The spacing in m.
      */
-    double get_spacing_m () const;
-    
-    
+    double get_spacing_m() const;
+
+
     /**
      * Get a randomized visual range
      *
      * @return a randomized visual range
-     */    
-    double get_randomized_range_m(mt* seed) const;    
+     */
+    double get_randomized_range_m(mt* seed) const;
 
     /**
      * Get the heading type for the object.
      *
      * @return The heading type.
      */
-    HeadingType get_heading_type () const;
+    HeadingType get_heading_type() const;
 
-    virtual ~SGMatModel ();
-    
+    virtual ~SGMatModel();
+
 
 protected:
-
     friend class SGMatModelGroup;
 
-    SGMatModel (const SGPropertyNode * node, double range_m);
+    SGMatModel(const SGPropertyNode* node, double range_m);
 
 private:
-
     /**
      * Actually load the models.
      *
      * This class uses lazy loading so that models won't be held
      * in memory for materials that are never referenced.
      */
-    void load_models( SGPropertyNode *prop_root );
+    void load_models(SGPropertyNode* prop_root);
 
     std::vector<std::string> _paths;
-    mutable std::vector<osg::ref_ptr<osg::Node> > _models;
+    mutable std::vector<vsg::ref_ptr<vsg::Node>> _models;
     mutable bool _models_loaded;
     double _coverage_m2;
     double _spacing_m;
@@ -160,11 +152,10 @@ private:
  * Each SGMaterial instance keeps a (possibly-empty) list of
  * object groups for placing randomly on the scenery.
  */
-class SGMatModelGroup : public SGReferenced {
-
+class SGMatModelGroup : public SGReferenced
+{
 public:
-
-    virtual ~SGMatModelGroup ();
+    virtual ~SGMatModelGroup();
 
 
     /**
@@ -172,7 +163,7 @@ public:
      *
      * @return The visual range.
      */
-    double get_range_m () const;
+    double get_range_m() const;
 
 
     /**
@@ -180,7 +171,7 @@ public:
      *
      * @return The number of objects.
      */
-    int get_object_count () const;
+    int get_object_count() const;
 
 
     /**
@@ -189,16 +180,14 @@ public:
      * @param index The object's index, zero-based.
      * @return The object selected.
      */
-    SGMatModel * get_object (int index) const;
+    SGMatModel* get_object(int index) const;
 
 protected:
-
     friend class SGMaterial;
 
-    SGMatModelGroup (SGPropertyNode * node, float default_object_range);
+    SGMatModelGroup(SGPropertyNode* node, float default_object_range);
 
 private:
-
     double _range_m;
-    std::vector<SGSharedPtr<SGMatModel> > _objects;
+    std::vector<SGSharedPtr<SGMatModel>> _objects;
 };

@@ -70,8 +70,8 @@ namespace simgear::canvas
       size_t size() const;
       bool empty() const;
 
-      osg::Vec2 cursorPos(size_t i) const;
-      osg::Vec2i nearestCursor(float x) const;
+      vsg::vec2 cursorPos(size_t i) const;
+      vsg::ivec2 nearestCursor(float x) const;
 
     protected:
       typedef Text::TextOSG::GlyphQuads GlyphQuads;
@@ -142,13 +142,13 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::Vec2 TextLine::cursorPos(size_t i) const
+  vsg::vec2 TextLine::cursorPos(size_t i) const
   {
     if( i > size() )
       // Position after last character if out of range (TODO better exception?)
       i = size();
 
-    osg::Vec2 pos(0, _text->_offset.y() + _line * _text->lineHeight());
+    vsg::vec2 pos(0, _text->_offset.y() + _line * _text->lineHeight());
 
     if( empty() ) {
       return pos;
@@ -182,7 +182,7 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::Vec2i TextLine::nearestCursor(float x) const
+  vsg::ivec2 TextLine::nearestCursor(float x) const
   {
     if (empty())
       return {static_cast<int>(_line), 0};
@@ -244,7 +244,7 @@ namespace simgear::canvas
 //    if( fill == "none" )
 //      TODO No text
 //    else
-    osg::Vec4 color;
+    vsg::vec4 color;
     if( parseColor(fill, color) )
       setColor( color );
   }
@@ -252,7 +252,7 @@ namespace simgear::canvas
   //----------------------------------------------------------------------------
   void Text::TextOSG::setStroke(const std::string& stroke)
   {
-    osg::Vec4 color;
+    vsg::vec4 color;
     if( stroke == "none" || !parseColor(stroke, color) )
       setBackdropType(NONE);
     else
@@ -265,7 +265,7 @@ namespace simgear::canvas
   //----------------------------------------------------------------------------
   void Text::TextOSG::setBackgroundColor(const std::string& fill)
   {
-    osg::Vec4 color;
+    vsg::vec4 color;
     if( parseColor(fill, color) )
       setBoundingBoxColor( color );
   }
@@ -329,9 +329,9 @@ namespace simgear::canvas
 
     SGRecti bb;
 
-    osg::Vec2 startOfLine_coords(0.0f,0.0f);
-    osg::Vec2 cursor(startOfLine_coords);
-    osg::Vec2 local(0.0f,0.0f);
+    vsg::vec2 startOfLine_coords(0.0f,0.0f);
+    vsg::vec2 cursor(startOfLine_coords);
+    vsg::vec2 local(0.0f,0.0f);
 
     unsigned int previous_charcode = 0;
     unsigned int line_length = 0;
@@ -351,7 +351,7 @@ namespace simgear::canvas
       TextIterator startOfLine_itr = itr;
 
       // find the end of the current line.
-      osg::Vec2 endOfLine_coords(cursor);
+      vsg::vec2 endOfLine_coords(cursor);
       TextIterator endOfLine_itr =
         const_cast<TextOSG*>(this)->computeLastCharacterOnLine(
           endOfLine_coords, itr, text.end()
@@ -486,7 +486,7 @@ namespace simgear::canvas
               {
                 case LEFT_TO_RIGHT:
                 {
-                  osg::Vec2 delta(activefont->getKerning(_fontSize,
+                  vsg::vec2 delta(activefont->getKerning(_fontSize,
                       previous_charcode,
                       charcode,
                       _kerningType));
@@ -496,7 +496,7 @@ namespace simgear::canvas
                 }
                 case RIGHT_TO_LEFT:
                 {
-                  osg::Vec2 delta(activefont->getKerning(_fontSize, charcode,
+                  vsg::vec2 delta(activefont->getKerning(_fontSize, charcode,
                       previous_charcode,
                       _kerningType));
                   cursor.x() -= delta.x() * wr;
@@ -509,16 +509,16 @@ namespace simgear::canvas
             }
 
             local = cursor;
-            osg::Vec2 bearing( horizontal ? glyph->getHorizontalBearing()
+            vsg::vec2 bearing( horizontal ? glyph->getHorizontalBearing()
                                           : glyph->getVerticalBearing() );
             local.x() += bearing.x() * wr;
             local.y() += bearing.y() * hr;
 
             // set up the coords of the quad
-            osg::Vec2 upLeft = local + osg::Vec2(0.f, height);
-            osg::Vec2 lowLeft = local;
-            osg::Vec2 lowRight = local + osg::Vec2(width, 0.f);
-            osg::Vec2 upRight = local + osg::Vec2(width, height);
+            vsg::vec2 upLeft = local + vsg::vec2(0.f, height);
+            vsg::vec2 lowLeft = local;
+            vsg::vec2 lowRight = local + vsg::vec2(width, 0.f);
+            vsg::vec2 upRight = local + vsg::vec2(width, height);
 
             // move the cursor onto the next character.
             // also expand bounding box
@@ -628,7 +628,7 @@ namespace simgear::canvas
         ss << _backdropHorizontalOffset;
         defineList["OUTLINE"] = osg::StateSet::DefinePair(ss.str(), osg::StateAttribute::ON);
       } else {
-        osg::Vec2f offset(_backdropHorizontalOffset, _backdropVerticalOffset);
+        vsg::vec2 offset(_backdropHorizontalOffset, _backdropVerticalOffset);
         switch(_backdropType) {
         case(DROP_SHADOW_BOTTOM_RIGHT) :    offset.set(_backdropHorizontalOffset, -_backdropVerticalOffset);  break;
         case(DROP_SHADOW_CENTER_RIGHT) :    offset.set(_backdropHorizontalOffset, 0.0f);                      break;
@@ -670,7 +670,7 @@ namespace simgear::canvas
     }
 
     // No matching cached stateset, create one from scratch
-    osg::ref_ptr<osg::StateSet> stateSet = new osg::StateSet;
+    vsg::ref_ptr<osg::StateSet> stateSet = new osg::StateSet;
     stateSet->setDefineList(defineList);
     // Cache it
     statesets.push_back(stateSet.get());
@@ -707,7 +707,7 @@ namespace simgear::canvas
     if( isInit<Text>() )
       return;
 
-    osg::ref_ptr<TextOSG> Text::*text = &Text::_text;
+    vsg::ref_ptr<TextOSG> Text::*text = &Text::_text;
 
     addStyle("fill", "color", &TextOSG::setFill, text);
     addStyle("background", "color", &TextOSG::setBackgroundColor, text);
@@ -750,10 +750,10 @@ namespace simgear::canvas
     staticInit();
 
     setDrawable(_text);
-    _text->setDataVariance(osg::Object::DYNAMIC);
+    _text->setDataVariance(vsg::Object::DYNAMIC);
     _text->setCharacterSizeMode(osgText::Text::OBJECT_COORDS);
     _text->setAxisAlignment(osgText::Text::USER_DEFINED_ROTATION);
-    _text->setRotation(osg::Quat(osg::PI, osg::X_AXIS));
+    _text->setRotation(osg::Quat(vsg::PI, osg::X_AXIS));
 
     setupStyle();
   }
@@ -840,13 +840,13 @@ namespace simgear::canvas
   }
 
   //----------------------------------------------------------------------------
-  osg::Vec2i Text::getNearestCursor(const osg::Vec2& pos) const
+  vsg::ivec2 Text::getNearestCursor(const vsg::vec2& pos) const
   {
     return _text->nearestLine(pos.y()).nearestCursor(pos.x());
   }
 
   //----------------------------------------------------------------------------
-  osg::Vec2 Text::getCursorPos(size_t line, size_t character) const
+  vsg::vec2 Text::getCursorPos(size_t line, size_t character) const
   {
     return _text->lineAt(line).cursorPos(character);
   }

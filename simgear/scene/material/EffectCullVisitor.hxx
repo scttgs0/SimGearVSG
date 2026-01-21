@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <vsg/all.h>
+
 #include <osgUtil/CullVisitor>
 
 #include <simgear/scene/model/SGLight.hxx>
@@ -36,7 +38,7 @@ public:
     EffectCullVisitor(const EffectCullVisitor&);
     virtual osgUtil::CullVisitor* clone() const;
     using osgUtil::CullVisitor::apply;
-    virtual void apply(osg::Node& node);
+    virtual void apply(vsg::Node& node);
     virtual void apply(osg::Geode& node);
     virtual void reset();
 
@@ -49,12 +51,12 @@ private:
 };
 
 /*
- * Install an EffectCullVisitor on a given osg::Camera.
+ * Install an EffectCullVisitor on a given vsg::Camera.
  * NOTE: This function must be called AFTER the camera has been added as an
  *       slave to the viewer. Otherwise the camera won't have a Renderer
  *       assigned to it.
  */
-void installEffectCullVisitor(osg::Camera *camera,
+void installEffectCullVisitor(vsg::Camera *camera,
                               bool collect_lights = false,
                               const std::string &effect_scheme = "");
 }

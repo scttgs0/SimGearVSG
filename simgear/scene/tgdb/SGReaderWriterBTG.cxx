@@ -63,7 +63,7 @@ SGReaderWriterBTG::readNode(const std::string& fileName,
 {
     const SGReaderWriterOptions* sgOptions;
     sgOptions = dynamic_cast<const SGReaderWriterOptions*>(options);
-    osg::Node* result = NULL;
+    vsg::Node* result = NULL;
     simgear::ErrorReportContext ec{"btg", fileName};
     try {
         simgear::ReportBadAllocGuard g;

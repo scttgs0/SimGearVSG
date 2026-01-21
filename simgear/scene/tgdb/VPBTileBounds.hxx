@@ -26,17 +26,17 @@ using namespace osgTerrain;
 
 class TileBounds {
     public:
-        TileBounds(Locator *locator, osg::Vec3d up);
-        virtual std::list<osg::Vec3d> clipToTile(std::list<osg::Vec3d> points);
-        virtual bool insideTile(osg::Vec3d pt);
+        TileBounds(Locator *locator, vsg::dvec3 up);
+        virtual std::list<vsg::dvec3> clipToTile(std::list<vsg::dvec3> points);
+        virtual bool insideTile(vsg::dvec3 pt);
     
     protected:
-        virtual osg::Vec3d getTileIntersection(osg::Vec3d inside, osg::Vec3d outside);
-        virtual osg::Vec3d getPlaneIntersection(osg::Vec3d inside, osg::Vec3d outside, osg::Vec3d normal, osg::Vec3d plane);
+        virtual vsg::dvec3 getTileIntersection(vsg::dvec3 inside, vsg::dvec3 outside);
+        virtual vsg::dvec3 getPlaneIntersection(vsg::dvec3 inside, vsg::dvec3 outside, vsg::dvec3 normal, vsg::dvec3 plane);
 
         // Corners of the tile
-        osg::Vec3d v00, v01, v10, v11;
+        vsg::dvec3 v00, v01, v10, v11;
 
         // Plane normals for the tile bounds
-        osg::Vec3d north, east, south, west;
+        vsg::dvec3 north, east, south, west;
 };

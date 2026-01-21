@@ -272,13 +272,13 @@ public:
     return true;
   }
 
-  osg::ref_ptr<osg::Node> getSurfaceGeometry(SGMaterialCache* matcache) const
+  vsg::ref_ptr<vsg::Node> getSurfaceGeometry(SGMaterialCache* matcache) const
   {
     if (materialTriangleMap.empty())
       return 0;
 
-    osg::ref_ptr<EffectGeode> eg = NULL;
-    osg::ref_ptr<osg::Group> group = (materialTriangleMap.size() > 1 ? new osg::Group : NULL);
+    vsg::ref_ptr<EffectGeode> eg = NULL;
+    vsg::ref_ptr<vsg::Group> group = (materialTriangleMap.size() > 1 ? new vsg::Group : NULL);
     if (group) {
         group->setName("surfaceGeometryGroup");
     }
@@ -310,7 +310,7 @@ public:
               include_normals = false;
       }
 
-      osg::Geometry* geometry = i->second.buildGeometry(include_normals);
+      vsg::Geometry* geometry = i->second.buildGeometry(include_normals);
       eg->runGenerators(geometry);  // Generate extra data needed by effect
       eg->addDrawable(geometry);
       if (group) {

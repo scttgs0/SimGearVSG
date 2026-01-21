@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <osg/ref_ptr>
+#include <vsg/all.h>
+
 #include <osgParticle/SmokeTrailEffect>
 #include <osgParticle/Particle>
 #include <osgParticle/ModularEmitter>
@@ -27,7 +28,6 @@
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 #include <osg/Notify>
-#include <osg/Vec3>
 
 namespace osg
 {
@@ -61,7 +61,7 @@ class Particles : public osg::NodeCallback
 public:
     Particles() = default;
 
-    void operator()(osg::Node* node, osg::NodeVisitor* nv) override;
+    void operator()(vsg::Node* node, osg::NodeVisitor* nv) override;
 
     void setupShooterSpeedData(const SGPropertyNode* configNode,
                                SGPropertyNode* modelRoot);
@@ -136,11 +136,11 @@ protected:
     float endSize;
     float counterStaticValue;
     float counterStaticExtraRange;
-    osg::ref_ptr<osgParticle::RadialShooter> shooter;
-    osg::ref_ptr<osgParticle::RandomRateCounter> counter;
-    osg::ref_ptr<osgParticle::ParticleSystem> particleSys;
-    osg::ref_ptr<osgParticle::FluidProgram> program;
-    osg::ref_ptr<osg::MatrixTransform> particleFrame;
+    vsg::ref_ptr<osgParticle::RadialShooter> shooter;
+    vsg::ref_ptr<osgParticle::RandomRateCounter> counter;
+    vsg::ref_ptr<osgParticle::ParticleSystem> particleSys;
+    vsg::ref_ptr<osgParticle::FluidProgram> program;
+    vsg::ref_ptr<osg::MatrixTransform> particleFrame;
 
     bool useGravity = false;
     bool useWind = false;
@@ -156,9 +156,9 @@ public:
 
     bool isEnabled() const;
 
-    osg::ref_ptr<osg::Group> appendParticles(const SGPropertyNode* configNode, SGPropertyNode* modelRoot, const osgDB::Options* options);
+    vsg::ref_ptr<vsg::Group> appendParticles(const SGPropertyNode* configNode, SGPropertyNode* modelRoot, const osgDB::Options* options);
 
-    osg::Group* getCommonRoot();
+    vsg::Group* getCommonRoot();
     osg::Geode* getCommonGeode();
 
     void initFromMainThread();
@@ -178,10 +178,10 @@ public:
      * atmosphere. This vector is in the Z-up Y-north frame, and the
      * magnitude is the velocity in meters per second.
      */
-    void setWindVector(const osg::Vec3& wind);
+    void setWindVector(const vsg::vec3& wind);
     void setWindFrom(const double from_deg, const double speed_kt);
 
-    osg::Vec3 getWindVector() const;
+    vsg::vec3 getWindVector() const;
 
 private:
     ParticlesGlobalManager();
@@ -191,8 +191,8 @@ private:
     class RegistrationCallback;
 
     // because Private inherits NodeCallback, we need to own it
-    // via an osg::ref_ptr
-    osg::ref_ptr<ParticlesGlobalManagerPrivate> d;
+    // via an vsg::ref_ptr
+    vsg::ref_ptr<ParticlesGlobalManagerPrivate> d;
 };
 
 } // namespace simgear

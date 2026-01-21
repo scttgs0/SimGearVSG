@@ -5,25 +5,21 @@
 
 #pragma once
 
-#ifndef __cplusplus
-# error This library requires C++
-#endif
-
-#include <simgear/compiler.h>
-
-#include <vector>
 #include <set>
+#include <vector>
 
-#include <osg/Node>
+#include <vsg/all.h>
+
 #include <osg/Texture2D>
 #include <osgDB/ReaderWriter>
 
+#include <simgear/compiler.h>
 #include <simgear/misc/sg_path.hxx>
 #include <simgear/props/props.hxx>
 #include <simgear/scene/util/NodeAndDrawableVisitor.hxx>
 
-namespace simgear
-{
+
+namespace simgear {
 class SGReaderWriterOptions;
 }
 
@@ -60,9 +56,8 @@ SGLoadTexture2D(bool staticTexture, const SGPath& path,
                            mipmaplevels);
 }
 
-namespace simgear
-{
-osg::Node* copyModel(osg::Node* model);
+namespace simgear {
+vsg::Node* copyModel(vsg::Node* model);
 
 // Change the StateSets of a model to hold different textures based on
 // a livery path.
@@ -71,12 +66,13 @@ class TextureUpdateVisitor : public NodeAndDrawableVisitor
 {
 public:
     TextureUpdateVisitor(const osgDB::FilePathList& pathList);
-    virtual void apply(osg::Node& node);
+    virtual void apply(vsg::Node& node);
     virtual void apply(osg::Drawable& drawable);
     // Copied from Mathias' earlier SGTextureUpdateVisitor
 protected:
     osg::Texture2D* textureReplace(int unit, const osg::StateAttribute* attr);
     osg::StateSet* cloneStateSet(const osg::StateSet* stateSet);
+
 private:
     osgDB::FilePathList _pathList;
 };
@@ -88,18 +84,18 @@ class UserDataCopyVisitor : public osg::NodeVisitor
 {
 public:
     UserDataCopyVisitor();
-    virtual void apply(osg::Node& node);
+    virtual void apply(vsg::Node& node);
 };
 
 /**
  * Transform an OSG subgraph by substituting Effects and EffectGeodes
  * for osg::Geodes with osg::StateSets. This is only guaranteed to
- * work for models prouced by the .ac loader.
+ * work for models produced by the .ac loader.
  *
  * returns a copy if any nodes are changed
  */
-osg::ref_ptr<osg::Node>
-instantiateEffects(osg::Node* model,
+vsg::ref_ptr<vsg::Node>
+instantiateEffects(vsg::Node* model,
                    PropertyList& effectProps,
                    const SGReaderWriterOptions* options,
                    const SGPath& currentDir = SGPath{});
@@ -108,12 +104,12 @@ instantiateEffects(osg::Node* model,
  * Apply a set of material-defined effects to a model
  * Transform an OSG subgraph by substituting Effects and EffectGeodes
  * for osg::Geodes with osg::StateSets. This is only guaranteed to
- * work for models prouced by the .ac loader.
+ * work for models produced by the .ac loader.
  *
  * returns a copy if any nodes are changed
  */
-osg::ref_ptr<osg::Node>
-instantiateMaterialEffects(osg::Node* model,
+vsg::ref_ptr<vsg::Node>
+instantiateMaterialEffects(vsg::Node* model,
                            const SGReaderWriterOptions* options,
                            const SGPath& modelPath = SGPath{});
 
@@ -121,17 +117,17 @@ instantiateMaterialEffects(osg::Node* model,
  * Transform an OSG subgraph by substituting the Effects and
  * EffectGeodes for osg::Geodes with osg::StateSets, inheriting from
  * the default model effect. This is only guaranteed to work for
- * models prouced by the .ac loader.
+ * models produced by the .ac loader.
  *
  * returns a copy if any nodes are changed
  */
 
-inline osg::ref_ptr<osg::Node>
-instantiateEffects(osg::Node* model,
+inline vsg::ref_ptr<vsg::Node>
+instantiateEffects(vsg::Node* model,
                    const SGReaderWriterOptions* options,
                    const SGPath& currentDir = SGPath{})
 {
     PropertyList effectProps;
     return instantiateEffects(model, effectProps, options, currentDir);
 }
-}
+} // namespace simgear

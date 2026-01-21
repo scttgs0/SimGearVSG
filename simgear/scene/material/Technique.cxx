@@ -37,7 +37,7 @@ struct ValidateOperation : GraphicsOperation
     {
     }
     virtual void operator() (GraphicsContext* gc);
-    osg::ref_ptr<Technique> technique;
+    vsg::ref_ptr<Technique> technique;
     static const std::string opName;
 };
 
@@ -56,7 +56,7 @@ Technique::Technique(bool alwaysValid)
 }
 
 Technique::Technique(const Technique& rhs, const osg::CopyOp& copyop) :
-    osg::Object(rhs,copyop),
+    vsg::Object(rhs,copyop),
     _contextMap(rhs._contextMap), _alwaysValid(rhs._alwaysValid),
     _shadowingStateSet(copyop(rhs._shadowingStateSet.get())),
     _validExpression(rhs._validExpression),
@@ -188,7 +188,7 @@ void Technique::resizeGLObjectBuffers(unsigned int maxSize)
     _contextMap.resize(maxSize);
 }
 
-void Technique::releaseGLObjects(osg::State* state) const
+void Technique::releaseGLObjects(vsg::State* state) const
 {
     if (_shadowingStateSet.valid())
         _shadowingStateSet->releaseGLObjects(state);

@@ -12,7 +12,7 @@ using namespace simgear;
 using namespace std::string_literals;
 
 // Constructor
-Atlas::Atlas(osg::ref_ptr<const SGReaderWriterOptions> options) {
+Atlas::Atlas(vsg::ref_ptr<const SGReaderWriterOptions> options) {
 
     _options = options;
 
@@ -41,7 +41,7 @@ Atlas::Atlas(osg::ref_ptr<const SGReaderWriterOptions> options) {
     _internalFormat = GL_RGB;
     for (; _imageIndex < standardTextureCount; _imageIndex++) {
         // Copy the texture into the atlas in the appropriate place
-        osg::ref_ptr<osg::Image> subtexture = osgDB::readRefImageFile(Atlas::STANDARD_TEXTURES[_imageIndex], options);
+        vsg::ref_ptr<vsg::Image> subtexture = osgDB::readRefImageFile(Atlas::STANDARD_TEXTURES[_imageIndex], options);
 
         if (subtexture && subtexture->valid()) {
 
@@ -83,19 +83,19 @@ void Atlas::addMaterial(int landclass, bool isWater, bool isSea, SGSharedPtr<SGM
             return;
         }
 
-        _dimensions->setElement(_materialLookupIndex, osg::Vec4f(mat->get_xsize(), mat->get_ysize(), 0.0, (double) mat->get_parameter("edge-hardness")));
+        _dimensions->setElement(_materialLookupIndex, vsg::vec4(mat->get_xsize(), mat->get_ysize(), 0.0, (double) mat->get_parameter("edge-hardness")));
 
         // The following are material parameters that are normally built into the Effect as Uniforms.  In the WS30
         // case we need to pass them as an array, indexed against the material.
-        _materialParams1->setElement(_materialLookupIndex, osg::Vec4f(mat->get_parameter("transition_model"), mat->get_parameter("hires_overlay_bias"), mat->get_parameter("grain_strength"), mat->get_parameter("intrinsic_wetness")));
-        _materialParams2->setElement(_materialLookupIndex, osg::Vec4f(mat->get_parameter("dot_density"), mat->get_parameter("dot_size"), mat->get_parameter("dust_resistance"), mat->get_parameter("rock_strata")));
+        _materialParams1->setElement(_materialLookupIndex, vsg::vec4(mat->get_parameter("transition_model"), mat->get_parameter("hires_overlay_bias"), mat->get_parameter("grain_strength"), mat->get_parameter("intrinsic_wetness")));
+        _materialParams2->setElement(_materialLookupIndex, vsg::vec4(mat->get_parameter("dot_density"), mat->get_parameter("dot_size"), mat->get_parameter("dust_resistance"), mat->get_parameter("rock_strata")));
 
         if (std::find(mat->get_names().begin(), mat->get_names().end(), "Sand") != mat->get_names().end()) {
             SG_LOG(SG_GENERAL, SG_DEBUG, "Found Sand material inserted into Atlas. Landclass " << landclass << ", index " << _materialLookupIndex);
             _shoreAtlastIndex->set((int) _materialLookupIndex);
         }
 
-        _PBRParams->setElement(_materialLookupIndex, osg::Vec4f(mat->get_metallic(), mat->get_roughness(), mat->get_occlusion(), 0.0));
+        _PBRParams->setElement(_materialLookupIndex, vsg::vec4(mat->get_metallic(), mat->get_roughness(), mat->get_occlusion(), 0.0));
         _bumpmapAmplitude->setElement(_materialLookupIndex, mat->get_bumpmap_amplitude());
         _heightAmplitude->setElement(_materialLookupIndex, mat->get_height_amplitude());
         _emission->setElement(_materialLookupIndex, mat->get_emission());
@@ -143,7 +143,7 @@ void Atlas::addMaterial(int landclass, bool isWater, bool isSea, SGSharedPtr<SGM
             if (_textureMap.find(fullPath) == _textureMap.end()) {
                 // Add any missing textures into the atlas image
                 // Copy the texture into the atlas in the appropriate place
-                osg::ref_ptr<osg::Image> subtexture = osgDB::readRefImageFile(fullPath, _options);
+                vsg::ref_ptr<vsg::Image> subtexture = osgDB::readRefImageFile(fullPath, _options);
 
                 if (subtexture && subtexture->valid()) {
 
@@ -169,8 +169,8 @@ void Atlas::addMaterial(int landclass, bool isWater, bool isSea, SGSharedPtr<SGM
         // We now have a textureList containing the full set of textures.  Pack the relevant ones into the Vec4 of the index Uniform.
         // This is a bit of a hack to maintain compatibility with the WS2.0 material definitions, as the material definitions use the
         // 11-15th textures for the various overlay textures for terrain-default.eff, we do the same for ws30.eff
-        _textureLookup1->setElement(_materialLookupIndex, osg::Vec4f( (float) (textureList[0] / 255.0), (float) (textureList[11] / 255.0), (float) (textureList[12] / 255.0), (float) (textureList[13] / 255.0)));
-        _textureLookup2->setElement(_materialLookupIndex, osg::Vec4f( (float) (textureList[14] / 255.0), (float) (textureList[15] / 255.0), (float) (textureList[20] / 255.0), (float) (textureList[21] / 255.0)));
+        _textureLookup1->setElement(_materialLookupIndex, vsg::vec4( (float) (textureList[0] / 255.0), (float) (textureList[11] / 255.0), (float) (textureList[12] / 255.0), (float) (textureList[13] / 255.0)));
+        _textureLookup2->setElement(_materialLookupIndex, vsg::vec4( (float) (textureList[14] / 255.0), (float) (textureList[15] / 255.0), (float) (textureList[20] / 255.0), (float) (textureList[21] / 255.0)));
         _bvhMaterialMap[_materialLookupIndex] = mat;
     } else {
         SG_LOG(SG_TERRAIN, SG_ALERT, "Attempt to add undefined material to Material Atlas: " << landclass);

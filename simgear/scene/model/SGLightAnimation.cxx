@@ -10,10 +10,10 @@ SGLightAnimation::SGLightAnimation(simgear::SGTransientModelData &modelData) :
     _light = SGLight::appendLight(modelData.getConfigNode(), modelData.getModelRoot(), true);
 }
 
-osg::Group*
-SGLightAnimation::createAnimationGroup(osg::Group& parent)
+vsg::Group*
+SGLightAnimation::createAnimationGroup(vsg::Group& parent)
 {
-    osg::Group* group = new osg::Group;
+    vsg::Group* group = new vsg::Group;
     group->setName("light animation node");
     parent.addChild(group);
     group->addChild(_light);
@@ -21,7 +21,7 @@ SGLightAnimation::createAnimationGroup(osg::Group& parent)
 }
 
 void
-SGLightAnimation::install(osg::Node& node)
+SGLightAnimation::install(vsg::Node& node)
 {
     SGAnimation::install(node);
     // Hide the legacy light geometry

@@ -14,12 +14,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifdef HAVE_CONFIG_H
-#  include <simgear_config.h>
-#endif
+#include <simgear_config.h>
 
 #include <osg/StateSet>
-#include <osg/Camera>
 #include <osgViewer/Renderer>
 
 #include "EffectCullVisitor.hxx"
@@ -40,7 +37,7 @@ EffectCullVisitor::EffectCullVisitor(bool collectLights, const std::string &effS
 }
 
 EffectCullVisitor::EffectCullVisitor(const EffectCullVisitor& rhs) :
-    osg::Object(), CullVisitor(rhs),
+    vsg::Object(), CullVisitor(rhs),
     _collectLights(rhs._collectLights),
     _effScheme(rhs._effScheme)
 {
@@ -51,7 +48,7 @@ CullVisitor* EffectCullVisitor::clone() const
     return new EffectCullVisitor(*this);
 }
 
-void EffectCullVisitor::apply(osg::Node &node)
+void EffectCullVisitor::apply(vsg::Node &node)
 {
     CullVisitor::apply(node);
     if (_collectLights) {
@@ -104,7 +101,7 @@ void EffectCullVisitor::reset()
 }
 
 void
-installEffectCullVisitor(osg::Camera *camera,
+installEffectCullVisitor(vsg::Camera *camera,
                          bool collect_lights,
                          const std::string &effect_scheme)
 {
@@ -116,7 +113,7 @@ installEffectCullVisitor(osg::Camera *camera,
     }
     for (int i = 0; i < 2; ++i) {
         osgUtil::SceneView *sceneView = renderer->getSceneView(i);
-        osg::ref_ptr<osgUtil::CullVisitor::Identifier> identifier
+        vsg::ref_ptr<osgUtil::CullVisitor::Identifier> identifier
             = sceneView->getCullVisitor()->getIdentifier();
         sceneView->setCullVisitor(new EffectCullVisitor(collect_lights, effect_scheme));
         sceneView->getCullVisitor()->setIdentifier(identifier.get());

@@ -30,7 +30,7 @@
 #include "SGSceneUserData.hxx"
 
 SGSceneUserData*
-SGSceneUserData::getSceneUserData(osg::Node* node)
+SGSceneUserData::getSceneUserData(vsg::Node* node)
 {
   if (!node)
     return 0;
@@ -41,7 +41,7 @@ SGSceneUserData::getSceneUserData(osg::Node* node)
 }
 
 const SGSceneUserData*
-SGSceneUserData::getSceneUserData(const osg::Node* node)
+SGSceneUserData::getSceneUserData(const vsg::Node* node)
 {
   if (!node)
     return 0;
@@ -52,7 +52,7 @@ SGSceneUserData::getSceneUserData(const osg::Node* node)
 }
 
 SGSceneUserData*
-SGSceneUserData::getOrCreateSceneUserData(osg::Node* node)
+SGSceneUserData::getOrCreateSceneUserData(vsg::Node* node)
 {
   SGSceneUserData* userData = getSceneUserData(node);
   if (userData)
@@ -91,7 +91,7 @@ SGSceneUserData::addPickCallback(SGPickCallback* pickCallback)
   _pickCallbacks.push_back(pickCallback);
 }
 
-bool SGSceneUserData_writeLocalData(const osg::Object& obj, osgDB::Output& fw)
+bool SGSceneUserData_writeLocalData(const vsg::Object& obj, osgDB::Output& fw)
 {
     const SGSceneUserData& data = static_cast<const SGSceneUserData&>(obj);
 

@@ -17,22 +17,20 @@
 // Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 // Boston, MA  02110-1301, USA.
 
-#include "DeletionManager.hxx"
-
 #include <OpenThreads/ScopedLock>
-#include <osg/Node>
+
+#include "DeletionManager.hxx"
 #include "OsgSingleton.hxx"
 
-namespace simgear
-{
+
+namespace simgear {
 using namespace osg;
 
 bool DeletionManager::handle(const osgGA::GUIEventAdapter& ea,
                              osgGA::GUIActionAdapter&,
-                             osg::Object*, osg::NodeVisitor*)
+                             vsg::Object*, osg::NodeVisitor*)
 {
-    if (ea.getEventType() == osgGA::GUIEventAdapter::FRAME)
-    {
+    if (ea.getEventType() == osgGA::GUIEventAdapter::FRAME) {
         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_mutex);
         _staleObjects.resize(0);
     }
@@ -59,5 +57,4 @@ DeletionManager* DeletionManager::instance()
 {
     return SingletonRefPtr<DeletionManager>::instance();
 }
-}
-
+} // namespace simgear

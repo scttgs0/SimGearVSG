@@ -7,34 +7,35 @@
 
 #pragma once
 
+#include <memory> // for auto-ptr
+#include <string>
+
+#include <vsg/all.h>
+
 #include <simgear/compiler.h>
 
-#include <string>
-#include <memory> // for auto-ptr
 
-#include <osg/Node>
-
-class SGMaterialLib;            // forward declaration
+class SGMaterialLib; // forward declaration
 class SGGeod;
 
 // Generate a generic sign
-osg::Node* SGMakeSign( SGMaterialLib *matlib, const std::string& content );
+vsg::Node* SGMakeSign(SGMaterialLib* matlib, const std::string& content);
 
-namespace simgear
-{
+namespace simgear {
 
 class AirportSignBuilder final
 {
 public:
     AirportSignBuilder(SGMaterialLib* mats, const SGGeod& center);
-    ~AirportSignBuilder();      // non-virtual intentional
+    ~AirportSignBuilder(); // non-virtual intentional
 
     void addSign(const SGGeod& pos, double heading, const std::string& content, int size);
 
-    osg::Node* getSignsGroup();
+    vsg::Node* getSignsGroup();
+
 private:
     class AirportSignBuilderPrivate;
     std::unique_ptr<AirportSignBuilderPrivate> d;
 };
 
-} // of namespace simgear
+} // namespace simgear
